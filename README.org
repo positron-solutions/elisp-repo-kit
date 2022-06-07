@@ -1,0 +1,319 @@
+#+TITLE: Elisp Repo Kit
+
+#+PROPERTY: LOGGING nil
+
+# NOTE: To avoid having this in the info manual, we use HTML rather than Org
+# syntax; it still appears with the GitHub renderer.
+#+HTML: <a href="https://melpa.org/#/elisp-repo-kit"><img src="https://melpa.org/packages/elisp-repo-kit-badge.svg" alt="melpa package"></a> <a href="https://stable.melpa.org/#/elisp-repo-kit"><img src="https://stable.melpa.org/packages/elisp-repo-kit-badge.svg" alt="melpa stable package"></a>
+#+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/ci.yml/badge.svg" alt="CI workflow status"></a>
+#+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://badgen.net/github/checks/positron-solutions/elisp-repo-kit/release-0.11.0/ubuntu" alt="Linux tests"></a>
+#+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://badgen.net/github/checks/positron-solutions/elisp-repo-kit/release-0.11.0/mac" alt="MacOS tests"></a>
+#+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=DCO+Check"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/lco.yml/badge.svg" alt="DCO Check"></a>
+
+Quickly start up an Emacs repository with:
+
+- An [[https://www.youtube.com/watch?v=RQK_DaaX34Q&list=PLEoMzSkcN8oPQtn7FQEF3D7sroZbXuPZ7][elisp]] package
+- Bytecode compiling, linting, and test running
+- CI with
+  [[https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs][Github
+  Actions]], configured for Darwin (MacOS) and Linux
+- [[https://nixos.org/#examples][Nix]] environment for obtaining dependencies or
+  reproducibly developing CI locally
+- Licensing, [[https://developercertificate.org/][DCO]], and DCO sign-off checks for PR's
+- [[https://github.com/melpa/melpa][MELPA]] publishing compatible
+
+*To get started:*
+
+The easest way is to *use the package to clone and rename the package.*
+
+** Install elisp-repo-kit
+
+  #+begin_src elisp
+    (use-package elisp-repo-kit)
+
+    ;; straight-use-package-by-default t and you want a git version
+    (use-package elisp-repo-kit
+      :straight
+      (elisp-repo-kit :type git :host github :repo "positron-solutions/elisp-repo-kit"))
+
+    ;; if straight-use-package-by-default is nil
+    (straight-use-package '(elisp-repo-kit :type git :host github
+                                           :repo "positron-solutions/elisp-repo-kit"))
+
+    ;; or use melpa, manual load-path & require, you brave yak shaver
+  #+end_src
+
+ Just call =elisp-repo-kit-= and provide a directory, answer all
+ of the questions, and you're ready to go create your repo and set your upstream
+ using magit.
+
+ The command calls =elisp-repo-kit-rename-relicense= as well to rename all of
+ the files, string replace names, re-license to GPL3.
+
+ Now just follow the steps in [[#finish-setting-up-your-new-github-repo][finish
+ setting up]] Have fun!
+
+*** Manual cloning
+
+  The standalone command, =elisp-repo-kit-clone= will clone without renaming.
+
+  This repo is also a
+  [[https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template][template
+  repository]], so you can fork without forking (Bruce Lee).
+
+  If you create via template or clone manually, it's presumed you know what
+  you're doing at that point.  Call =elisp-repo-kit-rename= on its own to rename
+  in these cases.
+
+* Contents                                                         :noexport:
+:PROPERTIES:
+:TOC:      :include siblings
+:END:
+:CONTENTS:
+- [[#local-development-instructions][Local development instructions]]
+  - [[#run-tests][Run tests]]
+  - [[#lint-and-byte-compile--code][Lint and byte-compile  code]]
+- [[#finish-setting-up-your-new-github-repo][Finish setting up your new Github repo]]
+  - [[#optional-steps][Optional Steps]]
+- [[#publishing-melpa][Publishing (MELPA)]]
+- [[#maintaining-your-versions][Maintaining your versions]]
+- [[#licensing-developer-certificate-of-origin][Licensing, Developer Certificate of Origin]]
+  - [[#license][License]]
+  - [[#developer-certificate-of-origin-dco][Developer Certificate of Origin (DCO)]]
+    - [[#sign-off][Sign-off]]
+    - [[#gpg-signature][GPG signature]]
+    - [[#user-setup-for-submitting-changes][User setup for submitting changes]]
+      - [[#automatically-add-sign-off][Automatically add sign-off]]
+      - [[#automatic-gpg-signing-with-per-project-keys][Automatic GPG signing with per-project keys]]
+      - [[#manually-signing--adding-sign-off][Manually signing & adding sign-off]]
+- [[#shout-outs][Shout-outs]]
+:END:
+
+* Local development instructions
+
+** Run tests
+
+You can /totally/ run the tests locally on whatever version of Emacs you have.
+*You do not need Nix to run tests.* CI will use Nix.  If you cannot reproduce a
+success (or failure) on CI, then you may want to switch to using nix to get a
+reprodicible toolchain so you can further develop with frozen versions from the
+nix [[https://nixos.wiki/wiki/Flakes][flake's]] flake.lock.
+
+#+begin_src bash
+  nix develop # loads the devShells.default from flake.nix
+  direnv allow # same as above with file watching
+  emacs --quick --load ./test/elisp-repo-kit-test-setup.el # graphical
+  emacs --script ./test/elisp-repo-kit-test-setup.el # terminal
+#+end_src
+
+** Lint and byte-compile  code
+
+Use [[https://github.com/gonewest818/elisp-lint][elisp-lint]] to detect issues
+with byte compiling, package format, code structure and others.  The
+configuration is found inside
+[[./test/elisp-repo-kit-test-lint.el][elisp-repo-kit-test-lint.el]] and the CI
+run is invoked inside of [[.github/workflows/ci.yml][ci.yml]] using Emacs in
+script mode.  Most of the configuration is in the lisp files.  CI only tests on
+on one platform, with native compilation enabled.
+
+You can run the lints manually almost the same as running tests.
+#+begin_src bash
+  nix develop
+  emacs --script ./test/elisp-repo-kit-lint.el
+  emacs --script test/elisp-repo-kit-lint-tests.el
+#+end_src
+
+# NOTE: Native compilation is stated to be asynchronous.  I should verify that
+# code is compiled before run.
+
+* Finish setting up your new Github repo
+
+You can copy this checklist to your org agenda files:
+
+- [X] Use this template to set up your repository.
+- [ ] Set up your git commit signing *and* [[#sign-off][sign-off]] so that it will
+  be straightforward for FSF to pull in any changes they want later
+- [ ] Sign up for [[https://app.cachix.org/][cachix]] and, create a binary cache
+  with API tokens and publice read access.
+- [ ] Add secrets necessary for your Github actions =CACHIX_AUTH_TOKEN= and
+  =CACHIX_CACHE_NAME=.
+- [ ] Enable actions and add the following actions to your allowed actions
+  list:
+
+  #+begin_src
+  actions/checkout@v2.4.2,
+  cachix/cachix-action@v10,
+  cachix/install-nix-action@v15,
+  tisonkun/actions-dco@v1.1
+  #+end_src
+
+- [ ] Get your package working, pushed, actions run, and CI badges all green
+- [ ] Publish to MELPA
+- [ ] Make a post on the [[https://old.reddit.com/r/emacs/][subreddit]] about your new package
+
+** Optional Steps
+
+ - [ ] Install =org-make-toc= for the automatic TOC generation in this org
+   document to work.
+ - [ ] Branch protect and enable checks for your default branch (usually master).
+   Merge commits, verified only, and no force push are recommended settings.
+ - [ ] Require contributors to sign-off on web-based commits
+
+Cachix is somewhat optional.  It's free for open-source projects.  It's about as
+easy to sign up and generate the token as to remove the step from the Github
+actions.
+
+* Publishing (MELPA)
+
+The following template can be filled in and pull-requested to MELPA to publish.
+You don't need to touch ~:files~ and ~commit~ and ~branch~ are optional
+depending on how you version / develop / tag.
+
+#+begin_src
+(elisp-repo-kit :fetcher github :repo "positron-solutions/elisp-repo-kit")
+#+end_src
+
+* Maintaining your versions
+
+Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]]
+and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get updates from MELPA, it's necessary to
+update the emacs-overlay with =nix flake lock --update-input emacs-overlay=.
+You can also specify revs and branches if you need to roll back.  MacOS tends to
+get a little less test emphasis, and so =nixpkgs-darwin-<version>= branches
+exist and are required to pass more Darwin tests before merging.  This is more
+stable if you are on MacOS. =nixpkgs-unstable= or =master= are your other less
+common options.
+
+* Licensing, Developer Certificate of Origin
+
+  This project is distributed with a Developer Certificate of Origin.  By adding
+  a sign-off notice to each commit, and by signing each commit, you will provide
+  means to authenticate your sign-off later, prevent forgery, and enforce the
+  DCO & License.
+
+  If you fail to implement this scheme, Emacs core will have significant reasons
+  not to directly merge changes that accumulate in your package because there
+  will not be a clear chain of authorship.
+
+** License
+
+   This template project is distributed with the MIT license. Running the rename
+   command will automatically switch to the GPL license.  *The MIT license
+   allows re-licensing, and so this change is compatible.* If you accept
+   non-trivial changes to your project, it will be very hard to change the GPL3
+   later, so consider this choice.
+
+** Developer Certificate of Origin (DCO)
+
+   A [[./DCO][copy of the DCO]] is distributed with this project.  Read its text to
+   understand the significance of configuring for sign-off.
+
+*** Sign-off
+
+    A sign-off means adding a "trailer" to your commit that looks like the
+    following:
+
+    #+begin_src
+    Signed-off-by: Random J Developer <random@developer.example.org>
+    #+end_src
+
+*** GPG signature
+
+    A GPG signed commit shows that the owner of the private key submitted the
+    changes.  Wherever signatures are recorded in chains, they can demonstrate
+    participation in changes elsewhere and awareness of what the submitter is
+    participating in.  While forgeries could still allow plagiarized changes to
+    be submitted, revealing this would cause the submitter to face legal
+    exposure, and so it is unlikely that the authenticity of a forgery will ever
+    be proven by the submitter, even though they have clearly provided the means
+    of incontrovertibly doing so.
+
+*** User setup for submitting changes
+
+    Follow these instructions before you get ready to submit a pull-request.
+
+    Refer to the
+    [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][Github
+    signing commits]] instructions to set up your git client to add GPG
+    signatures.  File issues if you run into Emacs-specific problems.
+
+    Because signing is intended to be a conscious process, please remember to
+    read and understand the [[./DCO][Developer Certificate of Origin]] before confinguring
+    your client to automatically sign-off on commits.
+
+**** Automatically add sign-off
+
+     In magit, set the =-s= switch.  Use =C-x C-s= (=transient-save=) to
+     preserve this switch on future uses.  (Note, this is not per-project).You
+     can also set the signature flag this way.
+
+**** Automatic GPG signing with per-project keys
+    
+    In order to specify which projects you intend to sign with which keys, you
+    will want to configure your git client using path-specific configurations.
+
+    Configuing git for this can be done with the following directory structure:
+
+    #+begin_src
+    /home/rjdeveloper/
+    ├── .gitconfig
+    └── .gitconfig.d
+        ├── sco-linux-projects.conf
+        ├── other-projects.conf
+        └── gpg-signing-projects.conf
+    #+end_src
+
+    In your root config, ~.gitconfig~, add an =includeIf= directive that will load the
+    configuration you use for projects you intend to GPG sign commits for.
+
+    #+begin_src
+    [includeIf "gitdir:/home/rjdeveloper/**/gpg-signing/**/.git"]
+      path = "~/.gitconfig.d/gpg-signing-projects.conf"
+    #+end_src
+
+    In the ~gpg-signing-projects.conf~ add your GPG signing configuration from
+    earlier.  =sign= adds the GPG signature automatically.  File an issue if you
+    need help with multiple GPG homes or other configurations.
+
+    #+begin_src
+    [user]
+      name = "Random J Developer"
+      email = "random@developer.example.org"
+      signingkey = "5FF0EBDC623B3AD4"
+
+    [commit]
+      sign = true
+      gpgSign = true
+    #+end_src
+
+**** Manually signing & adding sign-off
+
+    If you don't like these configurations and want to individually indicate you
+    have read and intend to apply the DCO to your changes, these commands are
+    equivalent:
+
+    #+begin_src bash
+      git commit -s -S --message "I don't like using .gitconfig"
+
+      # To clean up a commit
+      git commit --amend -s -S --no-message
+
+      # Combine with rebase to sign / sign-off multiple existing commits
+      git rebase -i
+    #+end_src
+
+* Shout-outs
+
+- [[https://github.com/alphapapa][alphapapa]] for being super prolific at
+  everything, including package writing, documentation, and activity on various
+  social platforms
+- [[https://github.com/adisbladis][adisbladis]] for the Nix overlay that makes
+  the CI and local development so nice
+- [[https://www.fsf.org/][FSF]] for the Yak shaving club
+
+# Local Variables:
+# eval: (require 'org-make-toc)
+# before-save-hook: org-make-toc
+# org-export-with-properties: ()
+# org-export-with-title: t
+# End:

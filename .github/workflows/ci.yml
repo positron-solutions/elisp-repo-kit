@@ -1,0 +1,108 @@
+# Copyright (C) 2022 <Positron Solutions>
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+# the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+name: CI
+
+on: # trigger this workflow on
+  push:
+    branches: [ $default-branch ] # pushes to the default branch
+  pull_request:
+    # or every pull request, from any branch to any branch
+
+  workflow_dispatch:
+    # Allows you to run this workflow manually from the Actions tab
+
+jobs:
+  continuous-integration: # just a job name
+
+    # Run on every OS and Emacsen
+    # Some steps specify their own logic!
+    strategy:
+      # Don't abort steps if any fails on any platform
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        emacsPkg: [ emacsNativeComp
+                    emacsUnstable
+                    # emacsGit
+                    # emacs
+                  ]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2.4.2
+      - uses: cachix/install-nix-action@v15
+        with:
+          extra_nix_config: |
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - uses: cachix/cachix-action@v10
+        with:
+          name: cargo2nix-gh
+          # This CACHIX_AUTH_TOKEN is a secret you must provide
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          # Some paths may confuse cachix.  Add them with a pipe to the pushFilter
+          # pushFilter: "(something-else$|.drv.chroot$)"
+
+      # Loading the development shell with frozen versions is important to
+      # verify that any flake commands will successfully run straight off of the
+      # github repository.
+      - name: load the shell with frozen versions
+        run: nix develop .#${{ matrix.emacsPkg }} --ignore-environment --command "emacs" "--version"
+
+      # Linting the package is less useful on multiple version.  Modify the
+      # logic if you wish to expand lint coverage.
+      - name: lint package
+        if: matrix.emacsPkgs == "emacsNativeComp" && matrix.os == "ubuntu-latest"
+        run: |
+          nix develop \
+            --override-input nixpkgs github:nixos/nixpkgs/release-22.05
+            --update-input emacs-overlay \
+            .#${{ matrix.emacsPkg }}
+
+          # Lint the package
+          emacs --script ./test/elisp-repo-kit-lint.el
+
+          # Lint the tests
+          emacs --script test/elisp-repo-kit-lint-tests.el
+
+      - name: run tests
+        run: |
+          # First load the shell.  Updating inputs will update the view of ELPA
+          # Emacs git, and nixpkgs.
+
+          # Possible RUNNER_OS values: Windows Linux MacOS
+          # https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+          if [[ $RUNNER_OS == Linux ]]; then
+            nix develop \
+              --override-input nixpkgs github:nixos/nixpkgs/release-22.05
+              --update-input emacs-overlay \
+              .#${{ matrix.emacsPkg }}
+
+          else
+            nix develop \
+              --override-input nixpkgs github:nixos/nixpkgs/nixpkgs-22.05-darwin
+              --update-input emacs-overlay
+              .#${{ matrix.emacsPkg }}
+          fi
+
+          # Runs the tests
+          emacs --quick --load test/emacs-repo-kit-test-setup.el -- $GITHUB_SHA
+
+          # If you need terminal tests too, uncomment
+          # emacs --script test/emacs-repo-kit-test-setup.el -- $GITHUB_SHA
