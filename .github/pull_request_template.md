@@ -17,4 +17,4 @@ the git log.
 1. **Allow maintainers to make changes to your pull request** (there's a
    checkbox)
 1. Once the pull request has been approved, you will be thanked and observe your
-   changes applied with authorshi, signature, and sign-off in the git log
+   changes applied with authorship, signature, and sign-off in the git log
