@@ -92,6 +92,7 @@ answer all the questions.
       - [[#automatic-gpg-signing-with-per-project-keys][Automatic GPG signing with per-project keys]]
       - [[#manually-signing--adding-sign-off][Manually signing & adding sign-off]]
 - [[#shout-outs][Shout-outs]]
+- [[#footnote-on-fsf-and-emacs-core-licensing][Footnote on FSF and Emacs Core Licensing]]
 :END:
 
 * Local development instructions
@@ -151,7 +152,7 @@ You can copy this checklist to your org agenda files:
 - [X] Create a repository (from [[#Install elisp-repo-kit][install]] instructions)
 - [ ] Create an empty Github repository and check the git remote configuration
 - [ ] Set up your git commit signing *and* [[#sign-off][sign-off]] so that it will
-  be straightforward[fn:1] for for FSF to pull in your changes if they want to
+  be [[#Footnote-on-FSF-and-Emacs-Core-Licensing][straightforward]] for for FSF to pull in your changes if they want to
   later
 - [ ] Sign up for [[https://app.cachix.org/][cachix]] and, create a binary cache
   with API tokens and publice read access
@@ -336,7 +337,9 @@ common options.
 - [[https://www.fsf.org/][FSF]] for the Yak shaving club
 - [[https://github.com/NobbZ][NobbZ]] for being all over the Nix & Emacs interwebs
 
-[fn:1] Free Software Foundation currently requires copyright assignment on all
+* Footnote on FSF and Emacs Core Licensing
+
+Free Software Foundation currently requires copyright assignment on all
 code that goes into Emacs core.  The DCO is a practice accepted by git, GCC, and
 the [[https://wiki.linuxfoundation.org/dco][Linux Kernel]].  Doing DCO sign-off
 is not the same as copyright assignment.  Doing DCO cannot guarantee change at
