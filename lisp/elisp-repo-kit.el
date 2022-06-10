@@ -138,22 +138,29 @@ for CI & local development."
     msg))
 
 ;;;###autoload
-(defun elisp-repo-kit-clone (clone-root package-name &optional rev)
+(defun elisp-repo-kit-clone (clone-root package-name user-org &optional rev)
   "Clone elisp-repo-kit to CLONE-ROOT and apply rename.
-PACKAGE-NAME will instruct git how to name the clone.
-REV can be used to check out a specific revision.  Warning!  The
-revision may have lost compatibility with the rename script.
-Each rev is intended only to be able to rename itself, as a quine
-and for forking as a new template repository."
+PACKAGE-NAME will instruct git how to name the clone.  USER-ORG
+is the user or organization you will use for your Github
+repository.  REV can be used to check out a specific revision.
+Warning!  The revision may have lost compatibility with the
+rename script.  Each rev is intended only to be able to rename
+itself, as a quine and for forking as a new template repository."
   (interactive "DClone to directory:")
   (if-let ((git-bin (executable-find "git")))
       (progn
         (shell-command
          (format "cd %s; %s clone https://github.com/positron-solutions/elisp-repo-kit.git %s"
                  clone-root git-bin package-name))
+        (shell-command
+         (format "cd %s/%s" clone-root package-name))
         (when rev
-          (shell-command
-           (format "cd %s/%s; %s checkout %s" clone-root package-name git-bin rev)))
+          (shell-command (format "%s checkout %s" git-bin rev)))
+        (shell-command
+         (format "%s remote rm origin" git-bin))
+        (shell-command
+         (format "%s remote add origin git@github.com:%s/%s.git"
+                 git-bin user-org package-name))
         (concat clone-root "/" package-name "/"))
     (error "Could not find git executible")))
 
@@ -204,7 +211,7 @@ and more details about argument usage.."
   (interactive "sPackage name: \nsAuthor: \nsGithub organization or username: \
 \nsEmail: \nsRev tag, or branch: ")
   (elisp-repo-kit-rename-relicense
-   (elisp-repo-kit-clone clone-root package-name rev)
+   (elisp-repo-kit-clone clone-root package-name user-org rev)
    package-name author user-org email))
 
 (provide 'elisp-repo-kit)
