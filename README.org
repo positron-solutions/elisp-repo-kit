@@ -6,8 +6,8 @@
 # syntax; it still appears with the GitHub renderer.
 #+HTML: <a href="https://melpa.org/#/elisp-repo-kit"><img src="https://melpa.org/packages/elisp-repo-kit-badge.svg" alt="melpa package"></a> <a href="https://stable.melpa.org/#/elisp-repo-kit"><img src="https://stable.melpa.org/packages/elisp-repo-kit-badge.svg" alt="melpa stable package"></a>
 #+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/ci.yml/badge.svg" alt="CI workflow status"></a>
-#+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://badgen.net/github/checks/positron-solutions/elisp-repo-kit/release-0.11.0/ubuntu" alt="Linux tests"></a>
-#+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://badgen.net/github/checks/positron-solutions/elisp-repo-kit/release-0.11.0/mac" alt="MacOS tests"></a>
+#+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://badgen.net/github/checks/positron-solutions/elisp-repo-kit/master/ubuntu" alt="Linux tests"></a>
+#+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://badgen.net/github/checks/positron-solutions/elisp-repo-kit/master/mac" alt="MacOS tests"></a>
 #+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=Developer+Certificate+of+Origin"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/lco.yml/badge.svg" alt="DCO Check"></a>
 
 Quickly start up an Emacs lisp repository on Github with:
