@@ -34,14 +34,12 @@ jobs:
     # Run on every OS and Emacsen
     # Some steps specify their own logic!
     strategy:
-      # Don't abort steps if any fails on any platform
-      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        emacsPkg: [ emacsNativeComp
-                    emacsUnstable
+        emacsPkg: [ emacsNativeComp,
+                    emacsUnstable,
                     # emacsGit
-                    # emacs
+                    emacs
                   ]
     runs-on: ${{ matrix.os }}
 
@@ -53,11 +51,12 @@ jobs:
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
       - uses: cachix/cachix-action@v10
         with:
-          name: cargo2nix-gh
-          # This CACHIX_AUTH_TOKEN is a secret you must provide
+          # This CACHIX_AUTH_TOKEN & CACHIX_CACHE_NAME are secrets you must set
+          # in your repository settings
+          name: ${{ secrets.CACHIX_CACHE_NAME }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           # Some paths may confuse cachix.  Add them with a pipe to the pushFilter
-          # pushFilter: "(something-else$|.drv.chroot$)"
+          pushFilter: "(.drv.chroot$)"
 
       # Loading the development shell with frozen versions is important to
       # verify that any flake commands will successfully run straight off of the
@@ -68,15 +67,18 @@ jobs:
       # Linting the package is less useful on multiple version.  Modify the
       # logic if you wish to expand lint coverage.
       - name: lint package
-        if: matrix.emacsPkgs == "emacsNativeComp" && matrix.os == "ubuntu-latest"
+        if: matrix.emacsPkg == 'emacs' && matrix.os == 'ubuntu-latest'
         run: |
-          nix develop \
-            --override-input nixpkgs github:nixos/nixpkgs/release-22.05
+          eval "$(nix print-dev-env \
+            --override-input nixpkgs github:nixos/nixpkgs/release-22.05 \
             --update-input emacs-overlay \
-            .#${{ matrix.emacsPkg }}
+            .#${{ matrix.emacsPkg }})"
+
+          echo $PWD
+          ls
 
           # Lint the package
-          emacs --script ./test/elisp-repo-kit-lint.el
+          emacs --script test/elisp-repo-kit-lint.el
 
           # Lint the tests
           emacs --script test/elisp-repo-kit-lint-tests.el
@@ -88,21 +90,27 @@ jobs:
 
           # Possible RUNNER_OS values: Windows Linux MacOS
           # https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+
+          # These eval "$(nix print-dev-env)" calls alter the shell.  In a
+          # non-interactive shell like CI, calling nix develop doesn't have the
+          # same behavior.  Use --command or modify the shell using eval and nix
+          # print-dev-env
           if [[ $RUNNER_OS == Linux ]]; then
-            nix develop \
-              --override-input nixpkgs github:nixos/nixpkgs/release-22.05
+            eval "$(nix print-dev-env  \
+              --override-input nixpkgs github:nixos/nixpkgs/release-22.05 \
               --update-input emacs-overlay \
-              .#${{ matrix.emacsPkg }}
+              .#${{ matrix.emacsPkg }})"
 
           else
-            nix develop \
-              --override-input nixpkgs github:nixos/nixpkgs/nixpkgs-22.05-darwin
-              --update-input emacs-overlay
-              .#${{ matrix.emacsPkg }}
+            eval "$(nix print-dev-env \
+              --override-input nixpkgs github:nixos/nixpkgs/nixpkgs-22.05-darwin \
+              --update-input emacs-overlay \
+              .#${{ matrix.emacsPkg }})"
           fi
 
-          # Runs the tests
-          emacs --quick --load test/emacs-repo-kit-test-setup.el -- $GITHUB_SHA
+          # Runs the tests in a graphical window (can freeze)
+          # emacs --quick --load test/elisp-repo-kit-test-setup.el -- $GITHUB_SHA
 
-          # If you need terminal tests too, uncomment
-          # emacs --script test/emacs-repo-kit-test-setup.el -- $GITHUB_SHA
+          # Run tests with terminal output and no graphical window
+          ls test
+          emacs --script test/elisp-repo-kit-test-setup.el -- $GITHUB_SHA
