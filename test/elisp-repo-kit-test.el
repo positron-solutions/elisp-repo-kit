@@ -42,10 +42,11 @@ for CI & local development."
   "Clone the repo and rename it, single step."
   (let ((rev (pop argv)))
     (elisp-repo-kit-new
-     (concat default-directory "clone-test/") ; test dir
+     default-directory
      "psionic-fusor" ; project-name
      "Selindis Raszagal" ; Author
      "new-shakuras" ; user-org
+     "selindis@new-shakuras.planet" ; email
      rev))) ; possibly nil
 
 (provide 'elisp-repo-kit-test)

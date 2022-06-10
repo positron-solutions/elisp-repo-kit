@@ -54,7 +54,7 @@
           "emacsUnstable"
           # from nixpkgs
           "emacs"
-          "emacs27"
+          "emacs28"
         ];
 
         # let's have a development shell per Emacs!
