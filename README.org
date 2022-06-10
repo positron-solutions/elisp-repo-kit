@@ -10,7 +10,7 @@
 #+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://badgen.net/github/checks/positron-solutions/elisp-repo-kit/release-0.11.0/mac" alt="MacOS tests"></a>
 #+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=Developer+Certificate+of+Origin"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/lco.yml/badge.svg" alt="DCO Check"></a>
 
-Quickly start up an Emacs repository with:
+Quickly start up an Emacs lisp repository on Github with:
 
 - An [[https://www.youtube.com/watch?v=RQK_DaaX34Q&list=PLEoMzSkcN8oPQtn7FQEF3D7sroZbXuPZ7][elisp]] package
 - Bytecode compiling, linting, and test running
@@ -24,7 +24,8 @@ Quickly start up an Emacs repository with:
 
 *To get started:*
 
-The easest way is to *use the package to clone and rename the package.*
+Install the package and run =elisp-repo-kit-new=, provide a directory, and
+answer all the questions.
 
 ** Install elisp-repo-kit
 
@@ -43,14 +44,17 @@ The easest way is to *use the package to clone and rename the package.*
     ;; or use melpa, manual load-path & require, you brave yak shaver
   #+end_src
 
- Just call =elisp-repo-kit-= and provide a directory, answer all
- of the questions, and you're ready to go create your repo and set your upstream
- using magit.
+=elisp-repo-kit-new= will ask for:
 
- The command calls =elisp-repo-kit-rename-relicense= as well to rename all of
- the files, string replace names, re-license to GPL3.
+  - Root directory you want to clone to
+  - Package name
+  - Author name
+  - Github user or organization
+  - Email address
 
- Now just follow the steps in [[#finish-setting-up-your-new-github-repo][finish
+ The =elisp-clone-repo-kit-new= calls =elisp-repo-kit-rename-relicense= to
+ rename all of the files, string replace names, and re-license to GPL3.  Now
+ just follow the steps in [[#finish-setting-up-your-new-github-repo][finish
  setting up]] Have fun!
 
 *** Manual cloning
@@ -72,7 +76,8 @@ The easest way is to *use the package to clone and rename the package.*
 :CONTENTS:
 - [[#local-development-instructions][Local development instructions]]
   - [[#run-tests][Run tests]]
-  - [[#lint-and-byte-compile--code][Lint and byte-compile  code]]
+  - [[#lint-and-byte-compile-code][Lint and byte-compile code]]
+  - [[#loading-and-re-loading-your-package][Loading and re-loading your package]]
 - [[#finish-setting-up-your-new-github-repo][Finish setting up your new Github repo]]
   - [[#optional-steps][Optional Steps]]
 - [[#publishing-melpa][Publishing (MELPA)]]
@@ -106,7 +111,7 @@ nix [[https://nixos.wiki/wiki/Flakes][flake's]] flake.lock.
   emacs --script ./test/elisp-repo-kit-test-setup.el # terminal
 #+end_src
 
-** Lint and byte-compile  code
+** Lint and byte-compile code
 
 Use [[https://github.com/gonewest818/elisp-lint][elisp-lint]] to detect issues
 with byte compiling, package format, code structure and others.  The
@@ -114,7 +119,9 @@ configuration is found inside
 [[./test/elisp-repo-kit-test-lint.el][elisp-repo-kit-test-lint.el]] and the CI
 run is invoked inside of [[.github/workflows/ci.yml][ci.yml]] using Emacs in
 script mode.  Most of the configuration is in the lisp files.  CI only tests on
-on one platform, with native compilation enabled.
+on one platform, with native compilation enabled.  The tests are also linted, to
+a less restrictive standard, found in
+[[./test/elisp-repo-kit-test-lint-tests.el][elisp-repo-kit-test-lint-tests.el]]
 
 You can run the lints manually almost the same as running tests.
 #+begin_src bash
@@ -123,6 +130,17 @@ You can run the lints manually almost the same as running tests.
   emacs --script test/elisp-repo-kit-lint-tests.el
 #+end_src
 
+Stale bytecode can result in stale test behavior.  A Makefile is not yet
+available, so just delete all =*.elc= files in /lisp and /test.
+
+** Loading and re-loading your package
+
+To load your local development version while hacking in Emacs, run
+=emacs-lisp-byte-compile-and-load= (this is a built-in function of emacs, not
+part of elisp-repo-kit).  *When you need to reload the package, call
+=unload-feature= and select your package name.*  If you do not unload, reloading
+has no effect and you will see stale behavior.
+
 # NOTE: Native compilation is stated to be asynchronous.  I should verify that
 # code is compiled before run.
 
@@ -130,13 +148,15 @@ You can run the lints manually almost the same as running tests.
 
 You can copy this checklist to your org agenda files:
 
-- [X] Use this template to set up your repository.
+- [X] Create a repository (from [[#Install elisp-repo-kit][install]] instructions)
+- [ ] Create an empty Github repository and check the git remote configuration
 - [ ] Set up your git commit signing *and* [[#sign-off][sign-off]] so that it will
-  be straightforward for FSF to pull in any changes they want later
+  be straightforward[fn:1] for for FSF to pull in your changes if they want to
+  later
 - [ ] Sign up for [[https://app.cachix.org/][cachix]] and, create a binary cache
-  with API tokens and publice read access.
+  with API tokens and publice read access
 - [ ] Add secrets necessary for your Github actions =CACHIX_AUTH_TOKEN= and
-  =CACHIX_CACHE_NAME=.
+  =CACHIX_CACHE_NAME=
 - [ ] Enable actions and add the following actions to your allowed actions
   list:
 
@@ -155,9 +175,13 @@ You can copy this checklist to your org agenda files:
 
  - [ ] Install =org-make-toc= for the automatic TOC generation in this org
    document to work.
- - [ ] Branch protect and enable checks for your default branch (usually master).
-   Merge commits, verified only, and no force push are recommended settings.
- - [ ] Require contributors to sign-off on web-based commits
+ - [ ] Branch protect and enable check requirements for your default branch
+   (usually master).  Merge commits, verified only, and no force push are
+   recommended settings.
+ - [ ] Enable requiring contributors to sign-off on web-based commits
+ - [ ] For security of your Cachix secrets and any other secrets you may someday
+   add, require Actions approval for all outside contributors and leave
+   repository permissions at read-only
 
 Cachix is somewhat optional.  It's free for open-source projects.  It's about as
 easy to sign up and generate the token as to remove the step from the Github
@@ -310,6 +334,14 @@ common options.
 - [[https://github.com/adisbladis][adisbladis]] for the Nix overlay that makes
   the CI and local development so nice
 - [[https://www.fsf.org/][FSF]] for the Yak shaving club
+- [[https://github.com/NobbZ][NobbZ]] for being all over the Nix & Emacs interwebs
+
+[fn:1] Free Software Foundation currently requires copyright assignment on all
+code that goes into Emacs core.  The DCO is a practice accepted by git, GCC, and
+the [[https://wiki.linuxfoundation.org/dco][Linux Kernel]].  Doing DCO sign-off
+is not the same as copyright assignment.  Doing DCO cannot guarantee change at
+the FSF, but it does make it a whole lot easier.  You will in any case be able
+to prove that your project is 100% covered by the license you chose.
 
 # Local Variables:
 # eval: (require 'org-make-toc)
