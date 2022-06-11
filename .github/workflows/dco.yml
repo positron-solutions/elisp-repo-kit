@@ -28,6 +28,9 @@ name: Developer Certificate of Origin Check
 
 on: [pull_request]
 
+  workflow_dispatch:
+    # Allows you to run this workflow manually from the Actions tab
+
 jobs:
   check:
     runs-on: ubuntu-latest
