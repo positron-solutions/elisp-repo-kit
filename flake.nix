@@ -51,7 +51,6 @@
         emacsPackages = [
           # from emacs-overlay
           "emacsGit"
-          "emacsNativeComp"
           "emacsUnstable"
           # from nixpkgs
           "emacs"
