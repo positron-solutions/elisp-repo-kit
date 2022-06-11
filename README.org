@@ -6,8 +6,6 @@
 # syntax; it still appears with the GitHub renderer.
 #+HTML: <a href="https://melpa.org/#/elisp-repo-kit"><img src="https://melpa.org/packages/elisp-repo-kit-badge.svg" alt="melpa package"></a> <a href="https://stable.melpa.org/#/elisp-repo-kit"><img src="https://stable.melpa.org/packages/elisp-repo-kit-badge.svg" alt="melpa stable package"></a>
 #+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/ci.yml/badge.svg" alt="CI workflow status"></a>
-#+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://badgen.net/github/checks/positron-solutions/elisp-repo-kit/master/ubuntu" alt="Linux tests"></a>
-#+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://badgen.net/github/checks/positron-solutions/elisp-repo-kit/master/mac" alt="MacOS tests"></a>
 #+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=Developer+Certificate+of+Origin"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/dco.yml/badge.svg" alt="DCO Check"></a>
 
 * Quickly set up an Emacs Lisp repository on Github with:
@@ -127,7 +125,7 @@ a less restrictive standard, found in
 You can run the lints manually almost the same as running tests.
 #+begin_src bash
   nix develop
-  emacs --script ./test/elisp-repo-kit-lint.el
+  emacs --script test/elisp-repo-kit-lint.el
   emacs --script test/elisp-repo-kit-lint-tests.el
 #+end_src
 
@@ -139,7 +137,7 @@ available, so just delete all =*.elc= files in /lisp and /test.
 To load your local development version while hacking in Emacs, run
 =emacs-lisp-byte-compile-and-load= (this is a built-in function of emacs, not
 part of elisp-repo-kit).  *When you need to reload the package, call
-=unload-feature= and select your package name.*  If you do not unload, reloading
+~unload-feature~ and select your package name.*  If you do not unload, reloading
 has no effect and you will see stale behavior.
 
 # NOTE: Native compilation is stated to be asynchronous.  I should verify that
@@ -151,11 +149,11 @@ You can copy this checklist to your org agenda files:
 
 - [X] Create a repository (from [[#Install elisp-repo-kit][install]] instructions)
 - [ ] Create an empty Github repository and check the git remote configuration
-- [ ] Set up your git commit signing *and* [[#sign-off][sign-off]] so that it will
-  be [[#Footnote-on-FSF-and-Emacs-Core-Licensing][straightforward]] for for FSF to pull in your changes if they want to
-  later
+- [ ] Set up your git commit shttps://www.youtube.com/watch?v=i8OLg-f9EHkigning
+  *and* [[#sign-off][sign-off]] so that it will be [[#Footnote-on-FSF-and-Emacs-Core-Licensing][straightforward]] for for FSF to pull in your
+  changes if they later change to DCO instead of copyright assignment.
 - [ ] Sign up for [[https://app.cachix.org/][cachix]] and, create a binary cache
-  with API tokens and publice read access
+  with API tokens and public read access
 - [ ] Add secrets necessary for your Github actions =CACHIX_AUTH_TOKEN= and
   =CACHIX_CACHE_NAME=
 - [ ] Enable actions and add the following actions to your allowed actions
@@ -200,14 +198,15 @@ depending on how you version / develop / tag.
 
 * Maintaining your versions
 
-Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]]
-and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get updates from MELPA, it's necessary to
-update the emacs-overlay with =nix flake lock --update-input emacs-overlay=.
-You can also specify revs and branches if you need to roll back.  MacOS tends to
-get a little less test emphasis, and so =nixpkgs-darwin-<version>= branches
-exist and are required to pass more Darwin tests before merging.  This is more
-stable if you are on MacOS. =nixpkgs-unstable= or =master= are your other less
-common options.
+Nixpkgs has a new release about every six months.  You can check their
+[[https://github.com/NixOS/nixpkgs/branches][branches]] and
+[[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get
+updates from MELPA, it's necessary to update the emacs-overlay with =nix flake
+lock --update-input emacs-overlay=.  You can also specify revs and branches if
+you need to roll back.  MacOS tends to get a little less test emphasis, and so
+=nixpkgs-darwin-<version>= branches exist and are required to pass more Darwin
+tests before merging.  This is more stable if you are on
+MacOS. =nixpkgs-unstable= or =master= are your other less common options.
 
 * Licensing, Developer Certificate of Origin
 
@@ -288,8 +287,9 @@ common options.
         └── gpg-signing-projects.conf
     #+end_src
 
-    In your root config, ~.gitconfig~, add an =includeIf= directive that will load the
-    configuration you use for projects you intend to GPG sign commits for.
+    In your root config, ~.gitconfig~, add an =includeIf= directive that will
+    load the configuration you use for projects you intend to GPG sign commits
+    for.
 
     #+begin_src
     [includeIf "gitdir:/home/rjdeveloper/**/gpg-signing/**/.git"]
@@ -339,12 +339,11 @@ common options.
 
 * Footnote on FSF and Emacs Core Licensing
 
-Free Software Foundation currently requires copyright assignment on all
-code that goes into Emacs core.  The DCO is a practice accepted by git, GCC, and
-the [[https://wiki.linuxfoundation.org/dco][Linux Kernel]].  Doing DCO sign-off
-is not the same as copyright assignment.  Doing DCO cannot guarantee change at
-the FSF, but it does make it a whole lot easier.  You will in any case be able
-to prove that your project is 100% covered by the license you chose.
+Free Software Foundation currently requires copyright assignment on all code
+that goes into Emacs core.  The DCO is a practice accepted by git, GCC, and the
+[[https://wiki.linuxfoundation.org/dco][Linux Kernel]].  Doing DCO sign-off is
+not the same as copyright assignment. You will in any case be able to prove that
+your project is 100% covered by the license you chose.
 
 # Local Variables:
 # eval: (require 'org-make-toc)
