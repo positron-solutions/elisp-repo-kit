@@ -106,9 +106,14 @@ nix [[https://nixos.wiki/wiki/Flakes][flake's]] flake.lock.
 #+begin_src bash
   nix develop # loads the devShells.default from flake.nix
   direnv allow # same as above with file watching
+
   emacs --quick --load ./test/elisp-repo-kit-test-setup.el # graphical
   emacs --script ./test/elisp-repo-kit-test-setup.el # terminal
+
+  make test # shortcut in Makefile
 #+end_src
+
+You will want to run =make-clean= in between runs for now.
 
 ** Lint and byte-compile code
 
@@ -127,6 +132,8 @@ You can run the lints manually almost the same as running tests.
   nix develop
   emacs --script test/elisp-repo-kit-lint.el
   emacs --script test/elisp-repo-kit-lint-tests.el
+
+  make lint # shortcut in Makefile
 #+end_src
 
 Stale bytecode can result in stale test behavior.  A Makefile is not yet
@@ -203,10 +210,11 @@ Nixpkgs has a new release about every six months.  You can check their
 [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get
 updates from MELPA, it's necessary to update the emacs-overlay with =nix flake
 lock --update-input emacs-overlay=.  You can also specify revs and branches if
-you need to roll back.  MacOS tends to get a little less test emphasis, and so
-=nixpkgs-darwin-<version>= branches exist and are required to pass more Darwin
-tests before merging.  This is more stable if you are on
-MacOS. =nixpkgs-unstable= or =master= are your other less common options.
+you need to roll back. There is a make shortcut: =make flake-update= MacOS tends
+to get a little less test emphasis, and so =nixpkgs-darwin-<version>= branches
+exist and are required to pass more Darwin tests before merging.  This is more
+stable if you are on MacOS. =nixpkgs-unstable= or =master= are your other less
+common options.
 
 * Licensing, Developer Certificate of Origin
 

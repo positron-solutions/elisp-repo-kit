@@ -43,7 +43,7 @@ for CI & local development."
   (let ((rev (pop argv)))
     (elisp-repo-kit-new
      default-directory
-     "psionic-fusor" ; project-name
+     "clone-rename-test" ; project-name
      "Selindis Raszagal" ; Author
      "new-shakuras" ; user-org
      "selindis@new-shakuras.planet" ; email
