@@ -37,7 +37,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        emacsPkg: [ emacsNativeComp,
+        emacsPkg: [ emacs28,
                     emacsUnstable,
                     # emacsGit
                     emacs
