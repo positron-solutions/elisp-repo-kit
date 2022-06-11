@@ -50,9 +50,10 @@
         # List of Emacsen to generate development shells for
         emacsPackages = [
           # from emacs-overlay
-          "emacsGit"
           "emacsUnstable"
+          "emacsNativeComp"
           # from nixpkgs
+          "emacsGit"
           "emacs"
           "emacs28"
         ];

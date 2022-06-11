@@ -40,6 +40,7 @@ jobs:
         emacsPkg: [ emacs28,
                     emacsUnstable,
                     # emacsGit
+                    emacsNativeComp,
                     emacs
                   ]
     runs-on: ${{ matrix.os }}
