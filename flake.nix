@@ -38,7 +38,8 @@
     emacs-overlay.inputs.flake-utils.follows = "flake-utils";
   };
 
-  outputs = inputs: with inputs;
+  outputs = inputs:
+    with inputs;
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
