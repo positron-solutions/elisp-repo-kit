@@ -27,8 +27,6 @@
 name: Developer Certificate of Origin Check
 
 on:
-  push:
-    branches: [ $default-branch ] # pushes to the default branch
   pull_request:
     # any pull-request
   workflow_dispatch:
