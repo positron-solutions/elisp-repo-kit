@@ -195,13 +195,59 @@ actions.
 
 * Publishing (MELPA)
 
-The following template can be filled in and pull-requested to MELPA to publish.
-You don't need to touch ~:files~ and ~commit~ and ~branch~ are optional
-depending on how you version / develop / tag.
+If you have green CI, you have already passed many requirements of publishing a
+MELPA package.  *You still need to build your package and verify your recipe.*
+You are going to clone melpa in order to make your PR.  You can use the clone to
+verify the recipe.
 
-#+begin_src
+Fork MELPA personally (not for organization) and clone it.
+
+#+begin_src shell
+  mkdir -p upstream  # in general a good way to separate projects
+  cd upstream
+  git clone git@github.com:$GITHUB_USER/melpa.git  # replace $GITHUB_USER
+#+end_src
+
+Install package-build
+
+#+begin_src elisp
+  (use-package package-build)
+#+end_src
+
+=package-build-create-recipe= will give you something like:
+
+#+begin_src elisp
 (elisp-repo-kit :fetcher github :repo "positron-solutions/elisp-repo-kit")
 #+end_src
+
+The following template can be filled in and pull-requested to MELPA to publish.
+You don't need to touch ~:files~.  The ~commit~ and ~branch~ are optional
+depending on how you version / develop / tag your releases.
+
+** Testing the build
+
+Copy the recipe into =recipes/elisp-repo-kit= inside your MELPA clone
+
+#+begin_src shell
+  make recipes/elisp-repo-kit
+  # Test sandbox installation (will affect ~/.emacs.d/elpa  So much for sandbox ¯\_(ツ)_/¯
+  EMACS_COMMAND=$(which emacs) make sandbox INSTALL=elisp-repo-kit
+#+end_src
+
+** Testing stable
+
+You need a tag on your default (usually master) branch of your repo,
+=positron-solutions/elisp-repo-kit=. Use =git tag -S v0.1.0= and =git push
+origin v0.1.0=.  You can also just create a release in the Github interface.
+
+#+begin_src shell
+    # Test stable builds against your tags
+    STABLE=t make recipes/elisp-repo-kit
+#+end_src
+
+If everything works, you are ready to make a pull request to MELPA.  Push your
+changes and check all the boxes in the PR template except the one that requires
+you to read the instructions.
 
 * Maintaining your versions
 
