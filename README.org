@@ -380,6 +380,53 @@ MacOS. =nixpkgs-unstable= or =master= are your other less common options.
       git rebase -i
     #+end_src
 
+* Compared to Other Similar Work
+
+This repository mainly captures the annoying work necessary to set up a new
+repository.  By focusing on just one minimal task, cloning itself and renaming,
+there is very little work a user will need to identify and remove to reach
+foundation.
+
+** Most similar existing work
+
+[[https://github.com/purcell/nix-emacs-ci][nix-emacs-ci]] capture the work needed to provide a running Emacs to CI.  Tools
+like [[https://github.com/doublep/eldev#continuous-integration][eldev]] and [[https://github.com/alphapapa/makem.sh/blob/master/test.yml][makem.sh]] have support for providing dependencies to that Emacs.
+The Nix flake [[./flake.nix][in this project]] describes both of these tasks.  Makem and Eldev
+etc document Gihub workflows, but the workflows in this repository are meant to
+be used out-of-the-box after cloning.  What remains for the user to focus on is
+*test discovery and running tests*.
+
+Nix-emacs-ci provides a lot of backwards-compatibility versions of Emacs.  The
+nix-overlay is more forward looking, providing =emacsGit= and sometimes other
+upstream branches when a big feature like native compilation is in the pipeline.
+Nix-emacs-ci is also still using legacy Nix, without flakes.  Flakes are just
+nicer and the way Nix is going.
+
+** Dependency Management
+
+Many tools for testing Emacs packages provide dependency management and loading
+those dependencies into a fresh Emacs instance.  Use of the [[https://github.com/nix-community/emacs-overlay][Nix Overlay]] greatly
+simplifies how this is accomplished.  Nix is extremely reliable at dependency
+management, and it is no surprise that much complexity is normalized away by
+just the basic behavior model of Nix.  The [[https://github.com/nix-community/emacs-overlay][emacs-overlay]] is what makes it so
+easy. In addition, *if your project needs or includes additional binary
+dependencies or modules*, Nix is an excellent way to provide them to CI and
+users.
+
+** Discovering and Running Tests & Lints
+
+This repository uses very bare elisp that can be run with just one Emacs switch
+in most cases.  The Makefile merely exposes this interface with the even more
+familiar make style of user interaction.
+
+The CI scripts are arranged to present a useful environment first.  The commands
+to invoke tests follow.  If the commands need to be changed, it is
+straightforward to change them /independently of how you provide dependencies/.
+Just be sure to propagate changes to the Makefile and README.
+
+Future versions of this project will continue to favor elisp scripts for test
+discovery and integration with Emacs.  Make and bash will be minimized.
+
 * Shout-outs
 
 - [[https://github.com/alphapapa][alphapapa]] for being super prolific at
