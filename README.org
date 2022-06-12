@@ -12,9 +12,7 @@
 
 - An [[https://www.youtube.com/watch?v=RQK_DaaX34Q&list=PLEoMzSkcN8oPQtn7FQEF3D7sroZbXuPZ7][elisp]] package
 - Bytecode compiling, linting, and test running
-- CI with
-  [[https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs][Github
-  Actions]], configured for Darwin (MacOS) and Linux
+- CI with [[https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs][Github Actions]], configured for Darwin (MacOS) and Linux
 - [[https://nixos.org/#examples][Nix]] environment for obtaining dependencies or
   reproducibly developing CI locally
 - Licensing, [[https://developercertificate.org/][DCO]], and DCO sign-off checks for PR's
@@ -52,16 +50,14 @@ answer all the questions.
 
  The =elisp-clone-repo-kit-new= calls =elisp-repo-kit-rename-relicense= to
  rename all of the files, string replace names, and re-license to GPL3.  Now
- just follow the steps in [[#finish-setting-up-your-new-github-repo][finish
- setting up]] Have fun!
+ just follow the steps in [[#finish-setting-up-your-new-github-repo][finish setting up]] Have fun!
 
 *** Manual cloning
 
   The standalone command, =elisp-repo-kit-clone= will clone without renaming.
 
-  This repo is also a
-  [[https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template][template
-  repository]], so you can fork without forking (Bruce Lee).
+  This repo is also a [[https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template][template repository]], so you can fork without forking
+  (Bruce Lee).
 
   If you create via template or clone manually, it's presumed you know what
   you're doing at that point.  Call =elisp-repo-kit-rename= on its own to rename
@@ -79,6 +75,9 @@ answer all the questions.
 - [[#finish-setting-up-your-new-github-repo][Finish setting up your new Github repo]]
   - [[#optional-steps][Optional Steps]]
 - [[#publishing-melpa][Publishing (MELPA)]]
+  - [[#testing-the-build][Testing the build]]
+  - [[#testing-stable][Testing stable]]
+- [[#overview-of-file-contents-and-structure][Overview of file contents and structure]]
 - [[#maintaining-your-versions][Maintaining your versions]]
 - [[#licensing-developer-certificate-of-origin][Licensing, Developer Certificate of Origin]]
   - [[#license][License]]
@@ -89,6 +88,10 @@ answer all the questions.
       - [[#automatically-add-sign-off][Automatically add sign-off]]
       - [[#automatic-gpg-signing-with-per-project-keys][Automatic GPG signing with per-project keys]]
       - [[#manually-signing--adding-sign-off][Manually signing & adding sign-off]]
+- [[#compared-to-other-similar-work][Compared to Other Similar Work]]
+  - [[#most-similar-existing-work][Most similar existing work]]
+  - [[#dependency-management][Dependency Management]]
+  - [[#discovering-and-running-tests--lints][Discovering and Running Tests & Lints]]
 - [[#shout-outs][Shout-outs]]
 - [[#footnote-on-fsf-and-emacs-core-licensing][Footnote on FSF and Emacs Core Licensing]]
 :END:
@@ -195,26 +198,101 @@ actions.
 
 * Publishing (MELPA)
 
-The following template can be filled in and pull-requested to MELPA to publish.
-You don't need to touch ~:files~ and ~commit~ and ~branch~ are optional
-depending on how you version / develop / tag.
+If you have green CI, you have already passed many requirements of publishing a
+MELPA package.  *You still need to build your package and verify your recipe.*
+You are going to clone melpa in order to make your PR.  You can use the clone to
+verify the recipe.
 
-#+begin_src
+Fork MELPA personally (not for organization) and clone it.
+
+#+begin_src shell
+  mkdir -p upstream  # in general a good way to separate projects
+  cd upstream
+  git clone git@github.com:$GITHUB_USER/melpa.git  # replace $GITHUB_USER
+#+end_src
+
+Install package-build
+
+#+begin_src elisp
+  (use-package package-build)
+#+end_src
+
+=package-build-create-recipe= will give you something like:
+
+#+begin_src elisp
 (elisp-repo-kit :fetcher github :repo "positron-solutions/elisp-repo-kit")
+#+end_src
+
+The following template can be filled in and pull-requested to MELPA to publish.
+You don't need to touch ~:files~.  The ~commit~ and ~branch~ are optional
+depending on how you version / develop / tag your releases.
+
+** Testing the build
+
+Copy the recipe into =recipes/elisp-repo-kit= inside your MELPA clone
+
+#+begin_src shell
+  make recipes/elisp-repo-kit
+  # Test sandbox installation (will affect ~/.emacs.d/elpa  So much for sandbox ¯\_(ツ)_/¯
+  EMACS_COMMAND=$(which emacs) make sandbox INSTALL=elisp-repo-kit
+#+end_src
+
+** Testing stable
+
+You need a tag on your default (usually master) branch of your repo,
+=positron-solutions/elisp-repo-kit=. Use =git tag -S v0.1.0= and =git push
+origin v0.1.0=.  You can also just create a release in the Github interface.
+
+#+begin_src shell
+    # Test stable builds against your tags
+    STABLE=t make recipes/elisp-repo-kit
+#+end_src
+
+If everything works, you are ready to make a pull request to MELPA.  Push your
+changes and check all the boxes in the PR template except the one that requires
+you to read the instructions.
+
+* Overview of file contents and structure
+
+/After cloning and renaming,/ you will have a file tree like this:
+
+#+begin_src shell
+  ├── .gitignore                        # ignores for byte compiles, autoloads etc
+  ├── flake.nix                         # dependencies for this project
+  ├── flake.lock                        # version controlled lock of flake.nix input versions
+  ├── .envrc                            # direnv integration with `nix develop`
+  ├── Makefile                          # shorcuts for shell operations
+  │
+  ├── README.org                        # this file
+  ├── COPYING                           # a GPL3 license
+  ├── DCO                               # Developer Certificate of Origin
+  │
+  ├── .github
+  │   ├── pull_request_template.md      # reminders for PR contributors
+  │   └── workflows
+  │       ├── ci.yml                    # workflow for lints and tests
+  │       └── dco.yml                   # workflow to check DCO sign-offs
+  │
+  ├── lisp
+  │   └── elisp-repo-kit.el             # the package
+  │
+  └── test
+      ├── elisp-repo-kit-lint.el        # elisp-lint shim for /lisp
+      ├── elisp-repo-kit-lint-tests.el  # elisp-lint shim for /test
+      ├── elisp-repo-kit-test.el        # ERT unit tests
+      └── elisp-repo-kit-test-setup.el  # test loading shim
 #+end_src
 
 * Maintaining your versions
 
-Nixpkgs has a new release about every six months.  You can check their
-[[https://github.com/NixOS/nixpkgs/branches][branches]] and
-[[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get
-updates from MELPA, it's necessary to update the emacs-overlay with =nix flake
-lock --update-input emacs-overlay=.  You can also specify revs and branches if
-you need to roll back. There is a make shortcut: =make flake-update= MacOS tends
-to get a little less test emphasis, and so =nixpkgs-darwin-<version>= branches
-exist and are required to pass more Darwin tests before merging.  This is more
-stable if you are on MacOS. =nixpkgs-unstable= or =master= are your other less
-common options.
+Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]]
+and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get updates from MELPA, it's necessary to
+update the emacs-overlay with =nix flake lock --update-input emacs-overlay=.
+You can also specify revs and branches if you need to roll back. There is a make
+shortcut: =make flake-update= MacOS tends to get a little less test emphasis,
+and so =nixpkgs-darwin-<version>= branches exist and are required to pass more
+Darwin tests before merging.  This is more stable if you are on
+MacOS. =nixpkgs-unstable= or =master= are your other less common options.
 
 * Licensing, Developer Certificate of Origin
 
@@ -264,10 +342,8 @@ common options.
 
     Follow these instructions before you get ready to submit a pull-request.
 
-    Refer to the
-    [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][Github
-    signing commits]] instructions to set up your git client to add GPG
-    signatures.  File issues if you run into Emacs-specific problems.
+    Refer to the [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][Github signing commits]] instructions to set up your git client
+    to add GPG signatures.  File issues if you run into Emacs-specific problems.
 
     Because signing is intended to be a conscious process, please remember to
     read and understand the [[./DCO][Developer Certificate of Origin]] before confinguring
@@ -334,6 +410,53 @@ common options.
       # Combine with rebase to sign / sign-off multiple existing commits
       git rebase -i
     #+end_src
+
+* Compared to Other Similar Work
+
+This repository mainly captures the annoying work necessary to set up a new
+repository.  By focusing on just one minimal task, cloning itself and renaming,
+there is very little work a user will need to identify and remove to reach
+foundation.
+
+** Most similar existing work
+
+[[https://github.com/purcell/nix-emacs-ci][nix-emacs-ci]] capture the work needed to provide a running Emacs to CI.  Tools
+like [[https://github.com/doublep/eldev#continuous-integration][eldev]] and [[https://github.com/alphapapa/makem.sh/blob/master/test.yml][makem.sh]] have support for providing dependencies to that Emacs.
+The Nix flake [[./flake.nix][in this project]] describes both of these tasks.  Makem and Eldev
+etc document Gihub workflows, but the workflows in this repository are meant to
+be used out-of-the-box after cloning.  What remains for the user to focus on is
+*test discovery and running tests*.
+
+Nix-emacs-ci provides a lot of backwards-compatibility versions of Emacs.  The
+nix-overlay is more forward looking, providing =emacsGit= and sometimes other
+upstream branches when a big feature like native compilation is in the pipeline.
+Nix-emacs-ci is also still using legacy Nix, without flakes.  Flakes are just
+nicer and the way Nix is going.
+
+** Dependency Management
+
+Many tools for testing Emacs packages provide dependency management and loading
+those dependencies into a fresh Emacs instance.  Use of the [[https://github.com/nix-community/emacs-overlay][Nix Overlay]] greatly
+simplifies how this is accomplished.  Nix is extremely reliable at dependency
+management, and it is no surprise that much complexity is normalized away by
+just the basic behavior model of Nix.  The [[https://github.com/nix-community/emacs-overlay][emacs-overlay]] is what makes it so
+easy. In addition, *if your project needs or includes additional binary
+dependencies or modules*, Nix is an excellent way to provide them to CI and
+users.
+
+** Discovering and Running Tests & Lints
+
+This repository uses very bare elisp that can be run with just one Emacs switch
+in most cases.  The Makefile merely exposes this interface with the even more
+familiar make style of user interaction.
+
+The CI scripts are arranged to present a useful environment first.  The commands
+to invoke tests follow.  If the commands need to be changed, it is
+straightforward to change them /independently of how you provide dependencies/.
+Just be sure to propagate changes to the Makefile and README.
+
+Future versions of this project will continue to favor elisp scripts for test
+discovery and integration with Emacs.  Make and bash will be minimized.
 
 * Shout-outs
 
