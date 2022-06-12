@@ -252,6 +252,37 @@ If everything works, you are ready to make a pull request to MELPA.  Push your
 changes and check all the boxes in the PR template except the one that requires
 you to read the instructions.
 
+* Overview of file contents and structure
+
+/After cloning and renaming,/ you will have a file tree like this:
+
+#+begin_src shell
+  ├── .gitignore                        # ignores for byte compiles, autoloads etc
+  ├── flake.nix                         # dependencies for this project
+  ├── flake.lock                        # version controlled lock of flake.nix input versions
+  ├── .envrc                            # direnv integration with `nix develop`
+  ├── Makefile                          # shorcuts for shell operations
+  │
+  ├── README.org                        # this file
+  ├── COPYING                           # a GPL3 license
+  ├── DCO                               # Developer Certificate of Origin
+  │
+  ├── .github
+  │   ├── pull_request_template.md      # reminders for PR contributors
+  │   └── workflows
+  │       ├── ci.yml                    # workflow for lints and tests
+  │       └── dco.yml                   # workflow to check DCO sign-offs
+  │
+  ├── lisp
+  │   └── elisp-repo-kit.el             # the package
+  │
+  └── test
+      ├── elisp-repo-kit-lint.el        # elisp-lint shim for /lisp
+      ├── elisp-repo-kit-lint-tests.el  # elisp-lint shim for /test
+      ├── elisp-repo-kit-test.el        # ERT unit tests
+      └── elisp-repo-kit-test-setup.el  # test loading shim
+#+end_src
+
 * Maintaining your versions
 
 Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]]
