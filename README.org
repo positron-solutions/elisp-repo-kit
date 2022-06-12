@@ -12,9 +12,7 @@
 
 - An [[https://www.youtube.com/watch?v=RQK_DaaX34Q&list=PLEoMzSkcN8oPQtn7FQEF3D7sroZbXuPZ7][elisp]] package
 - Bytecode compiling, linting, and test running
-- CI with
-  [[https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs][Github
-  Actions]], configured for Darwin (MacOS) and Linux
+- CI with [[https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs][Github Actions]], configured for Darwin (MacOS) and Linux
 - [[https://nixos.org/#examples][Nix]] environment for obtaining dependencies or
   reproducibly developing CI locally
 - Licensing, [[https://developercertificate.org/][DCO]], and DCO sign-off checks for PR's
@@ -52,16 +50,14 @@ answer all the questions.
 
  The =elisp-clone-repo-kit-new= calls =elisp-repo-kit-rename-relicense= to
  rename all of the files, string replace names, and re-license to GPL3.  Now
- just follow the steps in [[#finish-setting-up-your-new-github-repo][finish
- setting up]] Have fun!
+ just follow the steps in [[#finish-setting-up-your-new-github-repo][finish setting up]] Have fun!
 
 *** Manual cloning
 
   The standalone command, =elisp-repo-kit-clone= will clone without renaming.
 
-  This repo is also a
-  [[https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template][template
-  repository]], so you can fork without forking (Bruce Lee).
+  This repo is also a [[https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template][template repository]], so you can fork without forking
+  (Bruce Lee).
 
   If you create via template or clone manually, it's presumed you know what
   you're doing at that point.  Call =elisp-repo-kit-rename= on its own to rename
@@ -79,6 +75,9 @@ answer all the questions.
 - [[#finish-setting-up-your-new-github-repo][Finish setting up your new Github repo]]
   - [[#optional-steps][Optional Steps]]
 - [[#publishing-melpa][Publishing (MELPA)]]
+  - [[#testing-the-build][Testing the build]]
+  - [[#testing-stable][Testing stable]]
+- [[#overview-of-file-contents-and-structure][Overview of file contents and structure]]
 - [[#maintaining-your-versions][Maintaining your versions]]
 - [[#licensing-developer-certificate-of-origin][Licensing, Developer Certificate of Origin]]
   - [[#license][License]]
@@ -89,6 +88,10 @@ answer all the questions.
       - [[#automatically-add-sign-off][Automatically add sign-off]]
       - [[#automatic-gpg-signing-with-per-project-keys][Automatic GPG signing with per-project keys]]
       - [[#manually-signing--adding-sign-off][Manually signing & adding sign-off]]
+- [[#compared-to-other-similar-work][Compared to Other Similar Work]]
+  - [[#most-similar-existing-work][Most similar existing work]]
+  - [[#dependency-management][Dependency Management]]
+  - [[#discovering-and-running-tests--lints][Discovering and Running Tests & Lints]]
 - [[#shout-outs][Shout-outs]]
 - [[#footnote-on-fsf-and-emacs-core-licensing][Footnote on FSF and Emacs Core Licensing]]
 :END:
@@ -251,16 +254,14 @@ you to read the instructions.
 
 * Maintaining your versions
 
-Nixpkgs has a new release about every six months.  You can check their
-[[https://github.com/NixOS/nixpkgs/branches][branches]] and
-[[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get
-updates from MELPA, it's necessary to update the emacs-overlay with =nix flake
-lock --update-input emacs-overlay=.  You can also specify revs and branches if
-you need to roll back. There is a make shortcut: =make flake-update= MacOS tends
-to get a little less test emphasis, and so =nixpkgs-darwin-<version>= branches
-exist and are required to pass more Darwin tests before merging.  This is more
-stable if you are on MacOS. =nixpkgs-unstable= or =master= are your other less
-common options.
+Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]]
+and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get updates from MELPA, it's necessary to
+update the emacs-overlay with =nix flake lock --update-input emacs-overlay=.
+You can also specify revs and branches if you need to roll back. There is a make
+shortcut: =make flake-update= MacOS tends to get a little less test emphasis,
+and so =nixpkgs-darwin-<version>= branches exist and are required to pass more
+Darwin tests before merging.  This is more stable if you are on
+MacOS. =nixpkgs-unstable= or =master= are your other less common options.
 
 * Licensing, Developer Certificate of Origin
 
@@ -310,10 +311,8 @@ common options.
 
     Follow these instructions before you get ready to submit a pull-request.
 
-    Refer to the
-    [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][Github
-    signing commits]] instructions to set up your git client to add GPG
-    signatures.  File issues if you run into Emacs-specific problems.
+    Refer to the [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][Github signing commits]] instructions to set up your git client
+    to add GPG signatures.  File issues if you run into Emacs-specific problems.
 
     Because signing is intended to be a conscious process, please remember to
     read and understand the [[./DCO][Developer Certificate of Origin]] before confinguring
