@@ -75,6 +75,7 @@
 
                   # you can remove after your package no longer calls (require 'dash)
                   epkgs.melpaPackages.dash
+                  # epkgs.melpaStablePackages.dash
                   # epkgs.elpaPackages.dash
                   # epkgs.dash
 

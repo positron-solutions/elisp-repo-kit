@@ -40,13 +40,14 @@ for CI & local development."
 
 (ert-deftest erk-clone-and-rename-test ()
   "Clone the repo and rename it, single step."
-  (let ((rev (pop argv)))
+  (let ((rev (pop argv))
+        (clone-root (make-temp-file "elisp-repo-kit" t)))
     (elisp-repo-kit-new
-     default-directory
+     clone-root
      "clone-rename-test" ; project-name
      "Selindis Raszagal" ; Author
      "new-shakuras" ; user-org
-     "selindis@new-shakuras.planet" ; email
+     "selindis.r@new-shakuras.planet" ; email
      rev))) ; possibly nil
 
 (provide 'elisp-repo-kit-test)

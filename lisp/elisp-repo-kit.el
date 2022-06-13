@@ -5,7 +5,7 @@
 ;; Author:  <author>
 ;; Keywords: convenience
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "25.1"))
+;; Package-Requires: ((emacs "25.1") (dash "2.0"))
 ;; Homepage: http://github.com/positron-solutions/elisp-repo-kit
 
 ;; Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -54,9 +54,11 @@ you can redistribute it and/or modify
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.")
 (defconst elisp-repo-kit--rename-maps ; directory file hard-replace
   '(( nil "gpl-3.0.txt" "COPYING")
+    ("lisp/" "elisp-repo-kit.el" nil)
+    ("test/" "elisp-repo-kit-lint-tests.el" nil)
+    ("test/" "elisp-repo-kit-lint.el" nil)
     ("test/" "elisp-repo-kit-test-setup.el" nil)
-    ("test/" "elisp-repo-kit-test.el" nil)
-    ("lisp/" "elisp-repo-kit.el" nil)))
+    ("test/" "elisp-repo-kit-test.el" nil)))
 (defconst elisp-repo-kit--files-with-strings
   '("README.org"
     "lisp/elisp-repo-kit.el"
@@ -99,7 +101,7 @@ package headers."
          (print (format "visiting: %s" (buffer-file-name)))
          (when (re-search-forward ";; Copyright.*Positron Solutions" nil t)
            (end-of-line)
-           (insert (concat ", " author)))
+           (insert ", " author))
          (goto-char (point-min))
          (when (re-search-forward "<author>" nil t)
            (replace-match (concat author ", <" email ">")))
@@ -118,7 +120,7 @@ package headers."
          (goto-char (point-min))
          (while (re-search-forward "Elisp Repo Kit" nil t)
            (replace-match (string-join
-                           (mapcar 'capitalize (split-string "-" package-name))) " "))
+                           (mapcar #'capitalize (split-string "-" package-name))) " "))
          (save-buffer 0)
          (kill-buffer)))
      elisp-repo-kit--files-with-strings)))
