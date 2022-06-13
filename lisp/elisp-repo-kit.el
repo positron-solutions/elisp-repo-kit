@@ -101,7 +101,7 @@ package headers."
          (print (format "visiting: %s" (buffer-file-name)))
          (when (re-search-forward ";; Copyright.*Positron Solutions" nil t)
            (end-of-line)
-           (insert (concat ", " author)))
+           (insert ", " author))
          (goto-char (point-min))
          (when (re-search-forward "<author>" nil t)
            (replace-match (concat author ", <" email ">")))
