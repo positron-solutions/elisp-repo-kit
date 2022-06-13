@@ -78,6 +78,7 @@ answer all the questions.
   - [[#creating-the-recipe][Creating the recipe]]
   - [[#testing-package-build][Testing package build]]
   - [[#testing-stable-package-build][Testing stable package build]]
+  - [[#melpa-lints][MELPA Lints]]
 - [[#overview-of-file-contents-and-structure][Overview of file contents and structure]]
 - [[#maintaining-your-versions][Maintaining your versions]]
 - [[#licensing-developer-certificate-of-origin][Licensing, Developer Certificate of Origin]]
@@ -265,6 +266,18 @@ origin v0.1.0=.  You can also just create a release in the Github interface.
 #+begin_src shell
   # Test stable builds against your tags
   STABLE=t make recipes/elisp-repo-kit
+#+end_src
+
+** MELPA Lints
+
+Lastly, install [[https://github.com/riscy/melpazoid][melpazoid]] and call =melpazoid= on your main feature.  It does
+some additional lints.  You may need to install =package-lint= if you don't have
+it.  It's not declared in melpazoid's requirements.  Getting the package in Nix
+is not easy yet since melpazoid is not yet on Melpa.
+
+#+begin_src elisp
+  (straight-use-package
+   '(melpazoid :type git :host github :repo "riscy/melpazoid" :files ("melpazoid/melpazoid.el")))
 #+end_src
 
 If everything works, you are ready to make a pull request to MELPA.  Push your
