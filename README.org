@@ -145,14 +145,25 @@ available, so just delete all =*.elc= files in /lisp and /test.
 
 ** Loading and re-loading your package
 
-To load your local development version while hacking in Emacs, run
-=emacs-lisp-byte-compile-and-load= (this is a built-in function of emacs, not
-part of elisp-repo-kit).  *When you need to reload the package, call
-~unload-feature~ and select your package name.*  If you do not unload, reloading
-has no effect and you will see stale behavior.
+*When you need to reload the package, call ~unload-feature~ and select your
+package name.* If you do not unload, reloading has no effect and you will see
+stale behavior.
 
-# NOTE: Native compilation is stated to be asynchronous.  I should verify that
-# code is compiled before run.
+Whichever package installer you use probably supports local overrides.  The
+recommendation is [[https://github.com/radian-software/straight.el#overriding-recipes][straight]].  If you install using straight, you can call
+=straight-rebuild-package= and it will rebuild and load (but not reload) the
+package.
+
+#+begin_src elisp
+  (straight-use-package
+   '(elisp-repo-kit :local-repo "~/my-packages/positron/elisp-repo-kit"))
+#+end_src
+
+Because the load path is configured, you can call =(unload-feature
+'elisp-repo-kit)= and then =(require 'elisp-repo-kit)= to pick up changes.
+There should be a warning about stale byte code.
+
+# NOTE: Reload really needs to be implicit when rebuilding...
 
 * Finish setting up your new Github repo
 
