@@ -120,7 +120,7 @@ package headers."
          (goto-char (point-min))
          (while (re-search-forward "Elisp Repo Kit" nil t)
            (replace-match (string-join
-                           (mapcar 'capitalize (split-string "-" package-name))) " "))
+                           (mapcar #'capitalize (split-string "-" package-name))) " "))
          (save-buffer 0)
          (kill-buffer)))
      elisp-repo-kit--files-with-strings)))
