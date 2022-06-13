@@ -206,10 +206,12 @@ verify the recipe.
 
 ** Creating the recipe
 
-Fork MELPA personally (not for organization) and clone it.
+Fork MELPA personally (not for organization) and clone it to wherever you keep
+your upstreams.  It's a good idea to separate upstreams from projects you
+actively maintain so you can see and delete upstreams when not in use.
 
 #+begin_src shell
-  mkdir -p upstream  # in general a good way to separate projects
+  mkdir -p upstream
   cd upstream
   git clone git@github.com:$GITHUB_USER/melpa.git  # replace $GITHUB_USER
 #+end_src
@@ -250,8 +252,8 @@ You need a tag on your default (usually master) branch of your repo,
 origin v0.1.0=.  You can also just create a release in the Github interface.
 
 #+begin_src shell
-    # Test stable builds against your tags
-    STABLE=t make recipes/elisp-repo-kit
+  # Test stable builds against your tags
+  STABLE=t make recipes/elisp-repo-kit
 #+end_src
 
 If everything works, you are ready to make a pull request to MELPA.  Push your
@@ -466,11 +468,9 @@ discovery and integration with Emacs.  Make and bash will be minimized.
 
 * Shout-outs
 
-- [[https://github.com/alphapapa][alphapapa]] for being super prolific at
-  everything, including package writing, documentation, and activity on various
-  social platforms
-- [[https://github.com/adisbladis][adisbladis]] for the Nix overlay that makes
-  the CI and local development so nice
+- [[https://github.com/alphapapa][alphapapa]] for being super prolific at everything, including package writing,
+  documentation, and activity on various social platforms
+- [[https://github.com/adisbladis][adisbladis]] for the Nix overlay that makes the CI and local development so nice
 - [[https://www.fsf.org/][FSF]] for the Yak shaving club
 - [[https://github.com/NobbZ][NobbZ]] for being all over the Nix & Emacs interwebs
 
@@ -478,9 +478,11 @@ discovery and integration with Emacs.  Make and bash will be minimized.
 
 Free Software Foundation currently requires copyright assignment on all code
 that goes into Emacs core.  The DCO is a practice accepted by git, GCC, and the
-[[https://wiki.linuxfoundation.org/dco][Linux Kernel]].  Doing DCO sign-off is
-not the same as copyright assignment. You will in any case be able to prove that
-your project is 100% covered by the license you chose.
+[[https://wiki.linuxfoundation.org/dco][Linux Kernel]].  Doing DCO sign-off is not the same as copyright assignment, and
+serves a different purpose.  DCO is more defensive of /any/ users while
+copyright assignment is offensive in the case of GPL non-compliance. What DCO
+sign-off gains you is being able to prove that your project is 100% covered by
+the license you chose.
 
 # Local Variables:
 # eval: (require 'org-make-toc)
