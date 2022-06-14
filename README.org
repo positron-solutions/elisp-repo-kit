@@ -90,10 +90,11 @@ answer all the questions.
       - [[#automatically-add-sign-off][Automatically add sign-off]]
       - [[#automatic-gpg-signing-with-per-project-keys][Automatic GPG signing with per-project keys]]
       - [[#manually-signing--adding-sign-off][Manually signing & adding sign-off]]
-- [[#compared-to-other-similar-work][Compared to Other Similar Work]]
-  - [[#most-similar-existing-work][Most similar existing work]]
+- [[#package-scope-and-relation-to-other-work][Package scope and relation to other work]]
   - [[#dependency-management][Dependency Management]]
   - [[#discovering-and-running-tests--lints][Discovering and Running Tests & Lints]]
+  - [[#comparisons][Comparisons]]
+- [[#contributing][Contributing]]
 - [[#shout-outs][Shout-outs]]
 - [[#footnote-on-fsf-and-emacs-core-licensing][Footnote on FSF and Emacs Core Licensing]]
 :END:
@@ -122,14 +123,12 @@ You will want to run =make-clean= in between runs for now.
 
 ** Lint and byte-compile code
 
-Use [[https://github.com/gonewest818/elisp-lint][elisp-lint]] to detect issues
-with byte compiling, package format, code structure and others.  The
-configuration is found inside
-[[./test/elisp-repo-kit-test-lint.el][elisp-repo-kit-test-lint.el]] and the CI
-run is invoked inside of [[.github/workflows/ci.yml][ci.yml]] using Emacs in
-script mode.  Most of the configuration is in the lisp files.  CI only tests on
-on one platform, with native compilation enabled.  The tests are also linted, to
-a less restrictive standard, found in
+Use [[https://github.com/gonewest818/elisp-lint][elisp-lint]] to detect issues with byte compiling, package format, code
+structure and others.  The configuration is found inside
+[[./test/elisp-repo-kit-test-lint.el][elisp-repo-kit-test-lint.el]] and the CI run is invoked inside of [[.github/workflows/ci.yml][ci.yml]] using
+Emacs in script mode.  Most of the configuration is in the lisp files.  CI only
+tests on on one platform, with native compilation enabled.  The tests are also
+linted, to a less restrictive standard, found in
 [[./test/elisp-repo-kit-test-lint-tests.el][elisp-repo-kit-test-lint-tests.el]]
 
 You can run the lints manually almost the same as running tests.
@@ -443,36 +442,30 @@ are on MacOS. =nixpkgs-unstable= or =master= are your other less common options.
       git rebase -i
     #+end_src
 
-* Compared to Other Similar Work
+* Package scope and relation to other work
 
 This repository mainly captures the annoying work necessary to set up a new
-repository.  By focusing on just one minimal task, cloning itself and renaming,
-there is very little work a user will need to identify and remove to reach
-foundation.
+repository with everyting working.  By focusing on just one minimal task,
+cloning itself and renaming, there is very little work a user will need to
+identify and remove to reach the clean foundation.
 
-** Most similar existing work
-
-[[https://github.com/purcell/nix-emacs-ci][nix-emacs-ci]] capture the work needed to provide a running Emacs to CI.  Tools
-like [[https://github.com/doublep/eldev#continuous-integration][eldev]] and [[https://github.com/alphapapa/makem.sh/blob/master/test.yml][makem.sh]] have support for providing dependencies to that Emacs.
-The Nix flake [[./flake.nix][in this project]] describes both of these tasks.  Makem and Eldev
-etc document Gihub workflows, but the workflows in this repository are meant to
-be used out-of-the-box after cloning.  What remains for the user to focus on is
-*test discovery and running tests*.
-
-Nix-emacs-ci provides a lot of backwards-compatibility versions of Emacs.  The
-nix-overlay is more forward looking, providing =emacsGit= and sometimes other
-upstream branches when a big feature like native compilation is in the pipeline.
-Nix-emacs-ci is also still using legacy Nix, without flakes.  Flakes are just
-nicer and the way Nix is going.
+Commands within this package will focus on cleaner integration of the tests and
+lints with Emacs.  There has been a lot of work in this area, but much of it is
+tangled with dependency management and sandbox creation.
 
 ** Dependency Management
 
 Many tools for testing Emacs packages provide dependency management and loading
-those dependencies into a fresh Emacs instance.  Use of the [[https://github.com/nix-community/emacs-overlay][Nix Overlay]] greatly
-simplifies how this is accomplished.  Nix is extremely reliable at dependency
-management, and it is no surprise that much complexity is normalized away by
-just the basic behavior model of Nix.  The [[https://github.com/nix-community/emacs-overlay][emacs-overlay]] is what makes it so
-easy. In addition, *if your project needs or includes additional binary
+those dependencies into a fresh Emacs instance.  This package will never attempt
+to manage dependencies.  Dependencies will always be expressed through the Nix
+flake expressions and at most a lock file describing a frozen set of Emacs
+dependencies.
+
+Use of the [[https://github.com/nix-community/emacs-overlay][Emacs Nix Overlay]] is a simple way of stating and obtaining elisp
+dependencies for now.  Non-elisp dependencies are trivially provided form
+nixpkgs.  Nix is extremely reliable at dependency management, and it is no
+surprise that much complexity is normalized away by just the basic behavior
+model of Nix.  In addition, *if your project needs or includes additional binary
 dependencies or modules*, Nix is an excellent way to provide them to CI and
 users.
 
@@ -485,10 +478,60 @@ familiar make style of user interaction.
 The CI scripts are arranged to present a useful environment first.  The commands
 to invoke tests follow.  If the commands need to be changed, it is
 straightforward to change them /independently of how you provide dependencies/.
-Just be sure to propagate changes to the Makefile and README.
+Just be sure to propagate changes to the Makefile and README of your project.
 
 Future versions of this project will continue to favor elisp scripts for test
 discovery and integration with Emacs.  Make and bash will be minimized.
+
+** Comparisons
+
+There are many comparisons available to understand the roles of similar tools
+and how they relate to each other.
+
+- [[https://github.com/alphapapa/makem.sh#comparisons][makem.sh]]
+- [[https://github.com/doublep/eldev#see-also][Eldev]]
+- [[https://github.com/emacs-twist/nomake][nomake]] Is another project with Nix work
+
+[[https://github.com/purcell/nix-emacs-ci][nix-emacs-ci]] capture the work needed to provide a running Emacs to CI.  Tools
+like [[https://github.com/doublep/eldev#continuous-integration][eldev]] and [[https://github.com/alphapapa/makem.sh/blob/master/test.yml][makem.sh]] have support for providing dependencies to that Emacs.
+The Nix flake [[./flake.nix][in this project]] describes both of these tasks.  Makem and Eldev
+etc document Gihub workflows, but the workflows in this repository are meant to
+be used out-of-the-box after cloning, although to be fare, this is very little
+work.
+
+Nix-emacs-ci provides a lot of backwards-compatibility versions of Emacs.  The
+nix-overlay is more forward looking, providing =emacsGit= and sometimes other
+upstream branches when a big feature like native compilation is in the pipeline.
+Nix-emacs-ci is also still using legacy Nix, without flakes.  Flakes are just
+nicer and the way Nix is going.
+
+* Contributing
+
+First decide if you want to work on this repository or fork it to something
+entirely different.  Non-exhaustive list of changes that are very welcome:
+
+- To the maximum degree possible, this project should lean on elisp as a CLI
+  script backend
+- Running additional kinds of tests
+- Running additional lints
+- Fix bugs
+- Expose trivial options where a structural choice has limited them
+  unnecessarily
+- Behave the same, but with a less complicated code
+
+Changes will likely be rejected if it is aimed at:
+
+- Managing dependencies outside of Nix expressions other than a package that is
+  supposed to manage dependencies or test obtaining dependencies in a
+  user-present use case
+- Backwards compatibility for Emacs two versions behind next release.  Master,
+  current stable release, and release - 1 are the only versions being supported
+- pre-flake Nix support
+- Guix support without proper lockfile commonality between Emacs, Nix, and Guix.
+  All pure build systems are good, but if Emacs, Nix, and Guix are not *yet*
+  benefitting from a common lock format to describe what dependencies will be
+  obtained, it's not time to support them alongside each other in a single
+  repository
 
 * Shout-outs
 
@@ -501,12 +544,15 @@ discovery and integration with Emacs.  Make and bash will be minimized.
 * Footnote on FSF and Emacs Core Licensing
 
 Free Software Foundation currently requires copyright assignment on all code
-that goes into Emacs core.  The DCO is a practice accepted by git, GCC, and the
-[[https://wiki.linuxfoundation.org/dco][Linux Kernel]].  Doing DCO sign-off is not the same as copyright assignment, and
-serves a different purpose.  DCO is more defensive of /any/ users while
-copyright assignment is offensive in the case of GPL non-compliance. What DCO
-sign-off gains you is being able to prove that your project is 100% covered by
-the license you chose.
+that goes into Emacs core. Many GNU projects have since switched to using a
+Developer Certificate of Origin.  DCO sign-off is a practice accepted by git,
+GCC, and the [[https://wiki.linuxfoundation.org/dco][Linux Kernel]].  Doing DCO sign-off is not the same as copyright
+assignment, and serves a slightlly different purpose.  DCO is more defensive of
+/any/ users while copyright assignment is offensive in the case of GPL
+non-compliance. In any case, with DCO sign-off, you can be assured that changes
+submitted to a code base you control are incontrovertibly covered by the license
+you chose.  Using the DCO *may* make it easier for code in your project to be
+included in Emacs core later.
 
 # Local Variables:
 # eval: (require 'org-make-toc)
