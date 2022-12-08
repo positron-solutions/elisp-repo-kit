@@ -525,6 +525,7 @@ entirely different.  Non-exhaustive list of changes that are very welcome:
 - Expose trivial options where a structural choice has limited them
   unnecessarily
 - Behave the same, but with a less complicated code
+- Guix support
 
 Changes will likely be rejected if it is aimed at:
 
@@ -534,11 +535,7 @@ Changes will likely be rejected if it is aimed at:
 - Backwards compatibility for Emacs two versions behind next release.  Master,
   current stable release, and release - 1 are the only versions being supported
 - pre-flake Nix support
-- Guix support without proper lockfile commonality between Emacs, Nix, and Guix.
-  All pure build systems are good, but if Emacs, Nix, and Guix are not *yet*
-  benefitting from a common lock format to describe what dependencies will be
-  obtained, it's not time to support them alongside each other in a single
-  repository
+- Guix support that interferes with Nix support
 
 * Shout-outs
 
