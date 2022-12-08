@@ -39,7 +39,14 @@ answer all the questions.
     (straight-use-package '(elisp-repo-kit :type git :host github
                                            :repo "positron-solutions/elisp-repo-kit"))
 
+    ;; using elpaca (recommended to add a hash for reproducibility)
+    (elpaca-use-package
+     (example :host github
+              :repo "positron-solutions/elisp-repo-kit")
+     :demand t)
+
     ;; or use melpa, manual load-path & require, you brave yak shaver
+
   #+end_src
 
 =elisp-repo-kit-new= will ask for:
