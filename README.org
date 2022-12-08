@@ -571,8 +571,7 @@ Changes will likely be rejected if it is aimed at:
   control are strongly attested to be covered by the license you chose.
 
 # Local Variables:
-# eval: (require 'org-make-toc)
-# before-save-hook: org-make-toc
+# before-save-hook: (when (require 'org-make-toc nil t) (org-make-toc))
 # org-export-with-properties: ()
 # org-export-with-title: t
 # End:
