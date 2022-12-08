@@ -12,6 +12,7 @@
 
 - An [[https://www.youtube.com/watch?v=RQK_DaaX34Q&list=PLEoMzSkcN8oPQtn7FQEF3D7sroZbXuPZ7][elisp]] package
 - Bytecode compiling, linting, and test running
+- Commands to handle common elisp development gotchas
 - CI with [[https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs][Github Actions]], configured for Darwin (MacOS) and Linux
 - [[https://nixos.org/#examples][Nix]] environment for obtaining dependencies or
   reproducibly developing CI locally
@@ -26,6 +27,7 @@ answer all the questions.
 ** Install elisp-repo-kit
 
   #+begin_src elisp
+
     (use-package elisp-repo-kit)
 
     ;; straight-use-package-by-default t and you want a git version
