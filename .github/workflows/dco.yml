@@ -24,7 +24,7 @@
 # The check is added as a shield to the project's README.org so that all can see
 # the license check for the entire commit history.
 
-name: Developer Certificate of Origin Check
+name: DCO Check
 
 on:
   pull_request:
