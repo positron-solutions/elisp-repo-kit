@@ -502,9 +502,9 @@ and how they relate to each other.
 [[https://github.com/purcell/nix-emacs-ci][nix-emacs-ci]] capture the work needed to provide a running Emacs to CI.  Tools
 like [[https://github.com/doublep/eldev#continuous-integration][eldev]] and [[https://github.com/alphapapa/makem.sh/blob/master/test.yml][makem.sh]] have support for providing dependencies to that Emacs.
 The Nix flake [[./flake.nix][in this project]] describes both of these tasks.  Makem and Eldev
-etc document Gihub workflows, but the workflows in this repository are meant to
-be used out-of-the-box after cloning, although to be fare, this is very little
-work.
+etc document Gihub workflows, but *the workflows in this repository are meant to
+be used out-of-the-box after cloning*, although to be fair, there's more
+decisions than actual work.
 
 Nix-emacs-ci provides a lot of backwards-compatibility versions of Emacs.  The
 nix-overlay is more forward looking, providing =emacsGit= and sometimes other
