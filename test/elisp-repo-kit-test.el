@@ -1,4 +1,4 @@
-;;; elisp-repo-kit.el --- write a freaking package!  -*- lexical-binding: t; -*-
+;;; elisp-repo-kit-test.el --- test your freaking package!  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 Positron Solutions
 
@@ -22,21 +22,25 @@
 ;; CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ;;; Commentary:
-;; These tests are run by requiring elisp-repo-kit-test-setup.
+
+;; Run the batch tests from root directory:
+;; nix shell .#emacsGit --quick --script test/run-shim.el -- test
+;; Test dependencies can be provided to the Emacsen declared inside the root
+;; flake.nix.
+
+;; For local development, dependencies should be installed by the user.  Tests
+;; can be run from one of the project files using the `elisp-repo-kit-project-ert'
+;; command.
 
 ;;; Code:
 
-(require 'elisp-repo-kit)
+(require 'ert)
+(require 'elisp-repo-kit))
 
-(ert-deftest erk-great-job-test ()
-  "Tests if we are doing a great job."
-  (should (string-equal (elisp-repo-kit-great-job) "You're doing a great job!")))
-
-(ert-deftest erk-dash-dep-test ()
-  "Tests that dependencies are included with the provided Emacs.
-See the flake.nix for more information about providing your project dependencies
-for CI & local development."
-  (should (equal (elisp-repo-kit--dash-dep) '(1 4 9 16))))
+;; (declare-function erk-ert-dummy "elisp-repo-kit" ())
+;; (ert-deftest erk-ert-dummy-test ()
+;;   "Tests that tests are properly re-run with modified code."
+;;   (should (equal (erk-ert-dummy) 8)))
 
 (ert-deftest erk-clone-and-rename-test ()
   "Clone the repo and rename it, single step."
