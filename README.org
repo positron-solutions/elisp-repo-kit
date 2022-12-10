@@ -107,71 +107,91 @@ answer all the questions.
 - [[#footnote-on-fsf-and-emacs-core-licensing][Footnote on FSF and Emacs Core Licensing]]
 :END:
 
-* Local development instructions
+* Use to develop your package
+
+  Elisp repo kit contains some convenience functions to reload your package and
+  to discover and run ert tests.  These shortcuts just make common cases faster.
 
 ** Run tests
 
-You can /totally/ run the tests locally on whatever version of Emacs you have.
-*You do not need Nix to run tests.* CI will use Nix.  If you cannot reproduce a
-success (or failure) on CI, then you may want to switch to using nix to get a
-reprodicible toolchain so you can further develop with frozen versions from the
-nix [[https://nixos.wiki/wiki/Flakes][flake's]] flake.lock.
+   Run =elisp-repo-kit-ert-project= within your project.  The tests in =/test=
+   will be discovered, rebuilt & reloaded if necessary, and run.  There are a
+   few other commands to augment the [[https://www.gnu.org/software/emacs/manual/html_node/ert/][ert]] package.
 
-#+begin_src bash
-  nix develop # loads the devShells.default from flake.nix
-  direnv allow # same as above with file watching
+*** Running tests CI style
 
-  emacs --quick --load ./test/elisp-repo-kit-test-setup.el # graphical
-  emacs --script ./test/elisp-repo-kit-test-setup.el # terminal
+   If you cannot reproduce a failure (or success) on CI, then you may want to
+   switch to using nix to get a reprodicible toolchain so you can further
+   develop with frozen versions from the nix [[https://nixos.wiki/wiki/Flakes][flake's]] flake.lock.
 
-  make test # shortcut in Makefile
-#+end_src
+   #+begin_src bash
 
-You will want to run =make-clean= in between runs for now.
+     nix develop # loads the devShells.default from flake.nix
+     direnv allow # same as above with file watching
+
+     emacs --quick --load ./test/run-shim.el test # graphical
+     emacs --script ./test/run-test.el test # terminal
+
+   #+end_src
+
+   You can /totally/ run the tests locally on whatever version of Emacs you
+   have.  *You do not need Nix to run tests.* CI will use Nix.
 
 ** Lint and byte-compile code
 
-Use [[https://github.com/gonewest818/elisp-lint][elisp-lint]] to detect issues with byte compiling, package format, code
-structure and others.  The configuration is found inside
-[[./test/elisp-repo-kit-test-lint.el][elisp-repo-kit-test-lint.el]] and the CI run is invoked inside of [[.github/workflows/ci.yml][ci.yml]] using
-Emacs in script mode.  Most of the configuration is in the lisp files.  CI only
-tests on on one platform, with native compilation enabled.  The tests are also
-linted, to a less restrictive standard, found in
-[[./test/elisp-repo-kit-test-lint-tests.el][elisp-repo-kit-test-lint-tests.el]]
+   Use [[https://github.com/gonewest818/elisp-lint][elisp-lint]] to detect issues with byte compiling, package format, code
+   structure and others.
 
-You can run the lints manually almost the same as running tests.
-#+begin_src bash
-  nix develop
-  emacs --script test/elisp-repo-kit-lint.el
-  emacs --script test/elisp-repo-kit-lint-tests.el
+   The configuration is found inside [[./test/run-shim.el][test/run-shim.el]].  The CI run is invoked
+   inside of [[.github/workflows/ci.yml][ci.yml]] using Emacs in script mode.  Most of the configuration is in
+   the run shim.
 
-  make lint # shortcut in Makefile
-#+end_src
+   The tests are also linted, to a less restrictive standard, also found in
+   [[./test/run-shim.el][run-shim.el]]
 
-Stale bytecode can result in stale test behavior.  A Makefile is not yet
-available, so just delete all =*.elc= files in /lisp and /test.
+   You can run the lints manually almost the same as running tests.
+   #+begin_src bash
+
+     nix develop
+     # nix develop .#emacs28
+     # nix develop .#emacsGit
+     emacs --script test/run-shim.el lint
+     emacs --script test/run-shim.el lint-tests
+
+   #+end_src
 
 ** Loading and re-loading your package
 
-*When you need to reload the package, call ~unload-feature~ and select your
-package name.* If you do not unload, reloading has no effect and you will see
-stale behavior.
+   Run =elisp-repo-kit-reload-project= in one of your project files.  All features
+   in the /lisp directory will be re-compiled and loaded appropriately.
 
-Whichever package installer you use probably supports local overrides.  The
-recommendation is [[https://github.com/radian-software/straight.el#overriding-recipes][straight]].  If you install using straight, you can call
-=straight-rebuild-package= and it will rebuild and load (but not reload) the
-package.
+   *Note*, during reloading, unloading the current module is forced.  If other
+   packages you use depend on the project feature, results may be unpredicatable.
+   This is one reason batch style testing can be preferred.
 
-#+begin_src elisp
-  (straight-use-package
-   '(elisp-repo-kit :local-repo "~/my-packages/positron/elisp-repo-kit"))
-#+end_src
+*** Manual Loading & Reloading
 
-Because the load path is configured, you can call =(unload-feature
-'elisp-repo-kit)= and then =(require 'elisp-repo-kit)= to pick up changes.
-There should be a warning about stale byte code.
+    Especially in bootstrap situations such as working on this package itself,
+    you cannot unload the package in the middle of a command.  Some commands
+    have a =no-reload= variant just for this circumstance.
 
-# NOTE: Reload really needs to be implicit when rebuilding...
+    Call ~unload-feature~ and select your package name. If you do not unload,
+    reloading has no effect and you will see stale behavior.
+
+    When using locally installed packages such as with straight,
+    =straight-rebuild-pacakge= will rebuild but *not* reload.
+
+    Here's what such a local installation looks like:
+
+    #+begin_src elisp :eval never
+
+      (straight-use-package
+       '(elisp-repo-kit :local-repo "~/my-packages/positron/elisp-repo-kit"))
+
+    #+end_src
+
+    Because the load path is configured, you can call =(unload-feature
+    'elisp-repo-kit)= and then =(require 'elisp-repo-kit)= to pick up changes.
 
 * Finish setting up your new Github repo
 
@@ -304,30 +324,29 @@ There should be a warning about stale byte code.
   /After cloning and renaming,/ you will have a file tree like this:
 
   #+begin_src shell
+
     ├── .gitignore                        # ignores for byte compiles, autoloads etc
     ├── flake.nix                         # dependencies for this project
     ├── flake.lock                        # version controlled lock of flake.nix input versions
     ├── .envrc                            # direnv integration with `nix develop`
-    ├── Makefile                          # shorcuts for shell operations
     │
     ├── README.org                        # this file
     ├── COPYING                           # a GPL3 license
     ├── DCO                               # Developer Certificate of Origin
     │
     ├── .github
-    │   ├── pull_request_template.md      # reminders for PR contributors
-    │   └── workflows
-    │       ├── ci.yml                    # workflow for lints and tests
-    │       └── dco.yml                   # workflow to check DCO sign-offs
+    │   ├── pull_request_template.md      # reminders for PR contributors
+    │   └── workflows
+    │       ├── ci.yml                    # workflow for lints and tests
+    │       └── dco.yml                   # workflow to check DCO sign-offs
     │
     ├── lisp
-    │   └── elisp-repo-kit.el             # the package
+    │   └── elisp-repo-kit.el             # the package
     │
     └── test
-        ├── elisp-repo-kit-lint.el        # elisp-lint shim for /lisp
-        ├── elisp-repo-kit-lint-tests.el  # elisp-lint shim for /test
         ├── elisp-repo-kit-test.el        # ERT unit tests
-        └── elisp-repo-kit-test-setup.el  # test loading shim
+        └── run-shim.el                   # elisp script with test & lint routines
+
   #+end_src
 
 * Maintaining nixpkgs versions
