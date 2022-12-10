@@ -71,6 +71,9 @@ answer all the questions.
   you're doing at that point.  Call =elisp-repo-kit-rename= on its own to rename
   in these cases.
 
+  There are some customize options that cause the renaming to be transitively
+  consistent.
+
 * Contents                                                         :noexport:
 :PROPERTIES:
 :TOC:      :include siblings
@@ -210,10 +213,12 @@ answer all the questions.
     list:
 
     #+begin_src
+
     actions/checkout@v2.4.2,
     cachix/cachix-action@v10,
     cachix/install-nix-action@v15,
     tisonkun/actions-dco@v1.1
+
     #+end_src
 
   - [ ] Get your package working, pushed, actions run, and CI badges all green
