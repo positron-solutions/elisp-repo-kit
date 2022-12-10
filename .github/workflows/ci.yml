@@ -40,8 +40,6 @@ jobs:
         emacsPkg: [ emacs28,
                     emacsUnstable,
                     # emacsGit
-                    emacsNativeComp,
-                    emacs
                   ]
     runs-on: ${{ matrix.os }}
 
@@ -72,7 +70,7 @@ jobs:
         if: matrix.emacsPkg == 'emacs' && matrix.os == 'ubuntu-latest'
         run: |
           eval "$(nix print-dev-env \
-            --override-input nixpkgs github:nixos/nixpkgs/release-22.05 \
+            --override-input nixpkgs github:nixos/nixpkgs/release-22.11 \
             --update-input emacs-overlay \
             .#${{ matrix.emacsPkg }})"
 
@@ -80,10 +78,10 @@ jobs:
           ls
 
           # Lint the package
-          emacs --script test/elisp-repo-kit-lint.el
+          emacs --script test/run-shim.el -- lint
 
           # Lint the tests
-          emacs --script test/elisp-repo-kit-lint-tests.el
+          emacs --script test/run-shim.el -- lint-tests
 
       - name: run tests
         run: |
@@ -99,20 +97,20 @@ jobs:
           # print-dev-env
           if [[ $RUNNER_OS == Linux ]]; then
             eval "$(nix print-dev-env  \
-              --override-input nixpkgs github:nixos/nixpkgs/release-22.05 \
+              --override-input nixpkgs github:nixos/nixpkgs/release-22.11 \
               --update-input emacs-overlay \
               .#${{ matrix.emacsPkg }})"
 
           else
             eval "$(nix print-dev-env \
-              --override-input nixpkgs github:nixos/nixpkgs/nixpkgs-22.05-darwin \
+              --override-input nixpkgs github:nixos/nixpkgs/nixpkgs-22.11-darwin \
               --update-input emacs-overlay \
               .#${{ matrix.emacsPkg }})"
           fi
 
           # Runs the tests in a graphical window (can freeze)
-          # emacs --quick --load test/elisp-repo-kit-test-setup.el -- $GITHUB_SHA
+          # emacs --quick --load test/run-shim.el -- test $GITHUB_SHA
 
           # Run tests with terminal output and no graphical window
           ls test
-          emacs --script test/elisp-repo-kit-test-setup.el -- $GITHUB_SHA
+          emacs --script test/run-shim.el -- test $GITHUB_SHA

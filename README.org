@@ -129,8 +129,8 @@ answer all the questions.
      nix develop # loads the devShells.default from flake.nix
      direnv allow # same as above with file watching
 
-     emacs --quick --load ./test/run-shim.el test # graphical
-     emacs --script ./test/run-test.el test # terminal
+     emacs --quick --load ./test/run-shim.el -- test # graphical
+     emacs --script ./test/run-test.el -- test # terminal
 
    #+end_src
 
@@ -155,8 +155,8 @@ answer all the questions.
      nix develop
      # nix develop .#emacs28
      # nix develop .#emacsGit
-     emacs --script test/run-shim.el lint
-     emacs --script test/run-shim.el lint-tests
+     emacs --script test/run-shim.el -- lint
+     emacs --script test/run-shim.el -- lint-tests
 
    #+end_src
 
