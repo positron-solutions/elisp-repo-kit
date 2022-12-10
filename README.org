@@ -175,30 +175,30 @@ There should be a warning about stale byte code.
 
 * Finish setting up your new Github repo
 
-You can copy this checklist to your org agenda files:
+  You can copy this checklist to your org agenda files:
 
-- [X] Create a repository (from [[#Install elisp-repo-kit][install]] instructions)
-- [ ] Create an empty Github repository and check the git remote configuration
-- [ ] Set up your git commit signing (and verification so that it's obvious)
-  *and* [[#sign-off][sign-off]] so that it will be [[#Footnote-on-FSF-and-Emacs-Core-Licensing][straightforward]] for for FSF to pull in your
-  changes if they later change to DCO instead of copyright assignment.
-- [ ] Sign up for [[https://app.cachix.org/][cachix]] and, create a binary cache
-  with API tokens and public read access
-- [ ] Add secrets necessary for your Github actions =CACHIX_AUTH_TOKEN= and
-  =CACHIX_CACHE_NAME=
-- [ ] Enable actions and add the following actions to your allowed actions
-  list:
+  - [X] Create a repository (from [[#Install elisp-repo-kit][install]] instructions)
+  - [ ] Create an empty Github repository and check the git remote configuration
+  - [ ] Set up your git commit signing (and verification so that it's obvious)
+    *and* [[#sign-off][sign-off]] so that it will be [[#Footnote-on-FSF-and-Emacs-Core-Licensing][straightforward]] for for FSF to pull in your
+    changes if they later change to DCO instead of copyright assignment.
+  - [ ] Sign up for [[https://app.cachix.org/][cachix]] and, create a binary cache
+    with API tokens and public read access
+  - [ ] Add secrets necessary for your Github actions =CACHIX_AUTH_TOKEN= and
+    =CACHIX_CACHE_NAME=
+  - [ ] Enable actions and add the following actions to your allowed actions
+    list:
 
-  #+begin_src
-  actions/checkout@v2.4.2,
-  cachix/cachix-action@v10,
-  cachix/install-nix-action@v15,
-  tisonkun/actions-dco@v1.1
-  #+end_src
+    #+begin_src
+    actions/checkout@v2.4.2,
+    cachix/cachix-action@v10,
+    cachix/install-nix-action@v15,
+    tisonkun/actions-dco@v1.1
+    #+end_src
 
-- [ ] Get your package working, pushed, actions run, and CI badges all green
-- [ ] [[#Publishing-to-melpa][Publish]] to MELPA
-- [ ] Make a post on the [[https://old.reddit.com/r/emacs/][subreddit]] about your new package
+  - [ ] Get your package working, pushed, actions run, and CI badges all green
+  - [ ] [[#Publishing-to-melpa][Publish]] to MELPA
+  - [ ] Make a post on the [[https://old.reddit.com/r/emacs/][subreddit]] about your new package
 
 ** Optional Steps
 
@@ -212,126 +212,134 @@ You can copy this checklist to your org agenda files:
    add, require Actions approval for all outside contributors and leave
    repository permissions at read-only
 
-Cachix is somewhat optional.  It's free for open-source projects.  It's about as
-easy to sign up and generate the token as to remove the step from the Github
-actions.
+ Cachix is somewhat optional.  It's free for open-source projects.  It's about as
+ easy to sign up and generate the token as to remove the step from the Github
+ actions, so you won't save much time by avoiding it.
 
 * Publishing to MELPA
 
-If you have green CI, you have already passed many requirements of publishing a
-MELPA package.  *You still need to build your package and verify your recipe.*
-You are going to clone melpa in order to make your PR.  You can use the clone to
-verify the recipe.
+  If you have green CI, you have already passed many requirements of publishing a
+  MELPA package.  *You still need to build your package and verify your recipe.*
+  You are going to clone melpa in order to make your PR.  You can use the clone to
+  verify the recipe.
 
 ** Creating the recipe
 
-Fork MELPA personally (not for organization) and clone it to wherever you keep
-your upstreams.  It's a good idea to separate upstreams from projects you
-actively maintain so you can see and delete upstreams when not in use.
+   Fork MELPA personally (not for organization) and clone it to wherever you keep
+   your upstreams.  It's a good idea to separate upstreams from projects you
+   actively maintain so you can see and delete upstreams when not in use.
 
-#+begin_src shell
-  mkdir -p upstream
-  cd upstream
-  git clone git@github.com:$GITHUB_USER/melpa.git  # replace $GITHUB_USER
-#+end_src
+   #+begin_src shell
 
-Install package-build
+     mkdir -p upstream
+     cd upstream
+     git clone git@github.com:$GITHUB_USER/melpa.git  # replace $GITHUB_USER
 
-#+begin_src elisp
-  (use-package package-build)
-#+end_src
+   #+end_src
 
-=package-build-create-recipe= will give you something like:
+   Install package-build
 
-#+begin_src elisp
-(elisp-repo-kit :fetcher github :repo "positron-solutions/elisp-repo-kit")
-#+end_src
+   #+begin_src elisp
+     (use-package package-build)
+   #+end_src
 
-The following template can be filled in and pull-requested to MELPA to publish.
-You don't need to touch ~:files~.  The ~commit~ and ~branch~ are optional
-depending on how you version / develop / tag your releases.
+   =package-build-create-recipe= will give you something like:
 
-Copy the recipe into =recipes/elisp-repo-kit= inside your MELPA clone.
+   #+begin_src elisp
+   (elisp-repo-kit :fetcher github :repo "positron-solutions/elisp-repo-kit")
+   #+end_src
+
+   The following template can be filled in and pull-requested to MELPA to publish.
+   You don't need to touch ~:files~.  The ~commit~ and ~branch~ are optional
+   depending on how you version / develop / tag your releases.
+
+   Copy the recipe into =recipes/elisp-repo-kit= inside your MELPA clone.
 
 ** Testing package build
 
-Inside the MELPA clone root:
+   Inside the MELPA clone root:
 
-#+begin_src shell
-  # Builds the package
-  make recipes/elisp-repo-kit
-  # Test sandbox installation (will affect ~/.emacs.d/elpa  So much for sandbox ¯\_(ツ)_/¯
-  EMACS_COMMAND=$(which emacs) make sandbox INSTALL=elisp-repo-kit
-#+end_src
+   #+begin_src shell
+
+     # Builds the package
+     make recipes/elisp-repo-kit
+     # Test sandbox installation (will affect ~/.emacs.d/elpa  So much for sandbox ¯\_(ツ)_/¯
+     EMACS_COMMAND=$(which emacs) make sandbox INSTALL=elisp-repo-kit
+
+   #+end_src
 
 ** Testing stable package build
 
-You need a tag on your default (usually master) branch of your repo,
-=positron-solutions/elisp-repo-kit=. Use =git tag -S v0.1.0= and =git push
-origin v0.1.0=.  You can also just create a release in the Github interface.
+   You need a tag on your default (usually master) branch of your repo,
+   =positron-solutions/elisp-repo-kit=. Use =git tag -S v0.1.0= and =git push
+   origin v0.1.0=.  You can also just create a release in the Github interface.
 
-#+begin_src shell
-  # Test stable builds against your tags
-  STABLE=t make recipes/elisp-repo-kit
-#+end_src
+   #+begin_src shell
+
+     # Test stable builds against your tags
+     STABLE=t make recipes/elisp-repo-kit
+
+   #+end_src
 
 ** MELPA Lints
 
-Lastly, install [[https://github.com/riscy/melpazoid][melpazoid]] and call =melpazoid= on your main feature.  It does
-some additional lints.  You may need to install =package-lint= if you don't have
-it.  It's not declared in melpazoid's requirements.  Getting the package in Nix
-is not easy yet since melpazoid is not yet on Melpa.
+   Lastly, install [[https://github.com/riscy/melpazoid][melpazoid]] and call =melpazoid= on your main feature.  It does
+   some additional lints.  You may need to install =package-lint= if you don't have
+   it.  It's not declared in melpazoid's requirements.  Getting the package in Nix
+   is not easy yet since melpazoid is not yet on Melpa.
 
-#+begin_src elisp
-  (straight-use-package
-   '(melpazoid :type git :host github :repo "riscy/melpazoid" :files ("melpazoid/melpazoid.el")))
-#+end_src
+   #+begin_src elisp
 
-If everything works, you are ready to make a pull request to MELPA.  Push your
-changes and check all the boxes in the PR template except the one that requires
-you to read the instructions.
+     (straight-use-package
+      '(melpazoid :type git :host github :repo "riscy/melpazoid" :files ("melpazoid/melpazoid.el")))
+
+   #+end_src
+
+   If everything works, you are ready to make a pull request to MELPA.  Push your
+   changes and check all the boxes in the PR template except the one that requires
+   you to read the instructions.
 
 * Overview of file contents and structure
 
-/After cloning and renaming,/ you will have a file tree like this:
+  /After cloning and renaming,/ you will have a file tree like this:
 
-#+begin_src shell
-  ├── .gitignore                        # ignores for byte compiles, autoloads etc
-  ├── flake.nix                         # dependencies for this project
-  ├── flake.lock                        # version controlled lock of flake.nix input versions
-  ├── .envrc                            # direnv integration with `nix develop`
-  ├── Makefile                          # shorcuts for shell operations
-  │
-  ├── README.org                        # this file
-  ├── COPYING                           # a GPL3 license
-  ├── DCO                               # Developer Certificate of Origin
-  │
-  ├── .github
-  │   ├── pull_request_template.md      # reminders for PR contributors
-  │   └── workflows
-  │       ├── ci.yml                    # workflow for lints and tests
-  │       └── dco.yml                   # workflow to check DCO sign-offs
-  │
-  ├── lisp
-  │   └── elisp-repo-kit.el             # the package
-  │
-  └── test
-      ├── elisp-repo-kit-lint.el        # elisp-lint shim for /lisp
-      ├── elisp-repo-kit-lint-tests.el  # elisp-lint shim for /test
-      ├── elisp-repo-kit-test.el        # ERT unit tests
-      └── elisp-repo-kit-test-setup.el  # test loading shim
-#+end_src
+  #+begin_src shell
+    ├── .gitignore                        # ignores for byte compiles, autoloads etc
+    ├── flake.nix                         # dependencies for this project
+    ├── flake.lock                        # version controlled lock of flake.nix input versions
+    ├── .envrc                            # direnv integration with `nix develop`
+    ├── Makefile                          # shorcuts for shell operations
+    │
+    ├── README.org                        # this file
+    ├── COPYING                           # a GPL3 license
+    ├── DCO                               # Developer Certificate of Origin
+    │
+    ├── .github
+    │   ├── pull_request_template.md      # reminders for PR contributors
+    │   └── workflows
+    │       ├── ci.yml                    # workflow for lints and tests
+    │       └── dco.yml                   # workflow to check DCO sign-offs
+    │
+    ├── lisp
+    │   └── elisp-repo-kit.el             # the package
+    │
+    └── test
+        ├── elisp-repo-kit-lint.el        # elisp-lint shim for /lisp
+        ├── elisp-repo-kit-lint-tests.el  # elisp-lint shim for /test
+        ├── elisp-repo-kit-test.el        # ERT unit tests
+        └── elisp-repo-kit-test-setup.el  # test loading shim
+  #+end_src
 
-* Maintaining your versions
+* Maintaining nixpkgs versions
 
-Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]]
-and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get updated dependencies from MELPA, it's
-necessary to update the emacs-overlay with =nix flake lock --update-input
-emacs-overlay=.  You can also specify revs and branches if you need to roll
-back. There is a make shortcut: =make flake-update= MacOS tends to get a little
-less test emphasis, and so =nixpkgs-darwin-<version>= branches exist and are
-required to pass more Darwin tests before merging.  This is more stable if you
-are on MacOS. =nixpkgs-unstable= or =master= are your other less common options.
+  Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]]
+  and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get updated dependencies from MELPA, it's
+  necessary to update the emacs-overlay with =nix flake lock --update-input
+  emacs-overlay=.  You can also specify revs and branches if you need to roll
+  back. There is a make shortcut: =make flake-update= MacOS tends to get a little
+  less test emphasis, and so =nixpkgs-darwin-<version>= branches exist and are
+  required to pass more Darwin tests before merging.  This is more stable if you
+  are on MacOS. =nixpkgs-unstable= or =master= are your other less common options.
 
 * Licensing, Developer Certificate of Origin
 
@@ -364,7 +372,9 @@ are on MacOS. =nixpkgs-unstable= or =master= are your other less common options.
     following:
 
     #+begin_src
+
     Signed-off-by: Random J Developer <random@developer.example.org>
+
     #+end_src
 
 *** GPG signature
@@ -394,34 +404,39 @@ are on MacOS. =nixpkgs-unstable= or =master= are your other less common options.
 
 **** Automatic GPG signing with per-project keys
     
-    In order to specify which projects you intend to sign with which keys, you
-    will want to configure your git client using path-specific configurations.
+     In order to specify which projects you intend to sign with which keys, you
+     will want to configure your git client using path-specific configurations.
 
-    Configuing git for this can be done with the following directory structure:
+     Configuing git for this can be done with the following directory structure:
 
-    #+begin_src
+     #+begin_src
+
     /home/rjdeveloper/
     ├── .gitconfig
     └── .gitconfig.d
         ├── sco-linux-projects.conf
         ├── other-projects.conf
         └── gpg-signing-projects.conf
-    #+end_src
 
-    In your root config, ~.gitconfig~, add an =includeIf= directive that will
-    load the configuration you use for projects you intend to GPG sign commits
-    for.
+     #+end_src
 
-    #+begin_src
+     In your root config, ~.gitconfig~, add an =includeIf= directive that will
+     load the configuration you use for projects you intend to GPG sign commits
+     for.
+
+     #+begin_src
+
     [includeIf "gitdir:/home/rjdeveloper/**/gpg-signing/**/.git"]
       path = "~/.gitconfig.d/gpg-signing-projects.conf"
-    #+end_src
 
-    In the ~gpg-signing-projects.conf~ add your GPG signing configuration from
-    earlier.  =sign= adds the GPG signature automatically.  File an issue if you
-    need help with multiple GPG homes or other configurations.
+     #+end_src
 
-    #+begin_src
+     In the ~gpg-signing-projects.conf~ add your GPG signing configuration from
+     earlier.  =sign= adds the GPG signature automatically.  File an issue if you
+     need help with multiple GPG homes or other configurations.
+
+     #+begin_src
+
     [user]
       name = "Random J Developer"
       email = "random@developer.example.org"
@@ -430,119 +445,120 @@ are on MacOS. =nixpkgs-unstable= or =master= are your other less common options.
     [commit]
       sign = true
       gpgSign = true
-    #+end_src
+
+     #+end_src
 
 **** Manually signing & adding sign-off
 
-    If you don't like these configurations and want to individually indicate you
-    have read and intend to apply the DCO to your changes, these commands are
-    equivalent:
+     If you don't like these configurations and want to individually indicate you
+     have read and intend to apply the DCO to your changes, these commands are
+     equivalent:
 
-    #+begin_src bash
-      git commit -s -S --message "I don't like using .gitconfig"
+     #+begin_src bash
+       git commit -s -S --message "I don't like using .gitconfig"
 
-      # To clean up a commit
-      git commit --amend -s -S --no-message
+       # To clean up a commit
+       git commit --amend -s -S --no-message
 
-      # Combine with rebase to sign / sign-off multiple existing commits
-      git rebase -i
-    #+end_src
+       # Combine with rebase to sign / sign-off multiple existing commits
+       git rebase -i
+     #+end_src
 
 * Package scope and relation to other work
 
-This repository mainly captures the annoying work necessary to set up a new
-repository with everyting working.  By focusing on just one minimal task,
-cloning itself and renaming, there is very little work a user will need to
-identify and remove to reach the clean foundation.
+  This repository mainly captures the annoying work necessary to set up a new
+  repository with everyting working.  By focusing on just one minimal task,
+  cloning itself and renaming, there is very little work a user will need to
+  identify and remove to reach the clean foundation.
 
-Commands within this package will focus on cleaner integration of the tests and
-lints with Emacs.  There has been a lot of work in this area, but much of it is
-tangled with dependency management and sandbox creation.
+  Commands within this package will focus on cleaner integration of the tests and
+  lints with Emacs.  There has been a lot of work in this area, but much of it is
+  tangled with dependency management and sandbox creation.
 
 ** Dependency Management
 
-Many tools for testing Emacs packages provide dependency management and loading
-those dependencies into a fresh Emacs instance.  This package will never attempt
-to manage dependencies.  Dependencies will always be expressed through the Nix
-flake expressions and at most a lock file describing a frozen set of Emacs
-dependencies.
+   Many tools for testing Emacs packages provide dependency management and loading
+   those dependencies into a fresh Emacs instance.  This package will never attempt
+   to manage dependencies.  Dependencies will always be expressed through the Nix
+   flake expressions and at most a lock file describing a frozen set of Emacs
+   dependencies.
 
-Use of the [[https://github.com/nix-community/emacs-overlay][Emacs Nix Overlay]] is a simple way of stating and obtaining elisp
-dependencies for now.  Non-elisp dependencies are trivially provided form
-nixpkgs.  Nix is extremely reliable at dependency management, and it is no
-surprise that much complexity is normalized away by just the basic behavior
-model of Nix.  In addition, *if your project needs or includes additional binary
-dependencies or modules*, Nix is an excellent way to provide them to CI and
-users.
+   Use of the [[https://github.com/nix-community/emacs-overlay][Emacs Nix Overlay]] is a simple way of stating and obtaining elisp
+   dependencies for now.  Non-elisp dependencies are trivially provided form
+   nixpkgs.  Nix is extremely reliable at dependency management, and it is no
+   surprise that much complexity is normalized away by just the basic behavior
+   model of Nix.  In addition, *if your project needs or includes additional binary
+   dependencies or modules*, Nix is an excellent way to provide them to CI and
+   users.
 
 ** Discovering and Running Tests & Lints
 
-This repository uses very bare elisp that can be run with just one Emacs switch
-in most cases.  The Makefile merely exposes this interface with the even more
-familiar make style of user interaction.
+   This repository uses very bare elisp that can be run with just one Emacs switch
+   in most cases.  The Makefile merely exposes this interface with the even more
+   familiar make style of user interaction.
 
-The CI scripts are arranged to present a useful environment first.  The commands
-to invoke tests follow.  If the commands need to be changed, it is
-straightforward to change them /independently of how you provide dependencies/.
-Just be sure to propagate changes to the Makefile and README of your project.
+   The CI scripts are arranged to present a useful environment first.  The commands
+   to invoke tests follow.  If the commands need to be changed, it is
+   straightforward to change them /independently of how you provide dependencies/.
+   Just be sure to propagate changes to the Makefile and README of your project.
 
-Future versions of this project will continue to favor elisp scripts for test
-discovery and integration with Emacs.  Make and bash will be minimized.
+   Future versions of this project will continue to favor elisp scripts for test
+   discovery and integration with Emacs.  Make and bash will be minimized.
 
 ** Comparisons
 
-There are many comparisons available to understand the roles of similar tools
-and how they relate to each other.
+   There are many comparisons available to understand the roles of similar tools
+   and how they relate to each other.
 
-- [[https://github.com/alphapapa/makem.sh#comparisons][makem.sh]]
-- [[https://github.com/doublep/eldev#see-also][Eldev]]
-- [[https://github.com/emacs-twist/nomake][nomake]] Is another project with Nix work
+   - [[https://github.com/alphapapa/makem.sh#comparisons][makem.sh]]
+   - [[https://github.com/doublep/eldev#see-also][Eldev]]
+   - [[https://github.com/emacs-twist/nomake][nomake]] Is another project with Nix work
 
-[[https://github.com/purcell/nix-emacs-ci][nix-emacs-ci]] capture the work needed to provide a running Emacs to CI.  Tools
-like [[https://github.com/doublep/eldev#continuous-integration][eldev]] and [[https://github.com/alphapapa/makem.sh/blob/master/test.yml][makem.sh]] have support for providing dependencies to that Emacs.
-The Nix flake [[./flake.nix][in this project]] describes both of these tasks.  Makem and Eldev
-etc document Gihub workflows, but *the workflows in this repository are meant to
-be used out-of-the-box after cloning*, although to be fair, there's more
-decisions than actual work.
+   [[https://github.com/purcell/nix-emacs-ci][nix-emacs-ci]] capture the work needed to provide a running Emacs to CI.  Tools
+   like [[https://github.com/doublep/eldev#continuous-integration][eldev]] and [[https://github.com/alphapapa/makem.sh/blob/master/test.yml][makem.sh]] have support for providing dependencies to that Emacs.
+   The Nix flake [[./flake.nix][in this project]] describes both of these tasks.  Makem and Eldev
+   etc document Gihub workflows, but *the workflows in this repository are meant to
+   be used out-of-the-box after cloning*, although to be fair, there's more
+   decisions than actual work.
 
-Nix-emacs-ci provides a lot of backwards-compatibility versions of Emacs.  The
-nix-overlay is more forward looking, providing =emacsGit= and sometimes other
-upstream branches when a big feature like native compilation is in the pipeline.
-Nix-emacs-ci is also still using legacy Nix, without flakes.  Flakes are just
-nicer and the way Nix is going.
+   Nix-emacs-ci provides a lot of backwards-compatibility versions of Emacs.  The
+   nix-overlay is more forward looking, providing =emacsGit= and sometimes other
+   upstream branches when a big feature like native compilation is in the pipeline.
+   Nix-emacs-ci is also still using legacy Nix, without flakes.  Flakes are just
+   nicer and the way Nix is going.
 
 * Contributing
 
-First decide if you want to work on this repository or fork it to something
-entirely different.  Non-exhaustive list of changes that are very welcome:
+  First decide if you want to work on this repository or fork it to something
+  entirely different.  Non-exhaustive list of changes that are very welcome:
 
-- To the maximum degree possible, this project should lean on elisp as a CLI
-  script backend
-- Running additional kinds of tests
-- Running additional lints
-- Fix bugs
-- Expose trivial options where a structural choice has limited them
-  unnecessarily
-- Behave the same, but with a less complicated code
-- Guix support
+  - To the maximum degree possible, this project should lean on elisp as a CLI
+    script backend
+  - Running additional kinds of tests
+  - Running additional lints
+  - Fix bugs
+  - Expose trivial options where a structural choice has limited them
+    unnecessarily
+  - Behave the same, but with a less complicated code
+  - Guix support
 
-Changes will likely be rejected if it is aimed at:
+  Changes will likely be rejected if it is aimed at:
 
-- Managing dependencies outside of Nix expressions other than a package that is
-  supposed to manage dependencies or test obtaining dependencies in a
-  user-present use case
-- Backwards compatibility for Emacs two versions behind next release.  Master,
-  current stable release, and release - 1 are the only versions being supported
-- pre-flake Nix support
-- Guix support that interferes with Nix support
+  - Managing dependencies outside of Nix expressions other than a package that is
+    supposed to manage dependencies or test obtaining dependencies in a
+    user-present use case
+  - Backwards compatibility for Emacs two versions behind next release.  Master,
+    current stable release, and release - 1 are the only versions being supported
+  - pre-flake Nix support
+  - Guix support that interferes with Nix support
 
 * Shout-outs
 
-- [[https://github.com/alphapapa][alphapapa]] for being super prolific at everything, including package writing,
-  documentation, and activity on various social platforms
-- [[https://github.com/adisbladis][adisbladis]] for the Nix overlay that makes the CI and local development so nice
-- [[https://github.com/NobbZ][NobbZ]] for being all over the Nix & Emacs interwebs
-- [[https://www.fsf.org/][FSF]] and all contributors to Emacs & packages for the Yak shaving club
+  - [[https://github.com/alphapapa][alphapapa]] for being super prolific at everything, including package writing,
+    documentation, and activity on various social platforms
+  - [[https://github.com/adisbladis][adisbladis]] for the Nix overlay that makes the CI and local development so nice
+  - [[https://github.com/NobbZ][NobbZ]] for being all over the Nix & Emacs interwebs
+  - [[https://www.fsf.org/][FSF]] and all contributors to Emacs & packages for the Yak shaving club
 
 * Footnote on FSF and Emacs Core Licensing
 
