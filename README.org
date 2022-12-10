@@ -35,15 +35,14 @@ answer all the questions.
       :straight
       (elisp-repo-kit :type git :host github :repo "positron-solutions/elisp-repo-kit"))
 
-    ;; if straight-use-package-by-default is nil
-    (straight-use-package '(elisp-repo-kit :type git :host github
-                                           :repo "positron-solutions/elisp-repo-kit"))
-
     ;; using elpaca (recommended to add a hash for reproducibility)
     (elpaca-use-package
      (example :host github
-              :repo "positron-solutions/elisp-repo-kit")
-     :demand t)
+              :repo "positron-solutions/elisp-repo-kit"))
+
+    ;; if straight-use-package-by-default is nil
+    (straight-use-package '(elisp-repo-kit :type git :host github
+                                           :repo "positron-solutions/elisp-repo-kit"))
 
     ;; or use melpa, manual load-path & require, you brave yak shaver
 
