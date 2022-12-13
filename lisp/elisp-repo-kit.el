@@ -82,17 +82,13 @@ you can redistribute it and/or modify
 (defconst elisp-repo-kit--rename-maps ; directory file hard-replace
   '(( nil "gpl-3.0.txt" "COPYING")
     ("lisp/" "elisp-repo-kit.el" nil)
-    ("test/" "elisp-repo-kit-lint-tests.el" nil)
-    ("test/" "elisp-repo-kit-lint.el" nil)
-    ("test/" "elisp-repo-kit-test-setup.el" nil)
-    ("test/" "elisp-repo-kit-test.el" nil)))
+    ("test/" "elisp-repo-kit-test.el" nil)
+    ("test/" "run-shim.el" nil)))
 (defconst elisp-repo-kit--files-with-strings
   '("README.org"
     "lisp/elisp-repo-kit.el"
-    "test/elisp-repo-kit-lint.el"
-    "test/elisp-repo-kit-lint-tests.el"
     "test/elisp-repo-kit-test.el"
-    "test/elisp-repo-kit-test-setup.el"))
+    "test/run-shim.el"))
 
 (defun erk--project-root ()
   "Return project root or buffer directory."
