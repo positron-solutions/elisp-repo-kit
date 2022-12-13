@@ -79,7 +79,7 @@ you can redistribute it and/or modify
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.")
-(defconst elisp-repo-kit--rename-maps ; directory file hard-replace
+(defconst elisp-repo-kit--rename-maps ; directory file replacement-file
   '(( nil "gpl-3.0.txt" "COPYING")
     ("lisp/" "elisp-repo-kit.el" nil)
     ("test/" "elisp-repo-kit-test.el" nil)
@@ -219,19 +219,19 @@ feature reloading."
 
 (defun elisp-repo-kit--rename-package (dir old-package new-package)
   "Rename FILES in DIR.
-`elisp-repo-kit--rename-map' is a list of (<subdir> name
-<hard-rename>) triples.  When <subdir> is nil, it means use DIR.
-If <hard-rename> is nil means replace OLD-PACKAGE with NEW-PACKAGE,
-using `replace-regexp-in-string'.  DIR is the root of where we
-are renaming.  Existing files will be clobbered."
+`elisp-repo-kit--rename-map' is a list of (subdir filename
+replacement-filename) triples.  When subdir is nil, it means use
+DIR.  If replacement-filename is nil means replace OLD-PACKAGE
+with NEW-PACKAGE, using `replace-regexp-in-string'.  DIR is the
+root of where we are renaming.  Existing files will be
+clobbered."
   (mapc (lambda (rename-map)
           (let ((dir (concat dir (or (pop rename-map) "")))
-                (name (pop rename-map))
-                (hard-replace (pop rename-map)))
-            (let ((new-name (or hard-replace
-                                (replace-regexp-in-string old-package new-package name))))
-              (rename-file (concat dir name) (concat dir new-name) t))
-            (print (format "Used lexical variables %s %s" hard-replace rename-map))))
+                (filename (pop rename-map))
+                (replacement-filename (pop rename-map)))
+            (let ((new-name (or replacement-filename
+                                (replace-regexp-in-string old-package new-package filename))))
+              (rename-file (concat dir filename) (concat dir new-name) t))))
         elisp-repo-kit--rename-maps))
 
 (defun elisp-repo-kit--replace-strings (dir package-name author user-org email)
