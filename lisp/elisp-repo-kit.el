@@ -104,7 +104,7 @@ you can redistribute it and/or modify
   "Reload FEATURES, found in DIR."
   (dolist (feature features)
     (when (featurep feature) (unload-feature feature 'force)))
-  (let ((load-path (append elisp-dir load-path))
+  (let ((load-path (append (list dir) load-path))
         (load-prefer-newer t)
         (auto-compile-on-load-mode t)
         (auto-compile-on-save-mode t)
