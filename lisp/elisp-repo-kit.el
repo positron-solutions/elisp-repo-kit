@@ -351,21 +351,37 @@ by the author of this repository."
    clone-dir elisp-repo-kit-github-package-name package-name))
 
 ;;;###autoload
-(defun elisp-repo-kit-new (clone-root package-name author user-org email &optional rev)
+(defun elisp-repo-kit-new (package-name clone-root author user-org email &optional rev)
   "Clone elisp-repo-kit, rename, and relicense in one step.
-CLONE-ROOT is where you want to clone your package to.
-PACKAGE-NAME should be the long name of the package, what will
-show up in melpa etc.  AUTHOR will be used in copyright notices.
-USER-ORG is either your user or organization, which forms the
-first part of a github repo path.  EMAIL is shown after AUTHOR in
-package headers.  Optional REV is either a tag, branch or
-revision used in git checkout.
+CLONE-ROOT is where you want to clone your package to (including
+the clone dir).  PACKAGE-NAME should be the long name of the
+package, what will show up in melpa etc.  AUTHOR will be used in
+copyright notices.  USER-ORG is either your user or organization,
+which forms the first part of a github repo path.  EMAIL is shown
+after AUTHOR in package headers.  Optional REV is either a tag,
+branch or revision used in git checkout.
 
 See comments in `elisp-repo-kit-clone' and
 `elisp-repo-kit-rename-relicense' for implementation information
-and more details about argument usage.."
-  (interactive "sPackage name: \nsAuthor: \nsGithub organization or username: \
-\nsEmail: \nsRev tag, or branch: ")
+and more details about argument usage."
+  (interactive
+   (let* ((package-name
+           (read-string
+            (format "Package name, such as %s: " elisp-repo-kit-github-package-name)
+            "foo"))
+          (clone-root
+           (read-directory-name "Clone root: " default-directory))
+          (author
+           (let ((default (when (executable-find "git")
+                            (shell-command-to-string "git config user.name"))))
+             (read-string "Author: " default)))
+          (user-org (read-string "User or organization name: "))
+          (email
+           (let ((default (when (executable-find "git")
+                            (shell-command-to-string "git config user.email"))))
+             (read-string "Email: " default)))
+          (rev (read-string "Rev, tag, or branch (empty implies default branch): ")))
+     (list package-name clone-root author user-org email rev)))
   (elisp-repo-kit-rename-relicense
    (elisp-repo-kit-clone clone-root package-name user-org rev)
    package-name author user-org email))
