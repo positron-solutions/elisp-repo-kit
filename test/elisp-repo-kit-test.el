@@ -35,7 +35,7 @@
 ;;; Code:
 
 (require 'ert)
-(require 'elisp-repo-kit))
+(require 'elisp-repo-kit)
 
 ;; (declare-function erk-ert-dummy "elisp-repo-kit" ())
 ;; (ert-deftest erk-ert-dummy-test ()
