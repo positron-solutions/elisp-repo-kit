@@ -140,7 +140,7 @@ feature name derived file name"
   (erk--dir-features (concat (erk--project-root) "test" )))
 
 ;;;###autoload
-(defun erk-reload-project-features ()
+(defun erk-reload-project-package ()
   "Reload the features this project provides.
 The implementation assumes all packages pass package lint,
 providing a feature that matches the file name.
@@ -149,7 +149,7 @@ This function should attempt not to fail.  It is infrastructure
 for development, and being lenient for degenerate cases is fine."
   (interactive)
   (let* ((project-root (erk--project-root))
-         (lisp-subdir (concat project-root "/lisp"))
+         (lisp-subdir (concat project-root "lisp"))
          (project-elisp-dir (if (file-exists-p lisp-subdir) lisp-subdir
                               project-root))
          (package-features (erk--dir-features project-elisp-dir)))
@@ -165,44 +165,37 @@ This function should attempt not to fail.  It is infrastructure
 for development, and being lenient for degenerate cases is fine."
   (interactive)
   (let* ((project-root (erk--project-root))
-         (lisp-subdir (concat project-root "/test"))
+         (lisp-subdir (concat project-root "test"))
          (project-test-dir (if (file-exists-p lisp-subdir) lisp-subdir
-                              project-root))
+                             project-root))
          (package-features (erk--dir-features project-test-dir)))
-    (erk--reload package-features project-elisp-dir)))
+    (erk--reload package-features project-test-dir)))
 
 ;;;###autoload
 (defun erk-ert-rerun-this-no-reload ()
   "Rerun the ert test at point, but don't reaload anything.
-Use this when debugging something the tests are consuming or
-debugging elisp repo kit itself, which would likely behave
-unpredictably if reloaded in the middle of its own function
-call."
+Use this when debugging with external state or debugging elisp
+repo kit itself, which may behave strangely if reloaded in the
+middle of a command."
   (interactive)
   (save-excursion
     (beginning-of-defun)
     (let* ((form (funcall load-read-function (current-buffer)))
            (name (elt form 1)))
-      (ert `(member (,name))))))
+      (ert `(member ,name)))))
 
 ;;;###autoload
 (defun erk-ert-rerun-this ()
   "Rerun the ert test at point.
 Will reload all features and test features."
   (interactive)
-  ;; TODO detect if project is dirty and ask to reload
-  (erk-reload-project-features)
+  (erk-reload-project-package)
   (erk-reload-project-tests)
   (save-excursion
     (beginning-of-defun)
     (let* ((form (funcall load-read-function (current-buffer)))
            (name (elt form 1)))
-      (ert `(member ,(list name))))))
-
-(defun erk-ert-project-features ()
-  "List the features defined by the project.
-This assumes the convention of one elisp file per feature and
-feature name derived file name")
+      (ert `(member ,name)))))
 
 (defun erk-ert-project-results-buffer ()
   "Return an ERT buffer name based on project name.")
@@ -229,7 +222,7 @@ feature reloading."
 (defun erk-ert-project ()
   "Run all ert tests in this project."
   (interactive)
-  (erk-reload-project-features)
+  (erk-reload-project-package)
   (erk-reload-project-tests)
   (ert (erk-ert-project-selector)))
 
