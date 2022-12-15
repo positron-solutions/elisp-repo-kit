@@ -57,8 +57,8 @@
   (let ((rev (getenv "GITHUB_SHA"))
         (clone-root (make-temp-file "erk-clone-test-" t)))
     (erk-new
+     "new-project" ; package-name
      clone-root
-     "new-project" ; project-name
      "Selindis Raszagal" ; Author
      "new-shakuras" ; user-org
      "selindis.r@new-shakuras.planet" ; email
