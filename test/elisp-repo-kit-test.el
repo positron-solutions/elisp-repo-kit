@@ -37,23 +37,32 @@
 (require 'ert)
 (require 'elisp-repo-kit)
 
-;; (declare-function erk-ert-dummy "elisp-repo-kit" ())
-;; (ert-deftest erk-ert-dummy-test ()
-;;   "Tests that tests are properly re-run with modified code."
-;;   (should (equal (erk-ert-dummy) 8)))
+(ert-deftest erk--project-root-test ()
+  (should (string-match-p (rx "elisp-repo-kit/" eol)
+                        (erk--project-root))))
+
+(ert-deftest erk--dir-features-test ()
+  (should (equal
+           '(elisp-repo-kit)
+           (erk--dir-features (concat (erk--project-root) "lisp")))))
+
+(ert-deftest erk--package-features-test ()
+  (should (member 'elisp-repo-kit (erk--package-features))))
+
+(ert-deftest erk--test-features-test ()
+  (should (member 'elisp-repo-kit-test (erk--test-features))))
 
 (ert-deftest erk-clone-and-rename-test ()
   "Clone the repo and rename it, single step."
-  (let ((rev (pop argv))
-        (clone-root (make-temp-file "elisp-repo-kit" t)))
+  (let ((rev (getenv "GITHUB_SHA"))
+        (clone-root (make-temp-file "elisp-repo-kit-clone-test-" t)))
     (elisp-repo-kit-new
      clone-root
-     "clone-rename-test" ; project-name
+     "clone-rename" ; project-name
      "Selindis Raszagal" ; Author
      "new-shakuras" ; user-org
      "selindis.r@new-shakuras.planet" ; email
      rev))) ; possibly nil
 
 (provide 'elisp-repo-kit-test)
-
 ;;; elisp-repo-kit-test.el ends here.
