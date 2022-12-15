@@ -58,11 +58,12 @@
         (clone-root (make-temp-file "elisp-repo-kit-clone-test-" t)))
     (elisp-repo-kit-new
      clone-root
-     "clone-rename" ; project-name
+     "new-project" ; project-name
      "Selindis Raszagal" ; Author
      "new-shakuras" ; user-org
      "selindis.r@new-shakuras.planet" ; email
-     rev))) ; possibly nil
+     rev) ; possibly nil
+    (delete-directory clone-root)))
 
 (provide 'elisp-repo-kit-test)
 ;;; elisp-repo-kit-test.el ends here.

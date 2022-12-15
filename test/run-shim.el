@@ -119,11 +119,14 @@
       (print (format "Normalizing arguments, stripped: %s" (pop argv))))
     (pop argv))
 
+  (message "original default directory: %s" default-directory)
   ;; Configure load paths
   (setq default-directory (if load-file-name (file-name-directory load-file-name)
                             default-directory))
-  (let* ((tests-dir (expand-file-name (concat default-directory "../tests/")))
-         (lisp-dir (expand-file-name (concat default-directory "../lisp/"))))
+  (let* ((tests-dir (expand-file-name (concat default-directory "../test")))
+         (lisp-dir (expand-file-name (concat default-directory "../lisp"))))
+    (print (format "test load path: %s" tests-dir))
+    (print (format "package load path: %s" lisp-dir))
     (push tests-dir load-path)
     (push lisp-dir load-path))
 
