@@ -4,8 +4,8 @@
 
 ;; Author:  <author>
 ;; Keywords: convenience
-;; Version: 0.1.0
-;; Package-Requires: ((emacs "25.1") (project "0.7.1") (auto-compile "1.2.0") (dash "2.18.0")
+;; Version: 0.2.0
+;; Package-Requires: ((emacs "25.1") (project "0.7.1") (auto-compile "1.2.0") (dash "2.18.0") (ert "0"))
 ;; Homepage: http://github.com/positron-solutions/elisp-repo-kit
 
 ;; Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -50,6 +50,7 @@
 (require 'project) ; see flake.nix for providing dependencies for CI and local development.
 (require 'auto-compile)
 (require 'dash)
+(require 'ert)
 
 (defgroup elisp-repo-kit nil "Elisp repository kit.")
 
