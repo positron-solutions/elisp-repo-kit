@@ -212,8 +212,10 @@ will run, so new features or new symbols only avaialble after
 reload will not be picked up.  Run this after any necessary
 feature reloading."
   (let ((project-test-symbols
-         (mapcan (erk-ert-project-features) #'feature-symbols)))
-    (list 'satisfies (lambda (test) (member test project-test-symbols)))))
+         (mapcan #'feature-symbols (erk--test-features))))
+    `(satisfies ,(lambda (test) (member
+                            (ert-test-name test)
+                            project-test-symbols)))))
 
 ;;;###autoload
 (defun erk-ert-project ()
