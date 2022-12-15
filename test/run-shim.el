@@ -42,27 +42,7 @@
 
 ;;; Code:
 
-;; This expression normalizes the behavior of --quick --load <file> and --script
-;; <file> behavior.  If you don't do this, --script will see every argument
-;; passed and the arguments from the Nix wrapper to set load paths.  You can use
-;; this to pass extra options to your scripts in the github actions.
-(when (member (car argv) '("-l" "--"))
-  (print "Normalizing arguments")
-  (while (not (member (car argv) '("--" nil)))
-    (print (format "Normalizing arguments, stripped: %s" (pop argv))))
-  (pop argv))
-
-;; Configure load paths
-(setq default-directory (or (file-name-directory load-file-name) default-directory))
-(let* ((tests-dir (expand-file-name (concat default-directory "../tests/")))
-       (lisp-dir (expand-file-name (concat default-directory "../lisp/"))))
-  (push tests-dir load-path)
-  (push lisp-dir load-path))
-
-;; running manually may encounter stale .elc
-(setq load-prefer-newer t)
-
-(defun lint-package ()
+(defun erk--lint-package ()
   "Lint the files in the package directory."
 
   (require 'elisp-lint)
@@ -87,13 +67,13 @@
     (message "ARGS: %s" command-line-args-left)
 
     ;; (setq elisp-lint-ignored-validators nil
-    ;;  elisp-lint-file-validators nil
-    ;;  elisp-lint-buffer-validators nil
-    ;;  elisp-lint-batch-files nil)
+    ;;       elisp-lint-file-validators nil
+    ;;       elisp-lint-buffer-validators nil
+    ;;       elisp-lint-batch-files nil)
 
     (elisp-lint-files-batch)))
 
-(defun lint-tests ()
+(defun erk--lint-tests ()
   "Lint the files in the test directory."
 
   (require 'elisp-lint)
@@ -121,19 +101,48 @@
            (file-expand-wildcards "../test/*.el")))))
 
     ;; (setq elisp-lint-ignored-validators nil
-    ;;  elisp-lint-file-validators nil
-    ;;  elisp-lint-buffer-validators nil
-    ;;  elisp-lint-batch-files nil)
+    ;;       elisp-lint-file-validators nil
+    ;;       elisp-lint-buffer-validators nil
+    ;;       elisp-lint-batch-files nil)
 
     (elisp-lint-files-batch)))
 
-;; Consume the command and run one of the routines
-(setq command (pop argv)) ; nil-safe
-(cond ((string= command "test")
-       (require 'elisp-repo-kit-test)
-       (ert t))
-      ((string= command "lint") (lint-package))
-      ((string= command "lint-tests") (lint-tests))
-      t (print "Command not recognized.  Use test, lint, lint-tests etc."))
+(defun erk--run-shim ()
+  "Execute a CI process based on CLI arguments."
+  ;; This expression normalizes the behavior of --quick --load <file> and --script
+  ;; <file> behavior.  If you don't do this, --script will see every argument
+  ;; passed and the arguments from the Nix wrapper to set load paths.  You can use
+  ;; this to pass extra options to your scripts in the github actions.
+  (when (member (car argv) '("-l" "--"))
+    (print "Normalizing arguments")
+    (while (not (member (car argv) '("--" nil)))
+      (print (format "Normalizing arguments, stripped: %s" (pop argv))))
+    (pop argv))
 
+  ;; Configure load paths
+  (setq default-directory (if load-file-name (file-name-directory load-file-name)
+                            default-directory))
+  (let* ((tests-dir (expand-file-name (concat default-directory "../tests/")))
+         (lisp-dir (expand-file-name (concat default-directory "../lisp/"))))
+    (push tests-dir load-path)
+    (push lisp-dir load-path))
+
+  ;; running manually may encounter stale .elc
+  (setq load-prefer-newer t)
+
+  ;; Consume the command argument and run one of the routines
+  (setq command (pop argv)) ; nil-safe
+  (cond ((string= command "test")
+         (require 'elisp-repo-kit-test)
+         (ert t))
+        ((string= command "lint") (erk--lint-package))
+        ((string= command "lint-tests") (erk--lint-tests))
+        t (print "Command not recognized.  Use test, lint, lint-tests etc.")))
+
+;; Only attempt to run when Emacs is loading with or --batch --no-x-resources,
+;; which is implied by -Q.
+(when (or noninteractive inhibit-x-resources)
+  (erk--run-shim))
+
+(provide 'run-shim)
 ;;; run-shim.el ends here
