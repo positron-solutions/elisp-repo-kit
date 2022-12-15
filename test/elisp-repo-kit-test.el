@@ -50,7 +50,7 @@
   (should (member 'elisp-repo-kit (erk--package-features))))
 
 (ert-deftest erk--test-features-test ()
-  (should (member 'erk-test (erk--test-features))))
+  (should (member 'elisp-repo-kit-test (erk--test-features))))
 
 (ert-deftest erk-clone-and-rename-test ()
   "Clone the repo and rename it, single step."
@@ -63,7 +63,7 @@
      "new-shakuras" ; user-org
      "selindis.r@new-shakuras.planet" ; email
      rev) ; possibly nil
-    (delete-directory clone-root)))
+    (delete-directory clone-root t)))
 
 (provide 'elisp-repo-kit-test)
 ;;; elisp-repo-kit-test.el ends here.
