@@ -212,11 +212,17 @@ This selector generates the symbols list before that selector
 will run, so new features or new symbols only avaialble after
 reload will not be picked up.  Run this after any necessary
 feature reloading."
-  (let ((project-test-symbols
-         (mapcan #'feature-symbols (erk--test-features))))
-    `(satisfies ,(lambda (test) (member
-                            (ert-test-name test)
-                            project-test-symbols)))))
+  (let* ((test-features (erk--test-features))
+         (test-symbols (->> test-features
+                            (-map #'symbol-file)
+                            (--map (cdr (assoc it load-history)))
+                            (-flatten-n 1)
+                            (--filter (eq 'define-symbol-props (car it)))
+                            (-map #'cdr)
+                            (-flatten-n 2))))
+    (message "test-symbols: %s" test-symbols)
+    `(satisfies ,(lambda (test)
+                   (member (ert-test-name test) test-symbols)))))
 
 ;;;###autoload
 (defun erk-ert-project ()
