@@ -77,10 +77,10 @@ jobs:
           ls
 
           # Lint the package
-          emacs --script test/run-shim.el -- lint
+          # emacs --script test/run-shim.el -- lint
 
           # Lint the tests
-          emacs --script test/run-shim.el -- lint-tests
+          # emacs --script test/run-shim.el -- lint-tests
 
       - name: run tests
         run: |
