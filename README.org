@@ -217,9 +217,11 @@ answer all the questions.
     actions/checkout@v2.4.2,
     cachix/cachix-action@v10,
     cachix/install-nix-action@v15,
-    tisonkun/actions-dco@v1.1
+    actions/setup-python@v4,
 
     #+end_src
+
+    *Note*, Python is used to run a DCO check script, nothing more.
 
   - [ ] Get your package working, pushed, actions run, and CI badges all green
   - [ ] [[#Publishing-to-melpa][Publish]] to MELPA
