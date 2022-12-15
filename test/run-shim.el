@@ -57,7 +57,7 @@
          (append
           '(;; "--no-<check>
             ;; "--no-byte-compile"
-            ;; "--no-checkdoc"
+            "--no-checkdoc"
             ;; "--no-check-declare"
             )
           (seq-filter
@@ -93,7 +93,7 @@
           '("--no-package-lint"
             ;; "--no-<check>
             ;; "--no-byte-compile"
-            ;; "--no-checkdoc"
+            "--no-checkdoc"
             ;; "--no-check-declare"
             )
           (seq-filter
