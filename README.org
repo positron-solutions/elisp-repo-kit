@@ -21,7 +21,7 @@
 
 *To get started:*
 
-Install the package and run =elisp-repo-kit-new=, provide a directory, and
+Install the package and run =erk-new=, provide a directory, and
 answer all the questions.
 
 ** Install elisp-repo-kit
@@ -48,7 +48,7 @@ answer all the questions.
 
   #+end_src
 
-=elisp-repo-kit-new= will ask for:
+=erk-new= will ask for:
 
   - Root directory you want to clone to
   - Package name
@@ -56,19 +56,19 @@ answer all the questions.
   - Github user or organization
   - Email address
 
- The =elisp-clone-repo-kit-new= calls =elisp-repo-kit-rename-relicense= to
- rename all of the files, string replace names, and re-license to GPL3.  Now
- just follow the steps in [[#finish-setting-up-your-new-github-repo][finish setting up]] Have fun!
+ The =erk-new= calls =erk-rename-relicense= to rename all of the files, string
+ replace names, and re-license to GPL3.  Now just follow the steps in [[#finish-setting-up-your-new-github-repo][finish
+ setting up]] Have fun!
 
 *** Manual cloning
 
-  The standalone command, =elisp-repo-kit-clone= will clone without renaming.
+  The standalone command, =erk-clone= will clone without renaming.
 
   This repo is also a [[https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template][template repository]], so you can fork without forking
   (Bruce Lee).
 
   If you create via template or clone manually, it's presumed you know what
-  you're doing at that point.  Call =elisp-repo-kit-rename= on its own to rename
+  you're doing at that point.  Call =erk-rename= on its own to rename
   in these cases.
 
   There are some customize options that cause the renaming to be transitively
@@ -117,7 +117,7 @@ answer all the questions.
 
 ** Run tests
 
-   Run =elisp-repo-kit-ert-project= within your project.  The tests in =/test=
+   Run =erk-ert-project= within your project.  The tests in =/test=
    will be discovered, rebuilt & reloaded if necessary, and run.  There are a
    few other commands to augment the [[https://www.gnu.org/software/emacs/manual/html_node/ert/][ert]] package.
 
@@ -165,7 +165,7 @@ answer all the questions.
 
 ** Loading and re-loading your package
 
-   Run =elisp-repo-kit-reload-project= in one of your project files.  All features
+   Run =erk-reload-package= in one of your project files.  All features
    in the /lisp directory will be re-compiled and loaded appropriately.
 
    *Note*, during reloading, unloading the current module is forced.  If other
@@ -193,7 +193,7 @@ answer all the questions.
 
     #+end_src
 
-    Because the load path is configured, you can call =(unload-feature
+    Because the load path is configured above, you can call =(unload-feature
     'elisp-repo-kit)= and then =(require 'elisp-repo-kit)= to pick up changes.
 
 * Finish setting up your new Github repo

@@ -29,7 +29,7 @@
 ;; flake.nix.
 
 ;; For local development, dependencies should be installed by the user.  Tests
-;; can be run from one of the project files using the `elisp-repo-kit-project-ert'
+;; can be run from one of the project files using the `erk-ert-project'
 ;; command.
 
 ;;; Code:
@@ -50,13 +50,13 @@
   (should (member 'elisp-repo-kit (erk--package-features))))
 
 (ert-deftest erk--test-features-test ()
-  (should (member 'elisp-repo-kit-test (erk--test-features))))
+  (should (member 'erk-test (erk--test-features))))
 
 (ert-deftest erk-clone-and-rename-test ()
   "Clone the repo and rename it, single step."
   (let ((rev (getenv "GITHUB_SHA"))
-        (clone-root (make-temp-file "elisp-repo-kit-clone-test-" t)))
-    (elisp-repo-kit-new
+        (clone-root (make-temp-file "erk-clone-test-" t)))
+    (erk-new
      clone-root
      "new-project" ; project-name
      "Selindis Raszagal" ; Author

@@ -36,7 +36,7 @@
 ;;
 ;; The package also uses its own hosted source as a substrate for creating new
 ;; packages.  It will clone its source respository and then perform renaming &
-;; relicensing.  Simply call `elisp-repo-kit-new' to start a new package.  The
+;; relicensing.  Simply call `erk-new' to start a new package.  The
 ;; README documents remaining setup steps on Github and in preparation for
 ;; publishing on MELPA.
 ;;
@@ -52,23 +52,23 @@
 (require 'dash)
 (require 'ert)
 
-(defgroup elisp-repo-kit nil "Elisp repository kit.")
+(defgroup elisp-repo-kit nil "Elisp repository kit." :prefix 'erk)
 
-(defcustom elisp-repo-kit-github-package-name "elisp-repo-kit"
+(defcustom erk-github-package-name "elisp-repo-kit"
   "Default Github <project> for cloning templates.
 If you rename this repository after forking, you need to set this
 to clone from within the fork."
   :group 'elisp-repo-kit
   :type 'string)
 
-(defcustom elisp-repo-kit-github-userorg "positron-solutions"
+(defcustom erk-github-userorg "positron-solutions"
   "Default Github <user-or-org> for cloning templates.
 If you fork this repository, you need to set this to clone it
 from within the fork."
   :group 'elisp-repo-kit
   :type 'string)
 
-(defconst elisp-repo-kit--gpl3-notice ";; This program is free software; \
+(defconst erk--gpl3-notice ";; This program is free software; \
 you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
@@ -82,13 +82,13 @@ you can redistribute it and/or modify
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.")
 
-(defconst elisp-repo-kit--rename-maps ; directory file replacement-file
+(defconst erk--rename-maps ; directory file replacement-file
   '(( nil "gpl-3.0.txt" "COPYING")
     ("lisp/" "elisp-repo-kit.el" nil)
     ("test/" "elisp-repo-kit-test.el" nil)
     ("test/" "run-shim.el" nil)))
 
-(defconst elisp-repo-kit--files-with-strings
+(defconst erk--files-with-strings
   '("README.org"
     "lisp/elisp-repo-kit.el"
     "test/elisp-repo-kit-test.el"
@@ -97,6 +97,7 @@ you can redistribute it and/or modify
 (defun erk--project-root ()
   "Return project root or buffer directory."
   (let ((project (project-current)))
+    ;; TODO remove pre-28 support
     (or (if (version<= emacs-version "28.0")
             (car (with-suppressed-warnings
                      ((obsolete project-roots))
@@ -227,9 +228,9 @@ feature reloading."
   (erk-reload-project-tests)
   (ert (erk-ert-project-selector)))
 
-(defun elisp-repo-kit--rename-package (dir old-package new-package)
+(defun erk--rename-package (dir old-package new-package)
   "Rename FILES in DIR.
-`elisp-repo-kit--rename-map' is a list of (subdir filename
+`erk--rename-map' is a list of (subdir filename
 replacement-filename) triples.  When subdir is nil, it means use
 DIR.  If replacement-filename is nil means replace OLD-PACKAGE
 with NEW-PACKAGE, using `replace-regexp-in-string'.  DIR is the
@@ -242,22 +243,22 @@ clobbered."
             (let ((new-name (or replacement-filename
                                 (replace-regexp-in-string old-package new-package filename))))
               (rename-file (concat dir filename) (concat dir new-name) t))))
-        elisp-repo-kit--rename-maps))
+        erk--rename-maps))
 
-(defun elisp-repo-kit--replace-strings (dir package-name author user-org email)
+(defun erk--replace-strings (dir package-name author user-org email)
   "Replace values in files that need renaming or re-licensing.
 DIR is where we are replacing.  PACKAGE-NAME is the new package.
 AUTHOR will be used in copyright notices.  USER-ORG will be used
 as the first part of the new github path.  EMAIL is shown after
 AUTHOR in package headers."
   (let ((default-directory dir)
-        (elisp-repo-kit-github-path (concat elisp-repo-kit-github-userorg "/"
-                                            elisp-repo-kit-github-package-name))
+        (erk-github-path (concat erk-github-userorg "/"
+                                            erk-github-package-name))
         (github-path (concat user-org "/" package-name))
         (capitalized-package-title
          (string-join
           (mapcar #'capitalize
-                  (split-string elisp-repo-kit-github-package-name "-"))
+                  (split-string erk-github-package-name "-"))
           " ")))
     (mapc
      (lambda (file)
@@ -273,24 +274,24 @@ AUTHOR in package headers."
          (goto-char (point-min))
          ;; replace license with GPL3 notice
          (when (re-search-forward ";; Permission \\(.\\|\n\\)*SOFTWARE.$" nil t)
-           (replace-match elisp-repo-kit--gpl3-notice))
+           (replace-match erk--gpl3-notice))
          (goto-char (point-min))
          ;; update github paths for README links
-         (while (re-search-forward elisp-repo-kit-github-path nil t)
+         (while (re-search-forward erk-github-path nil t)
            (replace-match github-path))
          (goto-char (point-min))
          ;; update remaining package name strings
-         (while (re-search-forward elisp-repo-kit-github-package-name nil t)
+         (while (re-search-forward erk-github-package-name nil t)
            (replace-match package-name))
          (goto-char (point-min))
          (while (re-search-forward capitalized-package-title nil t)
            (replace-match capitalized-package-title))
          (save-buffer 0)
          (kill-buffer)))
-     elisp-repo-kit--files-with-strings)))
+     erk--files-with-strings)))
 
 ;;;###autoload
-(defun elisp-repo-kit-clone (clone-root package-name user-org &optional rev)
+(defun erk-clone (clone-root package-name user-org &optional rev)
   "Clone elisp-repo-kit to CLONE-ROOT and apply rename.
 PACKAGE-NAME will instruct git how to name the clone.  USER-ORG
 is the user or organization you will use for your Github
@@ -304,8 +305,8 @@ itself, as a quine and for forking as a new template repository."
         (shell-command
          (format "cd %s; %s clone https://github.com/%s/%s.git %s"
                  clone-root git-bin
-                 elisp-repo-kit-github-userorg
-                 elisp-repo-kit-github-package-name
+                 erk-github-userorg
+                 erk-github-package-name
                  package-name))
         (shell-command
          (format "cd %s/%s" clone-root package-name))
@@ -321,7 +322,7 @@ itself, as a quine and for forking as a new template repository."
     (error "Could not find git executible")))
 
 ;;;###autoload
-(defun elisp-repo-kit-rename-relicense (clone-dir package-name author user-org email)
+(defun erk-rename-relicense (clone-dir package-name author user-org email)
   "Rename and relicense your clone of elisp-repo-kit.
 CLONE-DIR is your elisp-repo-clone root.  PACKAGE-NAME should be
 the long name of the package, what will show up in melpa etc.
@@ -345,13 +346,13 @@ Re-licensing is fully permitted by the MIT license and intended
 by the author of this repository."
   (interactive "DCloned directory: \nsPackage name: \nsAuthor: \
 \nsGithub organization or username: \nsEmail: ")
-  (elisp-repo-kit--replace-strings
+  (erk--replace-strings
    clone-dir package-name author user-org email)
-  (elisp-repo-kit--rename-package
-   clone-dir elisp-repo-kit-github-package-name package-name))
+  (erk--rename-package
+   clone-dir erk-github-package-name package-name))
 
 ;;;###autoload
-(defun elisp-repo-kit-new (package-name clone-root author user-org email &optional rev)
+(defun erk-new (package-name clone-root author user-org email &optional rev)
   "Clone elisp-repo-kit, rename, and relicense in one step.
 CLONE-ROOT is where you want to clone your package to (including
 the clone dir).  PACKAGE-NAME should be the long name of the
@@ -361,13 +362,13 @@ which forms the first part of a github repo path.  EMAIL is shown
 after AUTHOR in package headers.  Optional REV is either a tag,
 branch or revision used in git checkout.
 
-See comments in `elisp-repo-kit-clone' and
-`elisp-repo-kit-rename-relicense' for implementation information
+See comments in `erk-clone' and
+`erk-rename-relicense' for implementation information
 and more details about argument usage."
   (interactive
    (let* ((package-name
            (read-string
-            (format "Package name, such as %s: " elisp-repo-kit-github-package-name)
+            (format "Package name, such as %s: " erk-github-package-name)
             "foo"))
           (clone-root
            (read-directory-name "Clone root: " default-directory))
@@ -382,8 +383,8 @@ and more details about argument usage."
              (read-string "Email: " default)))
           (rev (read-string "Rev, tag, or branch (empty implies default branch): ")))
      (list package-name clone-root author user-org email rev)))
-  (elisp-repo-kit-rename-relicense
-   (elisp-repo-kit-clone clone-root package-name user-org rev)
+  (erk-rename-relicense
+   (erk-clone clone-root package-name user-org rev)
    package-name author user-org email))
 
 (provide 'elisp-repo-kit)
