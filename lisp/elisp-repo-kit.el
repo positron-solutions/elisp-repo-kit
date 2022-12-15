@@ -80,11 +80,13 @@ you can redistribute it and/or modify
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.")
+
 (defconst elisp-repo-kit--rename-maps ; directory file replacement-file
   '(( nil "gpl-3.0.txt" "COPYING")
     ("lisp/" "elisp-repo-kit.el" nil)
     ("test/" "elisp-repo-kit-test.el" nil)
     ("test/" "run-shim.el" nil)))
+
 (defconst elisp-repo-kit--files-with-strings
   '("README.org"
     "lisp/elisp-repo-kit.el"
@@ -119,9 +121,8 @@ you can redistribute it and/or modify
   "Return list of features provided by elisp files in DIR.
 Except autoloads."
   (let* ((package-files (directory-files dir nil (rx ".el" string-end)))
-         (package-files (--reject
-                         (string-match-p (rx "autoloads.el" string-end) it)
-                         package-files)))
+         (package-files (->> package-files
+                             (--reject (string-match-p (rx "autoloads.el" string-end) it)))))
     (mapcar
      (lambda (f) (intern (string-remove-suffix ".el" f)))
      package-files)))
