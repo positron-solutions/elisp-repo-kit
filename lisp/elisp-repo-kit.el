@@ -125,6 +125,18 @@ Except autoloads."
      (lambda (f) (intern (string-remove-suffix ".el" f)))
      package-files)))
 
+(defun erk--package-features ()
+  "List the features defined by the project's package.
+This assumes the convention of one elisp file per feature and
+feature name derived file name"
+  (erk--dir-features (concat (erk--project-root) "lisp" )))
+
+(defun erk--test-features ()
+  "List the features defined in project's test packages.
+This assumes the convention of one elisp file per feature and
+feature name derived file name"
+  (erk--dir-features (concat (erk--project-root) "test" )))
+
 ;;;###autoload
 (defun erk-reload-project-features ()
   "Reload the features this project provides.
