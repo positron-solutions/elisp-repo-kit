@@ -226,12 +226,6 @@ feature reloading."
   (erk-reload-project-tests)
   (ert (erk-ert-project-selector)))
 
-;;;###autoload
-(defun erk-modified-command ()
-  "Say some stuff, but don't save this."
-  (interactive)
-  (message "thisfis moaod  fi lololol even more"))
-
 (defun elisp-repo-kit--rename-package (dir old-package new-package)
   "Rename FILES in DIR.
 `elisp-repo-kit--rename-map' is a list of (subdir filename
