@@ -44,16 +44,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2.4.2
-      - uses: cachix/install-nix-action@v15
+      - uses: cachix/install-nix-action@v18
         with:
           extra_nix_config: |
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      - uses: cachix/cachix-action@v10
+      - uses: cachix/cachix-action@v12
         with:
           # This CACHIX_AUTH_TOKEN & CACHIX_CACHE_NAME are secrets you must set
           # in your repository settings
           name: ${{ secrets.CACHIX_CACHE_NAME }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          extraPullNames: nix-community # look for pre-built binaries from upstream
           # Some paths may confuse cachix.  Add them with a pipe to the pushFilter
           pushFilter: "(.drv.chroot$)"
 

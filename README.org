@@ -215,8 +215,8 @@ answer all the questions.
     #+begin_src
 
     actions/checkout@v2.4.2,
-    cachix/cachix-action@v10,
-    cachix/install-nix-action@v15,
+    cachix/cachix-action@v12,
+    cachix/install-nix-action@v18,
     actions/setup-python@v4,
 
     #+end_src
