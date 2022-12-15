@@ -1,4 +1,4 @@
-;;; elisp-repo-kit.el --- Github elisp repo kit with bells & whistles  -*- lexical-binding: t; -*-
+;;; elisp-repo-kit.el --- Elisp Github repository kit  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 Positron Solutions
 
