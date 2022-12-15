@@ -58,6 +58,7 @@
           '(;; "--no-<check>
             ;; "--no-byte-compile"
             "--no-checkdoc"
+            "--no-package-lint"
             ;; "--no-check-declare"
             )
           (seq-filter
@@ -90,10 +91,10 @@
   ;; `command-line-args-left has the same effect as passing command line arguments.
   (let ((command-line-args-left
          (append
-          '("--no-package-lint"
-            ;; "--no-<check>
+          '(;; "--no-<check>
             ;; "--no-byte-compile"
             "--no-checkdoc"
+            "--no-package-lint"
             ;; "--no-check-declare"
             )
           (seq-filter

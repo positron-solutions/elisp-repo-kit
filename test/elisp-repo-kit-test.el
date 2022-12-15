@@ -39,7 +39,7 @@
 
 (ert-deftest erk--project-root-test ()
   (should (string-match-p (rx "elisp-repo-kit/" eol)
-                        (erk--project-root))))
+                          (erk--project-root))))
 
 (ert-deftest erk--dir-features-test ()
   (should (equal

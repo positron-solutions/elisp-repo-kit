@@ -5,7 +5,7 @@
 ;; Author:  <author>
 ;; Keywords: convenience
 ;; Version: 0.2.0
-;; Package-Requires: ((emacs "25.1") (project "0.7.1") (auto-compile "1.2.0") (dash "2.18.0") (ert "0"))
+;; Package-Requires: ((emacs "25.1") (project "0.7.1") (auto-compile "1.2.0") (dash "2.18.0") (ert "0.0.1"))
 ;; Homepage: http://github.com/positron-solutions/elisp-repo-kit
 
 ;; Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -52,7 +52,7 @@
 (require 'dash)
 (require 'ert)
 
-(defgroup elisp-repo-kit nil "Elisp repository kit." :prefix 'erk)
+(defgroup elisp-repo-kit nil "Elisp repository kit." :prefix 'erk :group 'elisp-repo-kit)
 
 (defcustom erk-github-package-name "elisp-repo-kit"
   "Default Github <project> for cloning templates.
@@ -253,7 +253,7 @@ as the first part of the new github path.  EMAIL is shown after
 AUTHOR in package headers."
   (let ((default-directory dir)
         (erk-github-path (concat erk-github-userorg "/"
-                                            erk-github-package-name))
+                                 erk-github-package-name))
         (github-path (concat user-org "/" package-name))
         (capitalized-package-title
          (string-join
