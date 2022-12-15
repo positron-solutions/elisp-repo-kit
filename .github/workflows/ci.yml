@@ -37,9 +37,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        emacsPkg: [ emacs28,
-                    emacsUnstable,
-                    # emacsGit
+        emacsPkg: [ emacs,
+                    emacsGit,
                   ]
     runs-on: ${{ matrix.os }}
 
