@@ -8,14 +8,17 @@
 #+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/ci.yml/badge.svg" alt="CI workflow status"></a>
 #+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=Developer+Certificate+of+Origin"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/dco.yml/badge.svg" alt="DCO Check"></a>
 
+This repository is a kit to start a new elisp package repository.  The package
+contained has commands to streamline elisp development.
+
 * Quickly set up an Emacs Lisp repository on Github with:
 
 - An [[https://www.youtube.com/watch?v=RQK_DaaX34Q&list=PLEoMzSkcN8oPQtn7FQEF3D7sroZbXuPZ7][elisp]] package
 - Bytecode compiling, linting, and test running
 - Commands to handle common elisp development gotchas
 - CI with [[https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs][Github Actions]], configured for Darwin (MacOS) and Linux
-- [[https://nixos.org/#examples][Nix]] environment for obtaining dependencies or
-  reproducibly developing CI locally
+- [[https://nixos.org/#examples][Nix]] environment for obtaining dependencies or reproducibly developing CI
+  locally
 - Licensing, [[https://developercertificate.org/][DCO]], and DCO sign-off checks for PR's
 - [[https://github.com/melpa/melpa][MELPA]] publishing compatible
 
@@ -52,6 +55,7 @@ answer all the questions.
 
   - Root directory you want to clone to
   - Package name
+  - Package prefix
   - Author name
   - Github user or organization
   - Email address
@@ -174,12 +178,17 @@ answer all the questions.
 
 *** Manual Loading & Reloading
 
+    To manually unload, run built-in command ~unload-feature~ and select your
+    package name. If you do not unload, reloading has no effect and you will see
+    stale behavior.
+
+    Next, add the package to your load-path and then require it or, more
+    directly, call =emacs-lisp-byte-compile-and-load= or
+    =emacs-lisp-native-compile-and-load=.
+
     Especially in bootstrap situations such as working on this package itself,
     you cannot unload the package in the middle of a command.  Some commands
     have a =no-reload= variant just for this circumstance.
-
-    Call ~unload-feature~ and select your package name. If you do not unload,
-    reloading has no effect and you will see stale behavior.
 
     When using locally installed packages such as with straight,
     =straight-rebuild-pacakge= will rebuild but *not* reload.
@@ -429,7 +438,7 @@ answer all the questions.
      can also set the signature flag this way.
 
 **** Automatic GPG signing with per-project keys
-    
+
      In order to specify which projects you intend to sign with which keys, you
      will want to configure your git client using path-specific configurations.
 
@@ -492,44 +501,57 @@ answer all the questions.
 
 * Package scope and relation to other work
 
-  This repository mainly captures the annoying work necessary to set up a new
-  repository with everyting working.  By focusing on just one minimal task,
-  cloning itself and renaming, there is very little work a user will need to
-  identify and remove to reach the clean foundation.
+  There are two functional goals of this repository:
+
+  - Automate the annoying work necessary to set up a new repository
+  - Streamline common elisp development workflows
 
   Commands within this package will focus on cleaner integration of the tests and
   lints with Emacs.  There has been a lot of work in this area, but much of it is
-  tangled with dependency management and sandbox creation.
+  tangled with dependency management and sandbox creation.  Much of the work is
+  done in languages other than elisp and focused on non-interactive workflows
+  with no interactive integration on top.
+
+  Providing close to out-of-box CI is a big focus.  By making it easier to
+  qualify changes from other users, it becomes less burdonsome to maintain
+  software, and by extension, less burdensom to publish and create software. The
+  effect is to drive creation of elisp in a way that can accelerate the flow of
+  elisp into Emacs itself.
 
 ** Dependency Management
 
-   Many tools for testing Emacs packages provide dependency management and loading
-   those dependencies into a fresh Emacs instance.  This package will never attempt
-   to manage dependencies.  Dependencies will always be expressed through the Nix
-   flake expressions and at most a lock file describing a frozen set of Emacs
-   dependencies.
+   This repository uses pure dependency management and then levarages it to
+   provide dependencies for development and CI environments.  The resulting user
+   experience is built around CI for reproducibility and interactive testing for
+   development speed.
 
-   Use of the [[https://github.com/nix-community/emacs-overlay][Emacs Nix Overlay]] is a simple way of stating and obtaining elisp
-   dependencies for now.  Non-elisp dependencies are trivially provided form
-   nixpkgs.  Nix is extremely reliable at dependency management, and it is no
-   surprise that much complexity is normalized away by just the basic behavior
-   model of Nix.  In addition, *if your project needs or includes additional binary
-   dependencies or modules*, Nix is an excellent way to provide them to CI and
-   users.
+   Because most elisp dependencies can be obtained without extensive system
+   dependency management, many tools for testing Emacs packages provide
+   dependency management and loading those dependencies into a fresh Emacs
+   instance.  This aligns well with ad-hoc sandboxed local testing.  This was
+   fine in the old days of impure dependency management and dirty environments.
+
+   The [[https://github.com/nix-community/emacs-overlay][Emacs Nix Overlay]] and Emacs support within nixpkgs make it possible to
+   stating and obtaining elisp dependencies in a completely pure way.  Non-elisp
+   dependencies are trivially provided form nixpkgs.  Nix is extremely reliable
+   at dependency management, and it is no surprise that much complexity is
+   normalized away by just the basic behavior model of Nix.  In addition, *if
+   your project needs or includes additional binary dependencies or modules*,
+   Nix is an excellent way to provide them to CI and users.
 
 ** Discovering and Running Tests & Lints
 
-   This repository uses very bare elisp that can be run with just one Emacs switch
-   in most cases.  The Makefile merely exposes this interface with the even more
-   familiar make style of user interaction.
+   During development, the commands provided under the =erk-= prefix make it
+   more convenient to reload your package and test features.  You can run the
+   ert tests for a project while working on multiple packages.
 
-   The CI scripts are arranged to present a useful environment first.  The commands
-   to invoke tests follow.  If the commands need to be changed, it is
-   straightforward to change them /independently of how you provide dependencies/.
-   Just be sure to propagate changes to the Makefile and README of your project.
+   During CI, this repository uses an elisp shim for discovering and running
+   tests.  The commands within the package for convenience during development
+   are not depeneded upon during CI.
 
-   Future versions of this project will continue to favor elisp scripts for test
-   discovery and integration with Emacs.  Make and bash will be minimized.
+   The CI actions obtain an environment with dependencies using Nix, so this can
+   also be done locally using Nix, meaning re-creating environments is available
+   to the user without leaning on CI.
 
 ** Comparisons
 
@@ -556,23 +578,26 @@ answer all the questions.
 * Contributing
 
   First decide if you want to work on this repository or fork it to something
-  entirely different.  Non-exhaustive list of changes that are very welcome:
+  entirely different.
 
-  - To the maximum degree possible, this project should lean on elisp as a CLI
-    script backend
-  - Running additional kinds of tests
-  - Running additional lints
+  Non-exhaustive list of changes that are very welcome:
+
+  - More interactive integrations with high-value elisp development workflows
+  - Running additional or better kinds of tests & lints
   - Fix bugs
   - Expose trivial options where a structural choice has limited them
     unnecessarily
   - Behave the same, but with a less complicated code
-  - Guix support
+  - Guix or other pure dependency management support
 
   Changes will likely be rejected if it is aimed at:
 
-  - Managing dependencies outside of Nix expressions other than a package that is
-    supposed to manage dependencies or test obtaining dependencies in a
-    user-present use case
+  - Non-elisp interfaces meant for invocation outside of Emacs or with scripting
+    implemented in a language besides elisp.
+  - Managing dependencies outside of Nix (or other pure dependency management)
+    expressions
+  - CI infrastructure support for non-Actions infrastructure (which cannot be
+    tested in this repo)
   - Backwards compatibility for Emacs two versions behind next release.  Master,
     current stable release, and release - 1 are the only versions being supported
   - pre-flake Nix support
