@@ -218,8 +218,8 @@ answer all the questions.
     changes if they later change to DCO instead of copyright assignment.
   - [ ] Sign up for [[https://app.cachix.org/][cachix]] and, create a binary cache
     with API tokens and public read access
-  - [ ] Add secrets necessary for your Github actions =CACHIX_AUTH_TOKEN= and
-    =CACHIX_CACHE_NAME=
+  - [ ] Add repository secrets necessary for your Github actions =CACHIX_AUTH_TOKEN= and
+    =CACHIX_CACHE_NAME= (settings -> secrets -> new repository secret)
   - [ ] Enable actions and add the following actions to your allowed actions
     list:
 
