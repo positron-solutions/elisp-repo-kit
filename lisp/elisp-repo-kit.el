@@ -227,7 +227,7 @@ feature reloading."
 
 ;;;###autoload
 (defun erk-ert-project ()
-  "Run all ert tests in this project."
+  "Run Ert interactively, with selector for this project."
   (interactive)
   (erk-reload-project-package)
   (erk-reload-project-tests)
