@@ -1,4 +1,4 @@
-;;; elisp-repo-kit.el --- write a freaking package!  -*- lexical-binding: t; -*-
+;;; elisp-repo-kit-test.el --- test your freaking package!  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 Positron Solutions
 
@@ -22,34 +22,49 @@
 ;; CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ;;; Commentary:
-;; These tests are run by requiring elisp-repo-kit-test-setup.
+
+;; Run the batch tests from root directory:
+;; nix shell .#emacsGit --quick --script test/run-shim.el -- test
+;; Test dependencies can be provided to the Emacsen declared inside the root
+;; flake.nix.
+
+;; For local development, dependencies should be installed by the user.  Tests
+;; can be run from one of the project files using the `erk-ert-project'
+;; command.
 
 ;;; Code:
 
+(require 'ert)
 (require 'elisp-repo-kit)
 
-(ert-deftest erk-great-job-test ()
-  "Tests if we are doing a great job."
-  (should (string-equal (elisp-repo-kit-great-job) "You're doing a great job!")))
+(ert-deftest erk--project-root-test ()
+  (should (string-match-p (rx "elisp-repo-kit/" eol)
+                          (erk--project-root))))
 
-(ert-deftest erk-dash-dep-test ()
-  "Tests that dependencies are included with the provided Emacs.
-See the flake.nix for more information about providing your project dependencies
-for CI & local development."
-  (should (equal (elisp-repo-kit--dash-dep) '(1 4 9 16))))
+(ert-deftest erk--dir-features-test ()
+  (should (equal
+           '(elisp-repo-kit)
+           (erk--dir-features (concat (erk--project-root) "lisp")))))
+
+(ert-deftest erk--package-features-test ()
+  (should (member 'elisp-repo-kit (erk--package-features))))
+
+(ert-deftest erk--test-features-test ()
+  (should (member 'elisp-repo-kit-test (erk--test-features))))
 
 (ert-deftest erk-clone-and-rename-test ()
   "Clone the repo and rename it, single step."
-  (let ((rev (pop argv))
-        (clone-root (make-temp-file "elisp-repo-kit" t)))
-    (elisp-repo-kit-new
+  (let ((rev (getenv "GITHUB_SHA"))
+        (clone-root (make-temp-file "erk-clone-test-" t)))
+    (erk-new
+     "new-project" ; package-name
+     "np-" ; package prefix (usually package-name)
      clone-root
-     "clone-rename-test" ; project-name
      "Selindis Raszagal" ; Author
      "new-shakuras" ; user-org
      "selindis.r@new-shakuras.planet" ; email
-     rev))) ; possibly nil
+     rev) ; possibly nil
+    (delete-directory clone-root t)))
 
 (provide 'elisp-repo-kit-test)
-
 ;;; elisp-repo-kit-test.el ends here.

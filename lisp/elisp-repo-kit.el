@@ -1,11 +1,11 @@
-;;; elisp-repo-kit.el --- Write a freaking package!  -*- lexical-binding: t; -*-
+;;; elisp-repo-kit.el --- Elisp Github repository kit  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 Positron Solutions
 
 ;; Author:  <author>
 ;; Keywords: convenience
-;; Version: 0.1.0
-;; Package-Requires: ((emacs "25.1") (dash "2.0"))
+;; Version: 0.2.0
+;; Package-Requires: ((emacs "25.1") (project "0.7.1") (auto-compile "1.2.0") (dash "2.18.0") (ert "0.0.1"))
 ;; Homepage: http://github.com/positron-solutions/elisp-repo-kit
 
 ;; Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -27,19 +27,53 @@
 
 ;;; Commentary:
 
-;; This package is meant to be destroyed.  Delete the Lisp.  Delete the tests.
-;; Create a new world for yourself.  Publish.  The commands contained here will
-;; download the repo and perform renaming and relicensing.  As you may have
-;; downloaded this package from MELPA, and as you have witnessed the CI passing,
-;; you should already unsterstand that you have walked across the bridge.  The
-;; license header checks will ensure that whatever Lisp you write or any
-;; contributions it attracts may well end up in the Emacs core.
+;; Set up Emacs package with Gihub repository configuration, complete with
+;; Actions CI, tests, lints, and a licensing scheme all ready to go.  Included
+;; commands are focused on productivity, appropriate for professional
+;; development in elisp.  The goal of the package is streamline authoring &
+;; distributing new Emacs packages.  It provides a well-integrated but rigid
+;; scheme, aka opinionated.
+;;
+;; The package also uses its own hosted source as a substrate for creating new
+;; packages.  It will clone its source respository and then perform renaming &
+;; relicensing.  Simply call `erk-new' to start a new package.  The
+;; README documents remaining setup steps on Github and in preparation for
+;; publishing on MELPA.
+;;
+;; As a development aid, the package is versatile enough to work on some elisp
+;; packages that were not descended from its own source.  The scope of
+;; functionality is primarily to interface with linting and testing frameworks,
+;; both in batch and live workflows.
 
 ;;; Code:
 
-(require 'dash) ; see flake.nix for providing dependencies for CI and local development.
+(require 'project) ; see flake.nix for providing dependencies for CI and local development.
+(require 'auto-compile)
+(require 'dash)
+(require 'ert)
 
-(defconst elisp-repo-kit--gpl3-notice ";; This program is free software; \
+(defgroup elisp-repo-kit nil "Elisp repository kit." :prefix 'erk :group 'elisp-repo-kit)
+
+(defcustom erk-github-package-name "elisp-repo-kit"
+  "Default Github <project> for cloning templates.
+If you rename this repository after forking, you need to set this
+to clone from within the fork."
+  :group 'elisp-repo-kit
+  :type 'string)
+
+(defcustom erk-package-prefix "erk-"
+  "Function names etc may use an initialism that requires renaming."
+  :group 'elisp-repo-kit
+  :type 'string)
+
+(defcustom erk-github-userorg "positron-solutions"
+  "Default Github <user-or-org> for cloning templates.
+If you fork this repository, you need to set this to clone it
+from within the fork."
+  :group 'elisp-repo-kit
+  :type 'string)
+
+(defconst erk--gpl3-notice ";; This program is free software; \
 you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
@@ -52,54 +86,195 @@ you can redistribute it and/or modify
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.")
-(defconst elisp-repo-kit--rename-maps ; directory file hard-replace
+
+(defconst erk--rename-maps ; directory file replacement-file
   '(( nil "gpl-3.0.txt" "COPYING")
     ("lisp/" "elisp-repo-kit.el" nil)
-    ("test/" "elisp-repo-kit-lint-tests.el" nil)
-    ("test/" "elisp-repo-kit-lint.el" nil)
-    ("test/" "elisp-repo-kit-test-setup.el" nil)
-    ("test/" "elisp-repo-kit-test.el" nil)))
-(defconst elisp-repo-kit--files-with-strings
+    ("test/" "elisp-repo-kit-test.el" nil)
+    ("test/" "run-shim.el" nil)))
+
+(defconst erk--files-with-strings
   '("README.org"
     "lisp/elisp-repo-kit.el"
-    "test/elisp-repo-kit-lint.el"
-    "test/elisp-repo-kit-lint-tests.el"
     "test/elisp-repo-kit-test.el"
-    "test/elisp-repo-kit-test-setup.el"))
-(defconst elisp-repo-kit--package-name "elisp-repo-kit")
-(defconst elisp-repo-kit--github-path "positron-solutions/elisp-repo-kit")
+    "test/run-shim.el"))
 
-(defun elisp-repo-kit--rename-package (dir old-package new-package)
+(defun erk--project-root ()
+  "Return project root or buffer directory."
+  (let ((project (project-current)))
+    ;; TODO remove pre-28 support
+    (or (if (version<= emacs-version "28.0")
+            (car (with-suppressed-warnings
+                     ((obsolete project-roots))
+                   (funcall 'project-roots project)))
+          (funcall 'project-root project))
+        default-directory)))
+
+(defun erk--reload (features dir)
+  "Reload FEATURES, found in DIR."
+  (dolist (feature features)
+    (when (featurep feature) (unload-feature feature 'force)))
+  (let ((load-path (append (list dir) load-path))
+        (load-prefer-newer t)
+        (auto-compile-on-load-mode t)
+        (auto-compile-on-save-mode t)
+        ;; ask user to save buffers in the current project
+        (save-some-buffers-default-predicate 'save-some-buffers-root))
+    (save-some-buffers)
+    (dolist (feature features)
+      (require feature))))
+
+(defun erk--dir-features (dir)
+  "Return list of features provided by elisp files in DIR.
+Except autoloads."
+  (let* ((package-files (directory-files dir nil (rx ".el" string-end)))
+         (package-files (->> package-files
+                             (--reject (string-match-p (rx "autoloads.el" string-end) it)))))
+    (mapcar
+     (lambda (f) (intern (string-remove-suffix ".el" f)))
+     package-files)))
+
+(defun erk--package-features ()
+  "List the features defined by the project's package.
+This assumes the convention of one elisp file per feature and
+feature name derived file name"
+  (erk--dir-features (concat (erk--project-root) "lisp" )))
+
+(defun erk--test-features ()
+  "List the features defined in project's test packages.
+This assumes the convention of one elisp file per feature and
+feature name derived file name"
+  (erk--dir-features (concat (erk--project-root) "test" )))
+
+;;;###autoload
+(defun erk-reload-project-package ()
+  "Reload the features this project provides.
+The implementation assumes all packages pass package lint,
+providing a feature that matches the file name.
+
+This function should attempt not to fail.  It is infrastructure
+for development, and being lenient for degenerate cases is fine."
+  (interactive)
+  (let* ((project-root (erk--project-root))
+         (lisp-subdir (concat project-root "lisp"))
+         (project-elisp-dir (if (file-exists-p lisp-subdir) lisp-subdir
+                              project-root))
+         (package-features (erk--dir-features project-elisp-dir)))
+    (erk--reload package-features project-elisp-dir)))
+
+;;;###autoload
+(defun erk-reload-project-tests ()
+  "Reload test features that this project provides.
+The implementation assumes all packages pass package lint,
+providing a feature that matches the file name.
+
+This function should attempt not to fail.  It is infrastructure
+for development, and being lenient for degenerate cases is fine."
+  (interactive)
+  (let* ((project-root (erk--project-root))
+         (lisp-subdir (concat project-root "test"))
+         (project-test-dir (if (file-exists-p lisp-subdir) lisp-subdir
+                             project-root))
+         (package-features (erk--dir-features project-test-dir)))
+    (erk--reload package-features project-test-dir)))
+
+;;;###autoload
+(defun erk-ert-rerun-this-no-reload ()
+  "Rerun the ert test at point, but don't reaload anything.
+Use this when debugging with external state or debugging elisp
+repo kit itself, which may behave strangely if reloaded in the
+middle of a command."
+  (interactive)
+  (save-excursion
+    (beginning-of-defun)
+    (let* ((form (funcall load-read-function (current-buffer)))
+           (name (elt form 1)))
+      (ert `(member ,name)))))
+
+;;;###autoload
+(defun erk-ert-rerun-this ()
+  "Rerun the ert test at point.
+Will reload all features and test features."
+  (interactive)
+  (erk-reload-project-package)
+  (erk-reload-project-tests)
+  (save-excursion
+    (beginning-of-defun)
+    (let* ((form (funcall load-read-function (current-buffer)))
+           (name (elt form 1)))
+      (ert `(member ,name)))))
+
+(defun erk-ert-project-results-buffer ()
+  "Return an ERT buffer name based on project name.")
+
+(defun erk-ert-project-selector ()
+  "Return a selector for just this project's ERT test.
+This selector generates the symbols list before that selector
+will run, so new features or new symbols only avaialble after
+reload will not be picked up.  Run this after any necessary
+feature reloading."
+  (let* ((test-features (erk--test-features))
+         (test-symbols (->> test-features
+                            (-map #'symbol-file)
+                            (--map (cdr (assoc it load-history)))
+                            (-flatten-n 1)
+                            (--filter (eq 'define-symbol-props (car it)))
+                            (-map #'cdr)
+                            (-flatten-n 2))))
+    (message "test-symbols: %s" test-symbols)
+    `(satisfies ,(lambda (test)
+                   (member (ert-test-name test) test-symbols)))))
+
+;;;###autoload
+(defun erk-ert-project ()
+  "Run Ert interactively, with selector for this project."
+  (interactive)
+  (erk-reload-project-package)
+  (erk-reload-project-tests)
+  (ert (erk-ert-project-selector)))
+
+(defun erk--rename-package (dir old-package new-package)
   "Rename FILES in DIR.
-`elisp-repo-kit--rename-map' is a list of (<subdir> name
-<hard-rename>) triples.  When <subdir> is nil, it means use DIR.
-If <hard-rename> is nil means replace OLD-PACKAGE with NEW-PACKAGE,
-using `replace-regexp-in-string'.  DIR is the root of where we
-are renaming.  Existing files will be clobbered."
+`erk--rename-map' is a list of (subdir filename
+replacement-filename) triples.  When subdir is nil, it means use
+DIR.  If replacement-filename is nil means replace OLD-PACKAGE
+with NEW-PACKAGE, using `replace-regexp-in-string'.  DIR is the
+root of where we are renaming.  Existing files will be
+clobbered."
   (mapc (lambda (rename-map)
           (let ((dir (concat dir (or (pop rename-map) "")))
-                (name (pop rename-map))
-                (hard-replace (pop rename-map)))
-            (let ((new-name (or hard-replace
-                                (replace-regexp-in-string old-package new-package name))))
-              (rename-file (concat dir name) (concat dir new-name) t))
-            (print (format "Used lexical variables %s %s" hard-replace rename-map))))
-        elisp-repo-kit--rename-maps))
+                (filename (pop rename-map))
+                (replacement-filename (pop rename-map)))
+            (let ((new-name (or replacement-filename
+                                (replace-regexp-in-string old-package new-package filename))))
+              (rename-file (concat dir filename) (concat dir new-name) t))))
+        erk--rename-maps))
 
-(defun elisp-repo-kit--replace-strings (dir package-name author user-org email)
+(defun erk--replace-strings (dir package-name package-prefix author user-org email)
   "Replace values in files that need renaming or re-licensing.
-DIR is where we are reaplacing.  PACKAGE-NAME is the new package.
-AUTHOR will be used in copyright notices.  USER-ORG will be used
-as the first part of the new github path.  EMAIL is shown after AUTHOR in
+DIR is where we are replacing.  PACKAGE-NAME is the new
+package.  PACKAGE-PREFIX is the elisp prefix.  AUTHOR will be
+used in copyright notices.  USER-ORG will be used as the first
+part of the new github path.  EMAIL is shown after AUTHOR in
 package headers."
   (let ((default-directory dir)
-        (github-path (concat user-org "/" package-name)))
+        (erk-github-path (concat erk-github-userorg "/"
+                                 erk-github-package-name))
+        (github-path (concat user-org "/" package-name))
+        (package-prefix (if (string-match-p (rx "-" eol) package-prefix)
+                            package-prefix
+                          (concat package-prefix "-")))
+        (capitalized-package-title
+         (string-join
+          (mapcar #'capitalize
+                  (split-string erk-github-package-name "-"))
+          " ")))
     (mapc
      (lambda (file)
        (with-current-buffer (find-file-noselect (concat dir file) t t)
          ;; append new author to copyright
          (print (format "visiting: %s" (buffer-file-name)))
-         (when (re-search-forward ";; Copyright.*Positron Solutions" nil t)
+         (when (re-search-forward ";; Copyright" nil t)
            (end-of-line)
            (insert ", " author))
          (goto-char (point-min))
@@ -108,39 +283,27 @@ package headers."
          (goto-char (point-min))
          ;; replace license with GPL3 notice
          (when (re-search-forward ";; Permission \\(.\\|\n\\)*SOFTWARE.$" nil t)
-           (replace-match elisp-repo-kit--gpl3-notice))
+           (replace-match erk--gpl3-notice))
          (goto-char (point-min))
          ;; update github paths for README links
-         (while (re-search-forward "positron-solutions/elisp-repo-kit" nil t)
+         (while (re-search-forward erk-github-path nil t)
            (replace-match github-path))
          (goto-char (point-min))
          ;; update remaining package name strings
-         (while (re-search-forward "elisp-repo-kit" nil t)
+         (while (re-search-forward erk-github-package-name nil t)
            (replace-match package-name))
          (goto-char (point-min))
-         (while (re-search-forward "Elisp Repo Kit" nil t)
-           (replace-match (string-join
-                           (mapcar #'capitalize (split-string "-" package-name))) " "))
+         (while (re-search-forward erk-package-prefix nil t)
+           (replace-match package-prefix))
+         (goto-char (point-min))
+         (while (re-search-forward capitalized-package-title nil t)
+           (replace-match capitalized-package-title))
          (save-buffer 0)
          (kill-buffer)))
-     elisp-repo-kit--files-with-strings)))
-
-(defun elisp-repo-kit--dash-dep ()
-  "Use dash and verify our dependency is included with Emacs.
-See the flake.nix for more information about providing your project dependencies
-for CI & local development."
-  (--map (* it it) '(1 2 3 4)))
+     erk--files-with-strings)))
 
 ;;;###autoload
-(defun elisp-repo-kit-great-job ()
-  "Tell package author they are doing a great job."
-  (interactive)
-  (let ((msg "You're doing a great job!"))
-    (message "%s" msg)
-    msg))
-
-;;;###autoload
-(defun elisp-repo-kit-clone (clone-root package-name user-org &optional rev)
+(defun erk-clone (clone-root package-name user-org &optional rev)
   "Clone elisp-repo-kit to CLONE-ROOT and apply rename.
 PACKAGE-NAME will instruct git how to name the clone.  USER-ORG
 is the user or organization you will use for your Github
@@ -152,8 +315,11 @@ itself, as a quine and for forking as a new template repository."
   (if-let ((git-bin (executable-find "git")))
       (progn
         (shell-command
-         (format "cd %s; %s clone https://github.com/positron-solutions/elisp-repo-kit.git %s"
-                 clone-root git-bin package-name))
+         (format "cd %s; %s clone https://github.com/%s/%s.git %s"
+                 clone-root git-bin
+                 erk-github-userorg
+                 erk-github-package-name
+                 package-name))
         (shell-command
          (format "cd %s/%s" clone-root package-name))
         (when rev
@@ -163,18 +329,19 @@ itself, as a quine and for forking as a new template repository."
         (shell-command
          (format "%s remote add origin git@github.com:%s/%s.git"
                  git-bin user-org package-name))
+        ;; return value for renaming
         (concat clone-root "/" package-name "/"))
     (error "Could not find git executible")))
 
 ;;;###autoload
-(defun elisp-repo-kit-rename-relicense (clone-dir package-name author user-org email)
+(defun erk-rename-relicense (clone-dir package-name package-prefix author user-org email)
   "Rename and relicense your clone of elisp-repo-kit.
 CLONE-DIR is your elisp-repo-clone root.  PACKAGE-NAME should be
-the long name of the package, what will show up in melpa etc.
-AUTHOR will be used in copyright notices.  USER-ORG is either
-your user or organization, which forms the first part of a github
-repo path.  EMAIL is shown after AUTHOR in
-package headers.
+the long name of the package, what will show up in melpa
+etc. PACKAGE-PREFIX is the elisp symbol prefix.  AUTHOR will be used
+in copyright notices.  USER-ORG is either your user or
+organization, which forms the first part of a github repo path.
+EMAIL is shown after AUTHOR in package headers.
 
 This command replaces all instances of:
 
@@ -191,30 +358,51 @@ Re-licensing is fully permitted by the MIT license and intended
 by the author of this repository."
   (interactive "DCloned directory: \nsPackage name: \nsAuthor: \
 \nsGithub organization or username: \nsEmail: ")
-  (elisp-repo-kit--replace-strings
-   clone-dir package-name author user-org email)
-  (elisp-repo-kit--rename-package
-   clone-dir elisp-repo-kit--package-name package-name))
+  (erk--replace-strings
+   clone-dir package-name package-prefix author user-org email)
+  (erk--rename-package clone-dir erk-github-package-name package-name))
 
 ;;;###autoload
-(defun elisp-repo-kit-new (clone-root package-name author user-org email &optional rev)
+(defun erk-new (package-name package-prefix clone-root author user-org email &optional rev)
   "Clone elisp-repo-kit, rename, and relicense in one step.
-CLONE-ROOT is where you want to clone your package to.
-PACKAGE-NAME should be the long name of the package, what will
-show up in melpa etc.  AUTHOR will be used in copyright notices.
-USER-ORG is either your user or organization, which forms the
-first part of a github repo path.  EMAIL is shown after AUTHOR in
-package headers.  Optional REV is either a tag, branch or
-revision used in git checkout.
+CLONE-ROOT is where you want to clone your package to (including
+the clone dir).  PACKAGE-NAME should be the long name of the
+package, what will show up in melpa etc.  PACKAGE-PREFIX can be
+either the same as the package or a contracted form, such as an
+initialism.  AUTHOR will be used in copyright notices.  USER-ORG
+is either your user or organization, which forms the first part
+of a github repo path.  EMAIL is shown after AUTHOR in package
+headers.  Optional REV is either a tag, branch or revision used
+in git checkout.
 
-See comments in `elisp-repo-kit-clone' and
-`elisp-repo-kit-rename-relicense' for implementation information
-and more details about argument usage.."
-  (interactive "sPackage name: \nsAuthor: \nsGithub organization or username: \
-\nsEmail: \nsRev tag, or branch: ")
-  (elisp-repo-kit-rename-relicense
-   (elisp-repo-kit-clone clone-root package-name user-org rev)
-   package-name author user-org email))
+See comments in `erk-clone' and `erk-rename-relicense' for
+implementation information and more details about argument usage."
+  (interactive
+   (let* ((package-name
+           (read-string
+            (format "Package name, such as %s: " erk-github-package-name)
+            "foo"))
+          (package-prefix
+           (read-string
+            (format "Package prefix, such as %s: " erk-package-prefix)))
+          (clone-root
+           (read-directory-name "Clone root: " default-directory))
+          (author
+           (let ((default (when (executable-find "git")
+                            (string-chop-newline
+                             (shell-command-to-string "git config user.name")))))
+             (read-string "Author: " default)))
+          (user-org (read-string "User or organization name: "))
+          (email
+           (let ((default (when (executable-find "git")
+                            (string-chop-newline
+                             (shell-command-to-string "git config user.email")))))
+             (read-string "Email: " default)))
+          (rev (read-string "Rev, tag, or branch (empty implies default branch): ")))
+     (list package-name package-prefix clone-root author user-org email rev)))
+  (erk-rename-relicense
+   (erk-clone clone-root package-name user-org rev)
+   package-name package-prefix author user-org email))
 
 (provide 'elisp-repo-kit)
 ;;; elisp-repo-kit.el ends here
