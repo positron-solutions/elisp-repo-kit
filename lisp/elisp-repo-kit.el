@@ -61,6 +61,11 @@ to clone from within the fork."
   :group 'elisp-repo-kit
   :type 'string)
 
+(defcustom erk-package-prefix "erk-"
+  "Function names etc may use an initialism that requires renaming."
+  :group 'elisp-repo-kit
+  :type 'string)
+
 (defcustom erk-github-userorg "positron-solutions"
   "Default Github <user-or-org> for cloning templates.
 If you fork this repository, you need to set this to clone it
@@ -245,16 +250,20 @@ clobbered."
               (rename-file (concat dir filename) (concat dir new-name) t))))
         erk--rename-maps))
 
-(defun erk--replace-strings (dir package-name author user-org email)
+(defun erk--replace-strings (dir package-name package-prefix author user-org email)
   "Replace values in files that need renaming or re-licensing.
-DIR is where we are replacing.  PACKAGE-NAME is the new package.
-AUTHOR will be used in copyright notices.  USER-ORG will be used
-as the first part of the new github path.  EMAIL is shown after
-AUTHOR in package headers."
+DIR is where we are replacing.  PACKAGE-NAME is the new
+package.  PACKAGE-PREFIX is the elisp prefix.  AUTHOR will be
+used in copyright notices.  USER-ORG will be used as the first
+part of the new github path.  EMAIL is shown after AUTHOR in
+package headers."
   (let ((default-directory dir)
         (erk-github-path (concat erk-github-userorg "/"
                                  erk-github-package-name))
         (github-path (concat user-org "/" package-name))
+        (package-prefix (if (string-match-p (rx "-" eol) package-prefix)
+                            package-prefix
+                          (concat package-prefix "-")))
         (capitalized-package-title
          (string-join
           (mapcar #'capitalize
@@ -283,6 +292,9 @@ AUTHOR in package headers."
          ;; update remaining package name strings
          (while (re-search-forward erk-github-package-name nil t)
            (replace-match package-name))
+         (goto-char (point-min))
+         (while (re-search-forward erk-package-prefix nil t)
+           (replace-match package-prefix))
          (goto-char (point-min))
          (while (re-search-forward capitalized-package-title nil t)
            (replace-match capitalized-package-title))
@@ -322,14 +334,14 @@ itself, as a quine and for forking as a new template repository."
     (error "Could not find git executible")))
 
 ;;;###autoload
-(defun erk-rename-relicense (clone-dir package-name author user-org email)
+(defun erk-rename-relicense (clone-dir package-name package-prefix author user-org email)
   "Rename and relicense your clone of elisp-repo-kit.
 CLONE-DIR is your elisp-repo-clone root.  PACKAGE-NAME should be
-the long name of the package, what will show up in melpa etc.
-AUTHOR will be used in copyright notices.  USER-ORG is either
-your user or organization, which forms the first part of a github
-repo path.  EMAIL is shown after AUTHOR in
-package headers.
+the long name of the package, what will show up in melpa
+etc. PACKAGE-PREFIX is the elisp symbol prefix.  AUTHOR will be used
+in copyright notices.  USER-ORG is either your user or
+organization, which forms the first part of a github repo path.
+EMAIL is shown after AUTHOR in package headers.
 
 This command replaces all instances of:
 
@@ -347,29 +359,32 @@ by the author of this repository."
   (interactive "DCloned directory: \nsPackage name: \nsAuthor: \
 \nsGithub organization or username: \nsEmail: ")
   (erk--replace-strings
-   clone-dir package-name author user-org email)
-  (erk--rename-package
-   clone-dir erk-github-package-name package-name))
+   clone-dir package-name package-prefix author user-org email)
+  (erk--rename-package clone-dir erk-github-package-name package-name))
 
 ;;;###autoload
-(defun erk-new (package-name clone-root author user-org email &optional rev)
+(defun erk-new (package-name package-prefix clone-root author user-org email &optional rev)
   "Clone elisp-repo-kit, rename, and relicense in one step.
 CLONE-ROOT is where you want to clone your package to (including
 the clone dir).  PACKAGE-NAME should be the long name of the
-package, what will show up in melpa etc.  AUTHOR will be used in
-copyright notices.  USER-ORG is either your user or organization,
-which forms the first part of a github repo path.  EMAIL is shown
-after AUTHOR in package headers.  Optional REV is either a tag,
-branch or revision used in git checkout.
+package, what will show up in melpa etc.  PACKAGE-PREFIX can be
+either the same as the package or a contracted form, such as an
+initialism.  AUTHOR will be used in copyright notices.  USER-ORG
+is either your user or organization, which forms the first part
+of a github repo path.  EMAIL is shown after AUTHOR in package
+headers.  Optional REV is either a tag, branch or revision used
+in git checkout.
 
-See comments in `erk-clone' and
-`erk-rename-relicense' for implementation information
-and more details about argument usage."
+See comments in `erk-clone' and `erk-rename-relicense' for
+implementation information and more details about argument usage."
   (interactive
    (let* ((package-name
            (read-string
             (format "Package name, such as %s: " erk-github-package-name)
             "foo"))
+          (package-prefix
+           (read-string
+            (format "Package prefix, such as %s: " erk-package-prefix)))
           (clone-root
            (read-directory-name "Clone root: " default-directory))
           (author
@@ -382,10 +397,10 @@ and more details about argument usage."
                             (shell-command-to-string "git config user.email"))))
              (read-string "Email: " default)))
           (rev (read-string "Rev, tag, or branch (empty implies default branch): ")))
-     (list package-name clone-root author user-org email rev)))
+     (list package-name package-prefix clone-root author user-org email rev)))
   (erk-rename-relicense
    (erk-clone clone-root package-name user-org rev)
-   package-name author user-org email))
+   package-name package-prefix author user-org email))
 
 (provide 'elisp-repo-kit)
 ;;; elisp-repo-kit.el ends here

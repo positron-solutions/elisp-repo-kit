@@ -58,6 +58,7 @@
         (clone-root (make-temp-file "erk-clone-test-" t)))
     (erk-new
      "new-project" ; package-name
+     "np-" ; package prefix (usually package-name)
      clone-root
      "Selindis Raszagal" ; Author
      "new-shakuras" ; user-org
