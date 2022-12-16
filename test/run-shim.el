@@ -59,6 +59,10 @@
             ;; "--no-byte-compile"
             "--no-checkdoc"
             "--no-package-lint"
+            ;; "--no-indent"
+            ;; "--no-indent-character"
+            ;; "--no-fill-column"
+            ;; "--no-trailing-whitespace"
             ;; "--no-check-declare"
             )
           (seq-filter
@@ -95,6 +99,10 @@
             ;; "--no-byte-compile"
             "--no-checkdoc"
             "--no-package-lint"
+            ;; "--no-indent"
+            ;; "--no-indent-character"
+            ;; "--no-fill-column"
+            ;; "--no-trailing-whitespace"
             ;; "--no-check-declare"
             )
           (seq-filter
