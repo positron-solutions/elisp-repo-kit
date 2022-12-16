@@ -1,7 +1,7 @@
 ## Pull Requests
 
 Generated changes to the flake.lock should be kept in a separate commit for the
-reviewer.
+reviewer.  Title your commit as "generated".
 
 Keeping these changes isolated in specific commits makes it much easier to pull
 in your changes in parallel with other features.  Maintainers may harvest your
