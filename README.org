@@ -83,10 +83,12 @@ answer all the questions.
 :TOC:      :include siblings
 :END:
 :CONTENTS:
-- [[#local-development-instructions][Local development instructions]]
+- [[#use-to-develop-your-package][Use to develop your package]]
   - [[#run-tests][Run tests]]
+    - [[#running-tests-ci-style][Running tests CI style]]
   - [[#lint-and-byte-compile-code][Lint and byte-compile code]]
   - [[#loading-and-re-loading-your-package][Loading and re-loading your package]]
+    - [[#manual-loading--reloading][Manual Loading & Reloading]]
 - [[#finish-setting-up-your-new-github-repo][Finish setting up your new Github repo]]
   - [[#optional-steps][Optional Steps]]
 - [[#publishing-to-melpa][Publishing to MELPA]]
@@ -95,7 +97,7 @@ answer all the questions.
   - [[#testing-stable-package-build][Testing stable package build]]
   - [[#melpa-lints][MELPA Lints]]
 - [[#overview-of-file-contents-and-structure][Overview of file contents and structure]]
-- [[#maintaining-your-versions][Maintaining your versions]]
+- [[#maintaining-nixpkgs-versions][Maintaining nixpkgs versions]]
 - [[#licensing-developer-certificate-of-origin][Licensing, Developer Certificate of Origin]]
   - [[#license][License]]
   - [[#developer-certificate-of-origin-dco][Developer Certificate of Origin (DCO)]]
