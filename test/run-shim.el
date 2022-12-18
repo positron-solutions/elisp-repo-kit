@@ -146,8 +146,7 @@
   (setq command (pop argv)) ; nil-safe
   (cond ((string= command "test")
          (require 'elisp-repo-kit-test)
-         (ert-run-tests-batch-and-exit)
-         )
+         (ert-run-tests-batch-and-exit))
         ((string= command "lint") (erk--lint-package))
         ((string= command "lint-tests") (erk--lint-tests))
         t (print "Command not recognized.  Use test, lint, lint-tests etc.")))
