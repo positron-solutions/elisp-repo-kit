@@ -33,7 +33,7 @@ jobs:
   continuous-integration: # just a job name
 
     # Run on every OS and Emacsen
-    # Some steps specify their own logic!
+    # Some steps switch logic on os or emacsPkg!
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
