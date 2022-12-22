@@ -125,6 +125,9 @@ you can redistribute it and/or modify
         (save-some-buffers-default-predicate 'save-some-buffers-root))
     (save-some-buffers)
     (dolist (feature features)
+      (let ((elc (concat dir "/" (symbol-name feature) ".elc")))
+        (unless (file-exists-p elc)
+          (byte-compile-file (concat dir "/" (symbol-name feature) ".el"))))
       (require feature))))
 
 (defun erk--dir-features (dir)
