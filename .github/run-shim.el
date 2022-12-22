@@ -42,9 +42,30 @@
 
 ;;; Code:
 
-(defun erk--lint-package ()
-  "Lint the files in the package directory."
+(require 'f)
 
+(defun run-shim ()
+  "Execute a CI process based on CLI arguments."
+  (run-shim-setup)
+
+  ;; Consume the command argument and run one of the routines Additional
+  ;; arguments can be read as needed in sub-commands.
+
+  ;; Modify this hunk to change your CI steps.
+  (pcase (pop argv)
+    ("test"
+     (require 'erk-test)
+     (ert-run-tests-batch-and-exit))
+    ("lint"
+     (run-shim-lint-package))
+    ("lint-tests"
+     (run-shim-lint-tests))
+    (t
+     (message "Command %s not recognized.  Use test, lint, lint-tests etc."
+              run-shim-command))))
+
+(defun run-shime-lint-package ()
+  "Lint the files in the package directory."
   (require 'elisp-lint)
   ;; 100-character column limit for lints.  If it's good enough for Linux, it's
   ;; good enough for us.  https://lkml.org/lkml/2020/5/29/1038
@@ -78,7 +99,7 @@
 
     (elisp-lint-files-batch)))
 
-(defun erk--lint-tests ()
+(defun run-shim-lint-tests ()
   "Lint the files in the test directory."
 
   (require 'elisp-lint)
@@ -116,8 +137,24 @@
 
     (elisp-lint-files-batch)))
 
-(defun erk--run-shim ()
-  "Execute a CI process based on CLI arguments."
+(defun run-shim-compile-dir-recursively (dir)
+  "Compile .el files in DIR.
+This is usually before loading for tests etc.  The behavior of
+byte compiled and native compiled code is more interesting than
+uncompiled elisp because usually installed packages will be
+compiled when run by the user."
+  (mapc (if (native-comp-available-p) #'native-compile
+          #'byte-compile-file)
+        (directory-files-recursively dir (rx ".el" eol))))
+
+(defun run-shim-setup ()
+  "Normalize load paths, compilation, and behavior of shell arguments.
+The `default-directory' will be set to the root of the
+repository.  Arguments will be stripped of Nix wrapper load
+paths.  The load path will be configured to included /test,
+/load, and the repository root.  Elisp files on the load path
+will be compiled, natively if available."
+
   ;; This expression normalizes the behavior of --quick --load <file> and --script
   ;; <file> behavior.  If you don't do this, --script will see every argument
   ;; passed and the arguments from the Nix wrapper to set load paths.  You can use
@@ -126,35 +163,32 @@
     (print "Normalizing arguments")
     (while (not (member (car argv) '("--" nil)))
       (print (format "Normalizing arguments, stripped: %s" (pop argv))))
-    (pop argv))
+    (pop argv)) ; pop the sentinel "--"
 
   (message "original default directory: %s" default-directory)
-  ;; Configure load paths
-  (setq default-directory (if load-file-name (file-name-directory load-file-name)
-                            default-directory))
-  (let* ((test-dir (expand-file-name (concat default-directory "../test")))
-         (lisp-dir (expand-file-name (concat default-directory "../lisp"))))
-    (print (format "test load path: %s" test-dir))
-    (print (format "package load path: %s" lisp-dir))
-    (push test-dir load-path)
-    (push lisp-dir load-path))
+  (let* ((root-directory (if load-file-name
+                             (f-parent (f-dirname load-file-name))
+                           (f-dirname default-directory)))
+         (test-dir (concat root-directory "test"))
+         (lisp-dir (concat root-directory "lisp"))
+         (package-dir (if (file-exists-p lisp-dir) lisp-dir
+                        root-directory)))
+    (message "load-file-name for run-shim.el: %s" load-file-name)
+    (message "root load path: %s" root-directory)
+    (when (file-exists-p test-dir)
+      (message (format "test load path: %s" test-dir))
+      (push test-dir load-path))
+    (message (format "package load path: %s" root-directory))
+    (push package-dir load-path)
+    (setq default-directory root-directory))
 
   ;; running manually may encounter stale .elc
-  (setq load-prefer-newer t)
-
-  ;; Consume the command argument and run one of the routines
-  (setq command (pop argv)) ; nil-safe
-  (cond ((string= command "test")
-         (require 'elisp-repo-kit-test)
-         (ert-run-tests-batch-and-exit))
-        ((string= command "lint") (erk--lint-package))
-        ((string= command "lint-tests") (erk--lint-tests))
-        t (print "Command not recognized.  Use test, lint, lint-tests etc.")))
+  (setq load-prefer-newer t))
 
 ;; Only attempt to run when Emacs is loading with or --batch --no-x-resources,
 ;; which is implied by -Q.
 (when (or noninteractive inhibit-x-resources)
-  (erk--run-shim))
+  (run-shim))
 
 (provide 'run-shim)
 ;;; run-shim.el ends here
