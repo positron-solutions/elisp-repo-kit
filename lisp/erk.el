@@ -182,7 +182,9 @@ for development, and being lenient for degenerate cases is fine."
          (lisp-subdir (concat project-root "test"))
          (project-test-dir (if (file-exists-p lisp-subdir) lisp-subdir
                              project-root))
-         (package-features (erk--dir-features project-test-dir)))
+         (package-features (--reject
+                            (string-match-p (symbol-name it) (rx "-test.el" eol))
+                            (erk--dir-features project-test-dir))))
     (erk--reload package-features project-test-dir)))
 
 ;;;###autoload
