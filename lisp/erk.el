@@ -5,7 +5,7 @@
 ;; Author:  <author>
 ;; Keywords: convenience
 ;; Version: 0.2.0
-;; Package-Requires: ((emacs "25.1") (auto-compile "1.2.0") (dash "2.18.0"))
+;; Package-Requires: ((emacs "28.1") (auto-compile "1.2.0") (dash "2.18.0"))
 ;; Homepage: http://github.com/positron-solutions/elisp-repo-kit
 
 ;; Permission is hereby granted, free of charge, to any person obtaining a copy of
