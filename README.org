@@ -1,25 +1,19 @@
-#+TITLE: Elisp Repo Kit
+#+TITLE: Elisp Repo Kit (ERK)
 
-#+PROPERTY: LOGGING nil
-
-# NOTE: To avoid having this in the info manual, we use HTML rather than Org
-# syntax; it still appears with the GitHub renderer.
 #+HTML: <a href="https://melpa.org/#/elisp-repo-kit"><img src="https://melpa.org/packages/elisp-repo-kit-badge.svg" alt="melpa package"></a> <a href="https://stable.melpa.org/#/elisp-repo-kit"><img src="https://stable.melpa.org/packages/elisp-repo-kit-badge.svg" alt="melpa stable package"></a>
 #+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/ci.yml/badge.svg" alt="CI workflow status"></a>
 #+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=Developer+Certificate+of+Origin"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/dco.yml/badge.svg" alt="DCO Check"></a>
 
-This repository is a kit to start a new elisp package repository.  The package
-contained has commands to streamline elisp development.
+This repository is a kit to start a new elisp package repository on Github.  The
+package contained has commands to streamline elisp development.
 
 * Quickly set up an Emacs Lisp repository on Github with:
 
 - An [[https://www.youtube.com/watch?v=RQK_DaaX34Q&list=PLEoMzSkcN8oPQtn7FQEF3D7sroZbXuPZ7][elisp]] package
-- Bytecode compiling, linting, and test running
-- Commands to handle common elisp development gotchas
 - CI with [[https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs][Github Actions]], configured for Darwin (MacOS) and Linux
 - [[https://nixos.org/#examples][Nix]] environment for obtaining dependencies or reproducibly developing CI
   locally
-- Licensing, [[https://developercertificate.org/][DCO]], and DCO sign-off checks for PR's
+- Licensing, [[https://developercertificate.org/][DCO]], DCO sign-off checks, PR template and [[./CONTRIBUTING.org][CONTRIBUTING]] instructions
 - [[https://github.com/melpa/melpa][MELPA]] publishing compatible
 
 *To get started:*
@@ -27,7 +21,7 @@ contained has commands to streamline elisp development.
 Install the package and run =erk-new=, provide a directory, and
 answer all the questions.
 
-** Install elisp-repo-kit
+** Install ERK
 
   #+begin_src elisp
 
@@ -61,8 +55,8 @@ answer all the questions.
   - Email address
 
  The =erk-new= calls =erk-rename-relicense= to rename all of the files, string
- replace names, and re-license to GPL3.  Now just follow the steps in [[#finish-setting-up-your-new-github-repo][finish
- setting up]] Have fun!
+ replace names, and re-license to GPL3.  Now just follow the steps in
+ [[#finish-setting-up-your-new-github-repo][finish setting up]] Have fun!
 
 *** Manual cloning
 
@@ -78,19 +72,20 @@ answer all the questions.
   There are some customize options that cause the renaming to be transitively
   consistent.
 
-* Contents                                                         :noexport:
+* Contents
 :PROPERTIES:
-:TOC:      :include siblings
+:TOC:      :include siblings :ignore this
 :END:
 :CONTENTS:
-- [[#use-to-develop-your-package][Use to develop your package]]
+- [[#using-erk-for-development][Using ERK for development]]
   - [[#run-tests][Run tests]]
-    - [[#running-tests-ci-style][Running tests CI style]]
-  - [[#lint-and-byte-compile-code][Lint and byte-compile code]]
   - [[#loading-and-re-loading-your-package][Loading and re-loading your package]]
-    - [[#manual-loading--reloading][Manual Loading & Reloading]]
+  - [[#duplicating-ci-locally][Duplicating CI Locally]]
 - [[#finish-setting-up-your-new-github-repo][Finish setting up your new Github repo]]
   - [[#optional-steps][Optional Steps]]
+- [[#overview-of-file-contents-and-structure][Overview of file contents and structure]]
+- [[#customizing-ci][Customizing CI]]
+- [[#licensing-developer-certificate-of-origin][Licensing, Developer Certificate of Origin]]
 - [[#publishing-to-melpa][Publishing to MELPA]]
   - [[#creating-the-recipe][Creating the recipe]]
   - [[#testing-package-build][Testing package build]]
@@ -102,11 +97,11 @@ answer all the questions.
   - [[#discovering-and-running-tests--lints][Discovering and Running Tests & Lints]]
   - [[#comparisons][Comparisons]]
 - [[#contributing][Contributing]]
-- [[#shout-outs][Shout-outs]]
 - [[#footnote-on-fsf-and-emacs-core-licensing][Footnote on FSF and Emacs Core Licensing]]
+- [[#shout-outs][Shout-outs]]
 :END:
 
-* Use to develop your package
+* Using ERK for development
 
   Elisp repo kit contains some convenience functions to reload your package and
   to discover and run ert tests.  These shortcuts just make common cases faster.
@@ -134,13 +129,13 @@ answer all the questions.
 
   You can copy this checklist to your org agenda files:
 
-  - [X] Create a repository (from [[#Install elisp-repo-kit][install]] instructions)
+  - [X] Create a repository (from [[#Install erk][install]] instructions)
   - [ ] Create an empty Github repository and check the git remote configuration
   - [ ] Set up your git commit signing (and verification so that it's obvious)
     *and* [[#sign-off][sign-off]] so that it will be [[#Footnote-on-FSF-and-Emacs-Core-Licensing][straightforward]] for for FSF to pull in your
     changes if they later change to DCO instead of copyright assignment.
-  - [ ] Sign up for [[https://app.cachix.org/][cachix]] and, create a binary cache
-    with API tokens and public read access
+  - [ ] Sign up for [[https://app.cachix.org/][cachix]] and, create a binary cache with API tokens and public
+    read access
   - [ ] Add repository secrets necessary for your Github actions =CACHIX_AUTH_TOKEN= and
     =CACHIX_CACHE_NAME= (settings -> secrets -> new repository secret)
   - [ ] Enable actions and add the following actions to your allowed actions
@@ -159,7 +154,7 @@ answer all the questions.
 
   - [ ] Get your package working, pushed, actions run, and CI badges all green
   - [ ] [[#Publishing-to-melpa][Publish]] to MELPA
-  - [ ] Make a post on the [[https://old.reddit.com/r/emacs/][subreddit]] about your new package
+  - [ ] Make a post on [[https://old.reddit.com/r/emacs/][reddit]] and [[https://emacs.ch/][mastodon]] about your new package
 
 ** Optional Steps
 
@@ -352,9 +347,9 @@ answer all the questions.
   - Automate the annoying work necessary to set up a new repository
   - Streamline common elisp development workflows
 
-  Commands within this package will focus on cleaner integration of the tests and
-  lints with Emacs.  There has been a lot of work in this area, but much of it is
-  tangled with dependency management and sandbox creation.  Much of the work is
+  Commands within this package will focus on cleaner integration of the tests
+  and lints with Emacs.  There has been a lot of work in this area, but much of
+  it is tangled with dependency management and sandbox creation.  Much of it is
   done in languages other than elisp and focused on non-interactive workflows
   with no interactive integration on top.
 
@@ -456,20 +451,13 @@ answer all the questions.
   - pre-flake Nix support
   - Guix support that interferes with Nix support
 
-* Shout-outs
-
-  - [[https://github.com/alphapapa][alphapapa]] for being super prolific at everything, including package writing,
-    documentation, and activity on various social platforms
-  - [[https://github.com/adisbladis][adisbladis]] for the Nix overlay that makes the CI and local development so nice
-  - [[https://github.com/NobbZ][NobbZ]] for being all over the Nix & Emacs interwebs
-  - [[https://www.fsf.org/][FSF]] and all contributors to Emacs & packages for the Yak shaving club
-
 * Footnote on FSF and Emacs Core Licensing
 
   Free Software Foundation (FSF) frequently requires copyright assignment on all
-  code that goes into Emacs core. Many GNU projects have since switched to using
-  a Developer Certificate of Origin.  DCO sign-off is a practice accepted by
-  git, GCC, and the [[https://wiki.linuxfoundation.org/dco][Linux Kernel]].
+  code that goes into Emacs core. Many free software projects formerly requiring
+  copyright assignment have since switched to using a Developer Certificate of
+  Origin.  DCO sign-off is a practice accepted by git, GCC, and the [[https://wiki.linuxfoundation.org/dco][Linux
+  Kernel]].
 
   Doing DCO sign-off is not the same as copyright assignment, and serves a
   slightly different purpose.  DCO sign-off is an attestation from the submitter
@@ -486,8 +474,15 @@ answer all the questions.
   signature, you can be assured that changes submitted to a code base you
   control are strongly attested to be covered by the license you chose.
 
+* Shout-outs
+
+  - [[https://github.com/alphapapa][alphapapa]] for being super prolific at everything, including package writing,
+    documentation, and activity on various social platforms
+  - [[https://github.com/adisbladis][adisbladis]] for the Nix overlay that makes the CI and local development so nice
+  - [[https://github.com/NobbZ][NobbZ]] for being all over the Nix & Emacs interwebs
+  - [[https://www.fsf.org/][FSF]] and all contributors to Emacs & packages for the Yak shaving club
+
 # Local Variables:
 # before-save-hook: (lambda () (when (require 'org-make-toc nil t) (org-make-toc)))
-# org-export-with-properties: ()
-# org-export-with-title: t
+# org-make-toc-link-type-fn: org-make-toc--link-entry-github
 # End:
