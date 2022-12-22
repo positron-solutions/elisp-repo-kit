@@ -43,11 +43,12 @@
 ;; As a development aid, the package is versatile enough to work on some elisp
 ;; packages that were not descended from its own source.  The scope of
 ;; functionality is primarily to interface with linting and testing frameworks,
-;; both in batch and live workflows.
+;; both in batch and interactive workflows.
 
 ;;; Code:
 
-(require 'project) ; see flake.nix for providing dependencies for CI and local development.
+;; see flake.nix for providing dependencies for CI and local development.
+(require 'project)
 (require 'auto-compile)
 (require 'dash)
 (require 'ert)
@@ -346,7 +347,7 @@ itself, as a quine and for forking as a new template repository."
 
 ;;;###autoload
 (defun erk-rename-relicense (clone-dir package-name package-prefix author user-org email)
-  "Rename and relicense your clone of elisp-repo-kit.
+  "Rename and relicense your clone of ERK.
 CLONE-DIR is your elisp-repo-clone root.  PACKAGE-NAME should be
 the long name of the package, what will show up in melpa
 etc. PACKAGE-PREFIX is the elisp symbol prefix.  AUTHOR will be used
