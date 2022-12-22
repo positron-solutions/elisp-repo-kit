@@ -31,21 +31,21 @@ answer all the questions.
 
   #+begin_src elisp
 
-    (use-package elisp-repo-kit)
+    (use-package erk) ; vanilla
 
-    ;; straight-use-package-by-default t and you want a git version
-    (use-package elisp-repo-kit
-      :straight
-      (elisp-repo-kit :type git :host github :repo "positron-solutions/elisp-repo-kit"))
-
-    ;; using elpaca (recommended to add a hash for reproducibility)
+    ;; using elpaca
     (elpaca-use-package
-     (example :host github
-              :repo "positron-solutions/elisp-repo-kit"))
+     (erk :host github
+          :repo "positron-solutions/elisp-repo-kit"))
 
-    ;; if straight-use-package-by-default is nil
-    (straight-use-package '(elisp-repo-kit :type git :host github
-                                           :repo "positron-solutions/elisp-repo-kit"))
+    ;; straight without `straight-use-package-by-default'
+    (straight-use-package '(erk :type git :host github
+                                :repo "positron-solutions/elisp-repo-kit"))
+
+    ;; straight with `straight-use-package-by-default' t
+    (use-package erk
+      :straight
+      (erk :type git :host github :repo "positron-solutions/elisp-repo-kit"))
 
     ;; or use melpa, manual load-path & require, you brave yak shaver
 
@@ -96,17 +96,7 @@ answer all the questions.
   - [[#testing-package-build][Testing package build]]
   - [[#testing-stable-package-build][Testing stable package build]]
   - [[#melpa-lints][MELPA Lints]]
-- [[#overview-of-file-contents-and-structure][Overview of file contents and structure]]
 - [[#maintaining-nixpkgs-versions][Maintaining nixpkgs versions]]
-- [[#licensing-developer-certificate-of-origin][Licensing, Developer Certificate of Origin]]
-  - [[#license][License]]
-  - [[#developer-certificate-of-origin-dco][Developer Certificate of Origin (DCO)]]
-    - [[#sign-off][Sign-off]]
-    - [[#gpg-signature][GPG signature]]
-    - [[#user-setup-for-submitting-changes][User setup for submitting changes]]
-      - [[#automatically-add-sign-off][Automatically add sign-off]]
-      - [[#automatic-gpg-signing-with-per-project-keys][Automatic GPG signing with per-project keys]]
-      - [[#manually-signing--adding-sign-off][Manually signing & adding sign-off]]
 - [[#package-scope-and-relation-to-other-work][Package scope and relation to other work]]
   - [[#dependency-management][Dependency Management]]
   - [[#discovering-and-running-tests--lints][Discovering and Running Tests & Lints]]
@@ -123,89 +113,22 @@ answer all the questions.
 
 ** Run tests
 
-   Run =erk-ert-project= within your project.  The tests in =/test=
-   will be discovered, rebuilt & reloaded if necessary, and run.  There are a
-   few other commands to augment the [[https://www.gnu.org/software/emacs/manual/html_node/ert/][ert]] package.
-
-*** Running tests CI style
-
-   If you cannot reproduce a failure (or success) on CI, then you may want to
-   switch to using nix to get a reprodicible toolchain so you can further
-   develop with frozen versions from the nix [[https://nixos.wiki/wiki/Flakes][flake's]] flake.lock.
-
-   #+begin_src bash
-
-     nix develop # loads the devShells.default from flake.nix
-     direnv allow # same as above with file watching
-
-     emacs --quick --load ./test/run-shim.el -- test # graphical
-     emacs --script ./test/run-test.el -- test # terminal
-
-   #+end_src
-
-   You can /totally/ run the tests locally on whatever version of Emacs you
-   have.  *You do not need Nix to run tests.* CI will use Nix.
-
-** Lint and byte-compile code
-
-   Use [[https://github.com/gonewest818/elisp-lint][elisp-lint]] to detect issues with byte compiling, package format, code
-   structure and others.
-
-   The configuration is found inside [[./test/run-shim.el][test/run-shim.el]].  The CI run is invoked
-   inside of [[.github/workflows/ci.yml][ci.yml]] using Emacs in script mode.  Most of the configuration is in
-   the run shim.
-
-   The tests are also linted, to a less restrictive standard, also found in
-   [[./test/run-shim.el][run-shim.el]]
-
-   You can run the lints manually almost the same as running tests.
-   #+begin_src bash
-
-     nix develop
-     # nix develop .#emacs28
-     # nix develop .#emacsGit
-     emacs --script test/run-shim.el -- lint
-     emacs --script test/run-shim.el -- lint-tests
-
-   #+end_src
+   Run =erk-ert-project= within your project.  The tests will be discovered,
+   rebuilt & reloaded if necessary, and run.  There are a few other commands to
+   augment the [[https://www.gnu.org/software/emacs/manual/html_node/ert/][ert]] package.
 
 ** Loading and re-loading your package
 
-   Run =erk-reload-package= in one of your project files.  All features
-   in the /lisp directory will be re-compiled and loaded appropriately.
+   Run =erk-reload-project-package= in one of your project files.  The features
+   will be recompiled and reloaded.
 
-   *Note*, during reloading, unloading the current module is forced.  If other
-   packages you use depend on the project feature, results may be unpredicatable.
-   This is one reason batch style testing can be preferred.
+   The =erk-reload-project-tests= is the complementary command for tests.
 
-*** Manual Loading & Reloading
+** Duplicating CI Locally
 
-    To manually unload, run built-in command ~unload-feature~ and select your
-    package name. If you do not unload, reloading has no effect and you will see
-    stale behavior.
-
-    Next, add the package to your load-path and then require it or, more
-    directly, call =emacs-lisp-byte-compile-and-load= or
-    =emacs-lisp-native-compile-and-load=.
-
-    Especially in bootstrap situations such as working on this package itself,
-    you cannot unload the package in the middle of a command.  Some commands
-    have a =no-reload= variant just for this circumstance.
-
-    When using locally installed packages such as with straight,
-    =straight-rebuild-pacakge= will rebuild but *not* reload.
-
-    Here's what such a local installation looks like:
-
-    #+begin_src elisp :eval never
-
-      (straight-use-package
-       '(elisp-repo-kit :local-repo "~/my-packages/positron/elisp-repo-kit"))
-
-    #+end_src
-
-    Because the load path is configured above, you can call =(unload-feature
-    'elisp-repo-kit)= and then =(require 'elisp-repo-kit)= to pick up changes.
+   The CI configuration is all stored in [[.github/][.github]].  Usually you will want
+   development instructions in your new repository.  The [[./CONTRIBUTING.org][CONTRIBUTING]] guide
+   contains instructions to reproduce the CI behavior.
 
 * Finish setting up your new Github repo
 
@@ -254,6 +177,80 @@ answer all the questions.
  easy to sign up and generate the token as to remove the step from the Github
  actions, so you won't save much time by avoiding it.
 
+* Overview of file contents and structure
+
+  /After cloning and renaming,/ you will have a file tree like this:
+
+  #+begin_src shell
+
+    ├── .gitignore                        # ignores for byte compiles, autoloads etc
+    │
+    ├── README.org                        # this file
+    ├── CONTRIBUTING.org                  # typical instructions for development
+    ├── COPYING                           # a GPL3 license
+    ├── DCO                               # Developer Certificate of Origin
+    │
+    ├── .github
+    │   ├── .envrc                        # direnv integration with `nix develop`
+    │   ├── flake.nix                     # dependencies for this project
+    │   ├── flake.lock                    # version controlled lock of flake.nix input versions
+    │   ├── run-shim.el                   # elisp script with test & lint routines
+    │   ├── pull_request_template.md      # reminders for PR contributors
+    │   └── workflows
+    │       ├── ci.yml                    # workflow for lints and tests
+    │       └── dco.yml                   # workflow to check DCO sign-offs
+    │
+    ├── lisp
+    │   └── erk.el             # the package
+    │
+    └── test
+        └── erk-test.el        # ERT unit tests
+
+  #+end_src
+
+  You can use either a multi-file or flat layout for lisp.  Just name test files
+  ~something-test.el~ and keep all lisp files in root, ~/lisp~ or ~/test~
+  directories.
+
+* Customizing CI
+
+  The [[.github/run-shim.el][run-shim.el]] script is just provides a CLI interface for adding commands in
+  the [[.github/workflows/ci.yml][ci.yml]] CI declaration.  Each action step just loads the shell, declared in
+  the [[.github/flake.nix][flake.nix]] and then runs the shim in Emacs.  The shim consumes the CLI
+  command arguments, so you can parameterize the invocations that way.
+
+  - If you need extra elisp dependencies during CI, add them to the =epkgs= list
+    in the flake.nix.
+  - If you need extra 3rd party dependencies, add them to =packages= in the call
+    to =mkShell=.
+  - To invoke different elisp operations, add / modify the commands in
+    [[.github/run-shim.el][run-shim.el]].
+
+  There's more information in [[CONTRIBUTING.org][CONTRIBUTING]] about running commands locally.  You
+  will want this information in your new repository.
+
+* Licensing, Developer Certificate of Origin
+
+  This template project is distributed with the MIT license. =erk-new= will also
+  run =erk-rename-relicense=, which will automatically switch to the GPL3
+  license.  *The MIT license allows re-licensing, and so this change is
+  compatible.* If you accept non-trivial changes to your project, it will be
+  very hard to change to the GPL3 later, so consider this choice.
+
+  The new repository will also come with DCO sign-off checking on PR's.  The
+  instructions are in the [[./CONTRIBUTING.org][CONTRIBUTING]] guide.  A DCO sign-off policy will give
+  your project a clear attestation of sufficient direct or transitive authority
+  from each contributor to submit changes under the terms of your project's
+  license.  This can only improve your legal protection from incidentally
+  handling copyrighted code.
+
+  The DCO choice in this repository is also meant to encourage & push stodgy
+  organizations whose responsibility it was to invent better processes towards
+  lower friction paths to contribute code.  If you fail to implement the DCO
+  sign-off scheme, there is less hope that the FSF will someday independently
+  merge changes that accumulate in your package because there will not be a
+  .
+
 * Publishing to MELPA
 
   If you have green CI, you have already passed many requirements of publishing a
@@ -284,14 +281,14 @@ answer all the questions.
    =package-build-create-recipe= will give you something like:
 
    #+begin_src elisp
-   (elisp-repo-kit :fetcher github :repo "positron-solutions/elisp-repo-kit")
+   (erk :fetcher github :repo "positron-solutions/elisp-repo-kit")
    #+end_src
 
    The following template can be filled in and pull-requested to MELPA to publish.
    You don't need to touch ~:files~.  The ~commit~ and ~branch~ are optional
    depending on how you version / develop / tag your releases.
 
-   Copy the recipe into =recipes/elisp-repo-kit= inside your MELPA clone.
+   Copy the recipe into =recipes/erk= inside your MELPA clone.
 
 ** Testing package build
 
@@ -300,9 +297,9 @@ answer all the questions.
    #+begin_src shell
 
      # Builds the package
-     make recipes/elisp-repo-kit
+     make recipes/erk
      # Test sandbox installation (will affect ~/.emacs.d/elpa  So much for sandbox ¯\_(ツ)_/¯
-     EMACS_COMMAND=$(which emacs) make sandbox INSTALL=elisp-repo-kit
+     EMACS_COMMAND=$(which emacs) make sandbox INSTALL=erk
 
    #+end_src
 
@@ -315,7 +312,7 @@ answer all the questions.
    #+begin_src shell
 
      # Test stable builds against your tags
-     STABLE=t make recipes/elisp-repo-kit
+     STABLE=t make recipes/erk
 
    #+end_src
 
@@ -337,36 +334,6 @@ answer all the questions.
    changes and check all the boxes in the PR template except the one that requires
    you to read the instructions.
 
-* Overview of file contents and structure
-
-  /After cloning and renaming,/ you will have a file tree like this:
-
-  #+begin_src shell
-
-    ├── .gitignore                        # ignores for byte compiles, autoloads etc
-    ├── flake.nix                         # dependencies for this project
-    ├── flake.lock                        # version controlled lock of flake.nix input versions
-    ├── .envrc                            # direnv integration with `nix develop`
-    │
-    ├── README.org                        # this file
-    ├── COPYING                           # a GPL3 license
-    ├── DCO                               # Developer Certificate of Origin
-    │
-    ├── .github
-    │   ├── pull_request_template.md      # reminders for PR contributors
-    │   └── workflows
-    │       ├── ci.yml                    # workflow for lints and tests
-    │       └── dco.yml                   # workflow to check DCO sign-offs
-    │
-    ├── lisp
-    │   └── elisp-repo-kit.el             # the package
-    │
-    └── test
-        ├── elisp-repo-kit-test.el        # ERT unit tests
-        └── run-shim.el                   # elisp script with test & lint routines
-
-  #+end_src
-
 * Maintaining nixpkgs versions
 
   Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]]
@@ -377,129 +344,6 @@ answer all the questions.
   less test emphasis, and so =nixpkgs-darwin-<version>= branches exist and are
   required to pass more Darwin tests before merging.  This is more stable if you
   are on MacOS. =nixpkgs-unstable= or =master= are your other less common options.
-
-* Licensing, Developer Certificate of Origin
-
-  This project is distributed with a Developer Certificate of Origin.  By adding
-  a sign-off notice and GPG signature to each commit, you will provide means to
-  authenticate your sign-off later strengthening your attestations stated in the
-  DCO, upholding the overall integrity of the license coverage over the project.
-
-  If you fail to implement this scheme, Emacs core will have significant reasons
-  not to directly merge changes that accumulate in your package because there
-  will not be a clear attestation of authority to submit changes under the terms
-  of your project's license.
-
-** License
-
-   This template project is distributed with the MIT license. Running the rename
-   command will automatically switch to the GPL license.  *The MIT license
-   allows re-licensing, and so this change is compatible.* If you accept
-   non-trivial changes to your project, it will be very hard to change to the
-   GPL3 later, so consider this choice.
-
-** Developer Certificate of Origin (DCO)
-
-   A [[./DCO][copy of the DCO]] is distributed with this project.  Read its text to
-   understand the significance of configuring for sign-off.
-
-*** Sign-off
-
-    A sign-off means adding a "trailer" to your commit that looks like the
-    following:
-
-    #+begin_src
-
-    Signed-off-by: Random J Developer <random@developer.example.org>
-
-    #+end_src
-
-*** GPG signature
-
-    A GPG signed commit shows that the owner of the private key submitted the
-    changes.  Wherever signatures are recorded in chains, they can demonstrate
-    participation in changes elsewhere and awareness of what the submitter is
-    participating in.  Corroborating user's signature accross a history of works
-    strengthens that user's attestation provided by DCO sign-off.
-
-*** User setup for submitting changes
-
-    Follow these instructions before you get ready to submit a pull-request.
-
-    Refer to the [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][Github signing commits]] instructions to set up your git client
-    to add GPG signatures.  File issues if you run into Emacs-specific problems.
-
-    Because signing is intended to be a conscious process, please remember to
-    read and understand the [[./DCO][Developer Certificate of Origin]] before confinguring
-    your client to automatically sign-off on commits.
-
-**** Automatically add sign-off
-
-     In magit, set the =-s= switch.  Use =C-x C-s= (=transient-save=) to
-     preserve this switch on future uses.  (Note, this is not per-project).You
-     can also set the signature flag this way.
-
-**** Automatic GPG signing with per-project keys
-
-     In order to specify which projects you intend to sign with which keys, you
-     will want to configure your git client using path-specific configurations.
-
-     Configuing git for this can be done with the following directory structure:
-
-     #+begin_src
-
-    /home/rjdeveloper/
-    ├── .gitconfig
-    └── .gitconfig.d
-        ├── sco-linux-projects.conf
-        ├── other-projects.conf
-        └── gpg-signing-projects.conf
-
-     #+end_src
-
-     In your root config, ~.gitconfig~, add an =includeIf= directive that will
-     load the configuration you use for projects you intend to GPG sign commits
-     for.
-
-     #+begin_src
-
-    [includeIf "gitdir:/home/rjdeveloper/**/gpg-signing/**/.git"]
-      path = "~/.gitconfig.d/gpg-signing-projects.conf"
-
-     #+end_src
-
-     In the ~gpg-signing-projects.conf~ add your GPG signing configuration from
-     earlier.  =sign= adds the GPG signature automatically.  File an issue if you
-     need help with multiple GPG homes or other configurations.
-
-     #+begin_src
-
-    [user]
-      name = "Random J Developer"
-      email = "random@developer.example.org"
-      signingkey = "5FF0EBDC623B3AD4"
-
-    [commit]
-      sign = true
-      gpgSign = true
-
-     #+end_src
-
-**** Manually signing & adding sign-off
-
-     If you don't like these configurations and want to individually indicate you
-     have read and intend to apply the DCO to your changes, these commands are
-     equivalent:
-
-     #+begin_src bash
-       git commit -s -S --message "I don't like using .gitconfig"
-
-       # To clean up a commit
-       git commit --amend -s -S --no-message
-
-       # Combine with rebase to sign / sign-off multiple existing commits
-       git rebase -i
-     #+end_src
 
 * Package scope and relation to other work
 
@@ -579,8 +423,15 @@ answer all the questions.
 
 * Contributing
 
-  First decide if you want to work on this repository or fork it to something
-  entirely different.
+  For turn-key contribution to the software ecosystem that keeps you moving, see
+  the funding links.
+
+  For code-based contribution, first decide if you want to work on this
+  repository or fork it to something entirely different.
+
+  The [[./CONTRIBUTING.org][CONTRIBUTING]] guide in this repo contains development instructions,
+  including singing & sign-off configuration.  You will usually want this file
+  in your own repositories.
 
   Non-exhaustive list of changes that are very welcome:
 

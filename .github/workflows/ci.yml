@@ -62,7 +62,7 @@ jobs:
       # verify that any flake commands will successfully run straight off of the
       # github repository.
       - name: load the shell with frozen versions
-        run: nix develop .#${{ matrix.emacsPkg }} --ignore-environment --command "emacs" "--version"
+        run: nix develop .github#${{ matrix.emacsPkg }} --ignore-environment --command "emacs" "--version"
 
       # Linting the package is less useful on multiple version.  Modify the
       # logic if you wish to expand lint coverage.
@@ -72,13 +72,13 @@ jobs:
           eval "$(nix print-dev-env \
             --override-input nixpkgs github:nixos/nixpkgs/release-22.11 \
             --update-input emacs-overlay \
-            .#${{ matrix.emacsPkg }})"
+            .github#${{ matrix.emacsPkg }})"
 
           # Lint the package
-          emacs --script test/run-shim.el -- lint
+          emacs --script .github/run-shim.el -- lint
 
           # Lint the tests
-          emacs --script test/run-shim.el -- lint-tests
+          emacs --script .github/run-shim.el -- lint-tests
 
       - name: run tests
         run: |
@@ -96,17 +96,17 @@ jobs:
             eval "$(nix print-dev-env  \
               --override-input nixpkgs github:nixos/nixpkgs/release-22.11 \
               --update-input emacs-overlay \
-              .#${{ matrix.emacsPkg }})"
+              .github#${{ matrix.emacsPkg }})"
 
           else
             eval "$(nix print-dev-env \
               --override-input nixpkgs github:nixos/nixpkgs/nixpkgs-22.11-darwin \
               --update-input emacs-overlay \
-              .#${{ matrix.emacsPkg }})"
+              .github#${{ matrix.emacsPkg }})"
           fi
 
           # Runs the tests in a graphical window (can freeze)
-          # emacs --quick --load test/run-shim.el -- test $GITHUB_SHA
+          # emacs --quick --load .github/run-shim.el -- test $GITHUB_SHA
 
           # Run tests with terminal output and no graphical window
-          emacs --script test/run-shim.el -- test $GITHUB_SHA
+          emacs --script .github/run-shim.el -- test $GITHUB_SHA

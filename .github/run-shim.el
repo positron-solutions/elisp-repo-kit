@@ -33,9 +33,9 @@
 ;; contains the dependencies declared in the flake.nix.
 ;;
 ;;   nix develop
-;;   "emacs" --quick --script test/run-shim.el -- test
-;;   "emacs" --quick --script test/run-shim.el -- lint
-;;   "emacs" --quick --script test/run-shim.el -- lint-tests
+;;   "emacs" --quick --script .github/run-shim.el -- test
+;;   "emacs" --quick --script .github/run-shim.el -- lint
+;;   "emacs" --quick --script .github/run-shim.el -- lint-tests
 ;;
 ;; Note that this elisp script assumes that some packages are located in
 ;; specific locations.
