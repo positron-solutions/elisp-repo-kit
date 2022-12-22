@@ -5,7 +5,7 @@
 ;; Author:  <author>
 ;; Keywords: convenience
 ;; Version: 0.2.0
-;; Package-Requires: ((emacs "25.1") (project "0.7.1") (auto-compile "1.2.0") (dash "2.18.0") (ert "0.0.1"))
+;; Package-Requires: ((emacs "25.1") (auto-compile "1.2.0") (dash "2.18.0"))
 ;; Homepage: http://github.com/positron-solutions/elisp-repo-kit
 
 ;; Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -52,6 +52,8 @@
 (require 'dash)
 (require 'ert)
 
+(eval-when-compile (require 'subr-x))
+
 (defgroup elisp-repo-kit nil "Elisp repository kit." :prefix 'erk :group 'elisp-repo-kit)
 
 (defcustom erk-github-package-name "elisp-repo-kit"
@@ -87,17 +89,18 @@ you can redistribute it and/or modify
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.")
 
-(defconst erk--rename-maps ; directory file replacement-file
+(defconst erk--rename-maps
   '(( nil "gpl-3.0.txt" "COPYING")
-    ("lisp/" "elisp-repo-kit.el" nil)
-    ("test/" "elisp-repo-kit-test.el" nil)
-    ("test/" "run-shim.el" nil)))
+    ("lisp/" "erk.el" nil)
+    ("test/" "erk-test.el" nil))
+  "List of (directory file replacement-file) forms.")
 
 (defconst erk--files-with-strings
   '("README.org"
-    "lisp/elisp-repo-kit.el"
-    "test/elisp-repo-kit-test.el"
-    "test/run-shim.el"))
+    "CONTRIBUTING.org"
+    "lisp/erk.el"
+    "test/erk.el"
+    ".github/run-shim.el"))
 
 (defun erk--project-root ()
   "Return project root or buffer directory."
