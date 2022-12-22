@@ -1,4 +1,4 @@
-;;; elisp-repo-kit.el --- Elisp Github repository kit  -*- lexical-binding: t; -*-
+;;; erk.el --- Elisp (Github) Repository Kit  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 Positron Solutions
 
@@ -61,8 +61,8 @@ to clone from within the fork."
   :group 'elisp-repo-kit
   :type 'string)
 
-(defcustom erk-package-prefix "erk-"
-  "Function names etc may use an initialism that requires renaming."
+(defcustom erk-package-prefix "erk"
+  "The prefix is used to features and file names."
   :group 'elisp-repo-kit
   :type 'string)
 
@@ -250,6 +250,13 @@ clobbered."
               (rename-file (concat dir filename) (concat dir new-name) t))))
         erk--rename-maps))
 
+(defun erk--normed-prefix-match (prefix)
+  "Searching for PREFIX without dashes is collision-prone."
+  (let ((normed (if (string-match-p (rx "-" eol) prefix)
+                    prefix
+                  (concat prefix "-"))))
+    (rx (or whitespace punctuation bol) (literal normed))))
+
 (defun erk--replace-strings (dir package-name package-prefix author user-org email)
   "Replace values in files that need renaming or re-licensing.
 DIR is where we are replacing.  PACKAGE-NAME is the new
@@ -261,14 +268,12 @@ package headers."
         (erk-github-path (concat erk-github-userorg "/"
                                  erk-github-package-name))
         (github-path (concat user-org "/" package-name))
-        (package-prefix (if (string-match-p (rx "-" eol) package-prefix)
-                            package-prefix
-                          (concat package-prefix "-")))
+        (package-prefix (erk--normed-prefix-match package-prefix))
+        (replace-prefix (erk--normed-prefix-match erk-package-prefix))
         (capitalized-package-title
-         (string-join
-          (mapcar #'capitalize
-                  (split-string erk-github-package-name "-"))
-          " ")))
+         (string-join (mapcar #'capitalize
+                              (split-string erk-github-package-name "-"))
+                      " ")))
     (mapc
      (lambda (file)
        (with-current-buffer (find-file-noselect (concat dir file) t t)
@@ -293,7 +298,7 @@ package headers."
          (while (re-search-forward erk-github-package-name nil t)
            (replace-match package-name))
          (goto-char (point-min))
-         (while (re-search-forward erk-package-prefix nil t)
+         (while (re-search-forward replace-prefix nil t)
            (replace-match package-prefix))
          (goto-char (point-min))
          (while (re-search-forward capitalized-package-title nil t)
@@ -360,7 +365,7 @@ by the author of this repository."
 \nsGithub organization or username: \nsEmail: ")
   (erk--replace-strings
    clone-dir package-name package-prefix author user-org email)
-  (erk--rename-package clone-dir erk-github-package-name package-name))
+  (erk--rename-package clone-dir erk-package-prefix package-name))
 
 ;;;###autoload
 (defun erk-new (package-name package-prefix clone-root author user-org email &optional rev)
@@ -404,5 +409,5 @@ implementation information and more details about argument usage."
    (erk-clone clone-root package-name user-org rev)
    package-name package-prefix author user-org email))
 
-(provide 'elisp-repo-kit)
-;;; elisp-repo-kit.el ends here
+(provide 'erk)
+;;; erk.el ends here
