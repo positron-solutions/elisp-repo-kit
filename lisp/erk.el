@@ -297,6 +297,10 @@ package headers."
         (replace-prefix (erk--prefix-match erk-package-prefix))
         (capitalized-package-title
          (string-join (mapcar #'capitalize
+                              (split-string package-name "-"))
+                      " "))
+        (replace-package-title
+         (string-join (mapcar #'capitalize
                               (split-string erk-github-package-name "-"))
                       " ")))
     (mapc
@@ -331,8 +335,8 @@ package headers."
          (while (re-search-forward replace-prefix nil t)
            (replace-match package-prefix nil t nil 1))
          (goto-char (point-min))
-         (while (re-search-forward capitalized-package-title nil t)
-           (replace-match capitalized-package-title))
+         (while (re-search-forward replace-package-title nil t)
+           (replace-match capitalized-package-title nil t))
          (save-buffer 0)
          (kill-buffer)))
      erk--files-with-strings)))
