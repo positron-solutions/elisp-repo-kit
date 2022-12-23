@@ -1,5 +1,7 @@
 #+TITLE: Contributing
 
+Development process & infrastructure guide.
+
 * Contents
 :PROPERTIES:
 :TOC:      :include siblings :ignore this
@@ -29,15 +31,16 @@
 
 ** Running tests
 
-   Run =erk-ert-project= within this project.  The tests will be discovered,
-   rebuilt & reloaded if necessary, and run.  There are a few other commands to
-   augment the [[https://www.gnu.org/software/emacs/manual/html_node/ert/][ert]] package.
+   Run =erk-ert-project= within this project.  The tests will be
+   discovered, rebuilt & reloaded if necessary, and run.  There are a
+   few other commands to augment the [[https://www.gnu.org/software/emacs/manual/html_node/ert/][ert]] package.
 
 *** Running tests CI style
 
-    If you cannot reproduce a failure (or success) on CI, then you may want to
-    switch to using nix to get a reprodicible toolchain so you can further
-    develop with frozen versions from the nix [[https://nixos.wiki/wiki/Flakes][flake's]] flake.lock.
+    If you cannot reproduce a failure (or success) on CI, then you may
+    want to switch to using [[https://nixos.org/download.html][nix]] to get a reprodicible toolchain so you
+    can further develop with frozen versions from the nix [[https://nixos.wiki/wiki/Flakes][flake's]]
+    flake.lock.
 
     #+begin_src bash
 
