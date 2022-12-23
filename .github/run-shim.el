@@ -85,8 +85,11 @@
             ;; "--no-check-declare"
             )
           (seq-filter
-           (lambda (s) (not (string-match-p ".*autoloads.*.el$" s)))
-           (file-expand-wildcards "../lisp/*.el")))))
+           (lambda (s) (not (or (string-match-p "*-test.el$" s)
+                           (string-match-p ".*autoloads.*.el$" s))))
+           (file-expand-wildcards
+            (if (file-exists-p "lisp/") "lisp/*.el"
+              "*.el"))))))
 
     (message "ARGS: %s" command-line-args-left)
 
@@ -125,8 +128,12 @@
             ;; "--no-check-declare"
             )
           (seq-filter
-           (lambda (s) (not (string-match-p ".*autoloads.*.el$" s)))
-           (file-expand-wildcards "../test/*.el")))))
+           (lambda (s) (string-match-p "*-test.el$" s))
+           (file-expand-wildcards
+            (if (file-exists-p "test/") "test/*.el"
+              "*-test.el"))))))
+
+    (message "ARGS: %s" command-line-args-left)
 
     ;; (setq elisp-lint-ignored-validators nil
     ;;       elisp-lint-file-validators nil
