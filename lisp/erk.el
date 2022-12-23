@@ -270,12 +270,17 @@ clobbered."
               (rename-file (concat dir filename) (concat dir new-name) t))))
         erk--rename-maps))
 
-(defun erk--normed-prefix-match (prefix)
-  "Searching for PREFIX without dashes is collision-prone."
-  (let ((normed (if (string-match-p (rx "-" eol) prefix)
-                    prefix
-                  (concat prefix "-"))))
-    (rx (or whitespace punctuation bol) (literal normed))))
+(defun erk--nodash (prefix)
+  "Strip dash from PREFIX if present."
+  (if (string-match-p (rx "-" eol) prefix)
+      (substring prefix 0 (length prefix))
+    prefix))
+
+(defun erk--prefix-match (prefix)
+  "Create somewhat collision-safe regex for PREFIX."
+  (rx (or whitespace punctuation bol)
+      (group (literal (erk--nodash prefix)))
+      (or whitespace punctuation eol)))
 
 (defun erk--replace-strings (dir package-name package-prefix author user-org email)
   "Replace values in files that need renaming or re-licensing.
@@ -288,8 +293,8 @@ package headers."
         (erk-github-path (concat erk-github-userorg "/"
                                  erk-github-package-name))
         (github-path (concat user-org "/" package-name))
-        (package-prefix (erk--normed-prefix-match package-prefix))
-        (replace-prefix (erk--normed-prefix-match erk-package-prefix))
+        (package-prefix (erk--nodash package-prefix))
+        (replace-prefix (erk--prefix-match erk-package-prefix))
         (capitalized-package-title
          (string-join (mapcar #'capitalize
                               (split-string erk-github-package-name "-"))
@@ -322,8 +327,9 @@ package headers."
          (while (re-search-forward erk-github-package-name nil t)
            (replace-match package-name))
          (goto-char (point-min))
+         ;; replace package prefix.  Uses group replacement.
          (while (re-search-forward replace-prefix nil t)
-           (replace-match package-prefix))
+           (replace-match package-prefix nil t nil 1))
          (goto-char (point-min))
          (while (re-search-forward capitalized-package-title nil t)
            (replace-match capitalized-package-title))
