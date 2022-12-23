@@ -427,13 +427,13 @@ implementation information and more details about argument usage."
            (read-directory-name "Clone root: " default-directory))
           (author
            (let ((default (when (executable-find "git")
-                            (string-chop-newline
+                            (string-trim
                              (shell-command-to-string "git config user.name")))))
              (read-string "Author: " default)))
           (user-org (read-string "User or organization name: "))
           (email
            (let ((default (when (executable-find "git")
-                            (string-chop-newline
+                            (string-trim
                              (shell-command-to-string "git config user.email")))))
              (read-string "Email: " default)))
           (rev (read-string "Rev, tag, or branch (empty implies default branch): ")))
