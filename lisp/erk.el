@@ -55,25 +55,25 @@
 
 (eval-when-compile (require 'subr-x))
 
-(defgroup elisp-repo-kit nil "Elisp repository kit." :prefix 'erk :group 'elisp-repo-kit)
+(defgroup erk nil "Elisp repository kit." :prefix 'erk :group 'erk)
 
 (defcustom erk-github-package-name "elisp-repo-kit"
   "Default Github <project> for cloning templates.
 If you rename this repository after forking, you need to set this
 to clone from within the fork."
-  :group 'elisp-repo-kit
+  :group 'erk
   :type 'string)
 
 (defcustom erk-package-prefix "erk"
   "The prefix is used to features and file names."
-  :group 'elisp-repo-kit
+  :group 'erk
   :type 'string)
 
 (defcustom erk-github-userorg "positron-solutions"
   "Default Github <user-or-org> for cloning templates.
 If you fork this repository, you need to set this to clone it
 from within the fork."
-  :group 'elisp-repo-kit
+  :group 'erk
   :type 'string)
 
 (defconst erk--gpl3-notice ";; This program is free software; \
