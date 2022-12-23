@@ -424,7 +424,8 @@ implementation information and more details about argument usage."
            (read-string
             (format "Package prefix, such as %s: " erk-package-prefix)))
           (clone-root
-           (read-directory-name "Clone root: " default-directory))
+           (directory-file-name
+            (read-directory-name "Clone root: " default-directory)))
           (author
            (let ((default (when (executable-find "git")
                             (string-trim
