@@ -103,6 +103,10 @@ you can redistribute it and/or modify
     "test/erk-test.el"
     ".github/run-shim.el"))
 
+(defconst erk--delete-files
+  '(".github/FUNDING.yml")
+  "Files that would require other accounts to migrate.")
+
 (defun erk--project-root ()
   "Return project root or buffer directory."
   (let ((project (project-current)))
@@ -250,6 +254,9 @@ DIR.  If replacement-filename is nil means replace OLD-PACKAGE
 with NEW-PACKAGE, using `replace-regexp-in-string'.  DIR is the
 root of where we are renaming.  Existing files will be
 clobbered."
+  (mapc (lambda (f) (delete-file (concat (file-name-as-directory dir) f)))
+        erk--delete-files)
+
   (mapc (lambda (rename-map)
           (let ((dir (concat dir (or (pop rename-map) "")))
                 (filename (pop rename-map))
