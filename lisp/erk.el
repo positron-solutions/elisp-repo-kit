@@ -359,15 +359,14 @@ itself, as a quine and for forking as a new template repository."
                  erk-github-userorg
                  erk-github-package-name
                  package-name))
-        (shell-command
-         (format "cd %s/%s" clone-root package-name))
-        (when rev
-          (shell-command (format "%s checkout %s" git-bin rev)))
-        (shell-command
-         (format "%s remote rm origin" git-bin))
-        (shell-command
-         (format "%s remote add origin git@github.com:%s/%s.git"
-                 git-bin user-org package-name))
+        (let ((default-directory (concat clone-root "/" package-name "/")))
+          (when rev
+            (shell-command (format "%s checkout %s" git-bin rev)))
+          (shell-command
+           (format "%s remote rm origin" git-bin))
+          (shell-command
+           (format "%s remote add origin git@github.com:%s/%s.git"
+                   git-bin user-org package-name)))
         ;; return value for renaming
         (concat clone-root "/" package-name "/"))
     (error "Could not find git executible")))
