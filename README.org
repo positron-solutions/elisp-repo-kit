@@ -45,7 +45,7 @@ answer all the questions.
 
   #+end_src
 
-=erk-new= will ask for:
+  =erk-new= will ask for:
 
   - Root directory you want to clone to
   - Package name
@@ -54,23 +54,24 @@ answer all the questions.
   - Github user or organization
   - Email address
 
- The =erk-new= calls =erk-rename-relicense= to rename all of the files, string
- replace names, and re-license to GPL3.  Now just follow the steps in
- [[#finish-setting-up-your-new-github-repo][finish setting up]] Have fun!
+  The =erk-new= calls =erk-rename-relicense= to rename all of the files, string
+  replace names, and re-license to GPL3.  Now just follow the steps in
+  [[#finish-setting-up-your-new-github-repo][finish setting up]] Have fun!
 
 *** Manual cloning
 
-  The standalone command, =erk-clone= will clone without renaming.
+    The standalone command, =erk-clone= will clone without renaming.
 
-  This repo is also a [[https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template][template repository]], so you can fork without forking
-  (Bruce Lee).
+    This repo is also a [[https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template][template repository]], so you can fork without forking
+    (Bruce Lee).
 
-  If you create via template or clone manually, it's presumed you know what
-  you're doing at that point.  Call =erk-rename= on its own to rename
-  in these cases.
+    If you create via template or clone manually, it's presumed you know what
+    you're doing at that point.  Call =erk-rename= on its own to rename
+    in these cases.
 
-  There are some customize options that cause the renaming to be transitively
-  consistent.
+    There are some customize options that cause the renaming to be transitively
+    consistent.
+
 *** Manually Add Just CI
 
     Copy the .github folder and the contributing guide to your package.  Set up
