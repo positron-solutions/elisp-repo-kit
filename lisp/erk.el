@@ -317,23 +317,23 @@ package headers."
            (insert ", " author))
          (goto-char (point-min))
          (when (re-search-forward "<author>" nil t)
-           (replace-match (concat author ", <" email ">")))
+           (replace-match (concat author ", <" email ">") nil t))
          (goto-char (point-min))
          ;; replace license with GPL3 notice
          (when (re-search-forward ";; Permission \\(.\\|\n\\)*SOFTWARE.$" nil t)
-           (replace-match erk--gpl3-notice))
+           (replace-match erk--gpl3-notice nil t))
          (goto-char (point-min))
          ;; update github paths for README links
          (while (re-search-forward erk-github-path nil t)
-           (replace-match github-path))
-         (goto-char (point-min))
-         ;; update remaining package name strings
-         (while (re-search-forward erk-github-package-name nil t)
-           (replace-match package-name))
+           (replace-match github-path nil t))
          (goto-char (point-min))
          ;; replace package prefix.  Uses group replacement.
          (while (re-search-forward replace-prefix nil t)
            (replace-match package-prefix nil t nil 1))
+         (goto-char (point-min))
+         ;; update remaining package name strings.
+         (while (re-search-forward erk-github-package-name nil t)
+           (replace-match package-name nil t))
          (goto-char (point-min))
          (while (re-search-forward replace-package-title nil t)
            (replace-match capitalized-package-title nil t))
