@@ -201,10 +201,10 @@ answer all the questions.
     │       └── dco.yml                   # workflow to check DCO sign-offs
     │
     ├── lisp
-    │   └── erk.el             # the package
+    │   └── erk.el                        # the package
     │
     └── test
-        └── erk-test.el        # ERT unit tests
+        └── erk-test.el                   # ERT unit tests
 
   #+end_src
 
