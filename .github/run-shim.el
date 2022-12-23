@@ -42,8 +42,6 @@
 
 ;;; Code:
 
-(require 'f)
-
 (defun run-shim ()
   "Execute a CI process based on CLI arguments."
   (run-shim-setup)
@@ -167,8 +165,12 @@ will be compiled, natively if available."
 
   (message "original default directory: %s" default-directory)
   (let* ((root-directory (if load-file-name
-                             (f-parent (f-dirname load-file-name))
-                           (f-dirname default-directory)))
+                             (file-name-directory
+                              (directory-file-name
+                               (file-name-directory load-file-name)))
+                           (file-name-directory
+                            (directory-file-name
+                             default-directory))))
          (test-dir (concat root-directory "test"))
          (lisp-dir (concat root-directory "lisp"))
          (package-dir (if (file-exists-p lisp-dir) lisp-dir
