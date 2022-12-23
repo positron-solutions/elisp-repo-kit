@@ -100,7 +100,7 @@ you can redistribute it and/or modify
   '("README.org"
     "CONTRIBUTING.org"
     "lisp/erk.el"
-    "test/erk.el"
+    "test/erk-test.el"
     ".github/run-shim.el"))
 
 (defun erk--project-root ()
