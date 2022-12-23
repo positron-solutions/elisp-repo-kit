@@ -32,7 +32,7 @@
 ;; byte compile where necessary.  The Emacs provided by the nix develop shell
 ;; contains the dependencies declared in the flake.nix.
 ;;
-;;   nix develop
+;;   nix develop .github#
 ;;   "emacs" --quick --script .github/run-shim.el -- test
 ;;   "emacs" --quick --script .github/run-shim.el -- lint
 ;;   "emacs" --quick --script .github/run-shim.el -- lint-tests
