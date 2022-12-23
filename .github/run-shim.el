@@ -62,7 +62,7 @@
      (message "Command %s not recognized.  Use test, lint, lint-tests etc."
               run-shim-command))))
 
-(defun run-shime-lint-package ()
+(defun run-shim-lint-package ()
   "Lint the files in the package directory."
   (require 'elisp-lint)
   ;; 100-character column limit for lints.  If it's good enough for Linux, it's
