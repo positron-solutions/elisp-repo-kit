@@ -118,8 +118,8 @@ you can redistribute it and/or modify
     (or (if (version<= emacs-version "28.0")
             (car (with-suppressed-warnings
                      ((obsolete project-roots))
-                   (funcall 'project-roots project)))
-          (funcall 'project-root project))
+                   (funcall #'project-roots project)))
+          (funcall #'project-root project))
         default-directory)))
 
 (defun erk--reload (features dir)
@@ -131,7 +131,7 @@ you can redistribute it and/or modify
         (auto-compile-on-load-mode t)
         (auto-compile-on-save-mode t)
         ;; ask user to save buffers in the current project
-        (save-some-buffers-default-predicate 'save-some-buffers-root))
+        (save-some-buffers-default-predicate #'save-some-buffers-root))
     (save-some-buffers)
     (dolist (feature features)
       (let ((elc (concat dir "/" (symbol-name feature) ".elc")))
