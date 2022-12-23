@@ -58,7 +58,7 @@
      (run-shim-lint-package))
     ("lint-tests"
      (run-shim-lint-tests))
-    (t
+    (_
      (message "Command %s not recognized.  Use test, lint, lint-tests etc."
               run-shim-command))))
 
