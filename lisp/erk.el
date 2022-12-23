@@ -416,28 +416,30 @@ in git checkout.
 See comments in `erk-clone' and `erk-rename-relicense' for
 implementation information and more details about argument usage."
   (interactive
-   (let* ((package-name
-           (read-string
-            (format "Package name, such as %s: " erk-github-package-name)
-            "foo"))
-          (package-prefix
-           (read-string
-            (format "Package prefix, such as %s: " erk-package-prefix)))
-          (clone-root
-           (directory-file-name
-            (read-directory-name "Clone root: " default-directory)))
-          (author
-           (let ((default (when (executable-find "git")
-                            (string-trim
-                             (shell-command-to-string "git config user.name")))))
-             (read-string "Author: " default)))
-          (user-org (read-string "User or organization name: "))
-          (email
-           (let ((default (when (executable-find "git")
-                            (string-trim
-                             (shell-command-to-string "git config user.email")))))
-             (read-string "Email: " default)))
-          (rev (read-string "Rev, tag, or branch (empty implies default branch): ")))
+   (let*
+       ((package-name
+         (read-string
+          (format "Package name, such as %s: " erk-github-package-name)
+          "foo"))
+        (package-prefix
+         (read-string
+          (format "Package prefix, such as %s: " erk-package-prefix)))
+        (clone-root
+         (directory-file-name
+          (read-directory-name "Clone root: " default-directory)))
+        (author
+         (let ((default (when (executable-find "git")
+                          (string-trim
+                           (shell-command-to-string "git config user.name")))))
+           (read-string "Author: " default)))
+        (user-org (read-string "User or organization name: "))
+        (email
+         (let ((default (when (executable-find "git")
+                          (string-trim
+                           (shell-command-to-string "git config user.email")))))
+           (read-string "Email: " default)))
+        (rev (read-string
+              "Rev, tag, or branch (empty implies default branch): ")))
      (list package-name package-prefix clone-root author user-org email rev)))
   (erk-rename-relicense
    (erk-clone clone-root package-name user-org rev)
