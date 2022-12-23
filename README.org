@@ -71,6 +71,10 @@ answer all the questions.
 
   There are some customize options that cause the renaming to be transitively
   consistent.
+*** Manually Add Just CI
+
+    Copy the .github folder and the contributing guide to your package.  Set up
+    your secrets for Cachix. Read the CI customization section.
 
 * Contents
 :PROPERTIES:
