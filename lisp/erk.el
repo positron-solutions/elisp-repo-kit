@@ -308,10 +308,10 @@ package headers."
        (with-current-buffer (find-file-noselect (concat dir file) t t)
          ;; append new author to copyright
          (print (format "visiting: %s" (buffer-file-name)))
-         (mapc (lambda (s) (while (re-search-forward (rx (literal s)) nil t)
-                        (replace-match "")))
+         (mapc (lambda (s)
+                 (while (re-search-forward (rx (literal s)) nil t)
+                   (replace-match "")))
                erk--remove-strings)
-
          (when (re-search-forward ";; Copyright" nil t)
            (end-of-line)
            (insert ", " author))
