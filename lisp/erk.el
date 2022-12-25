@@ -352,23 +352,22 @@ rename script.  Each rev is intended only to be able to rename
 itself, as a quine and for forking as a new template repository."
   (interactive "DClone to directory:")
   (if-let ((git-bin (executable-find "git")))
-      (progn
-        (shell-command
-         (format "cd %s; %s clone https://github.com/%s/%s.git %s"
-                 clone-root git-bin
-                 erk-github-userorg
-                 erk-github-package-name
-                 package-name))
-        (let ((default-directory (concat clone-root "/" package-name "/")))
-          (when rev
-            (shell-command (format "%s checkout %s" git-bin rev)))
-          (shell-command
-           (format "%s remote rm origin" git-bin))
-          (shell-command
-           (format "%s remote add origin git@github.com:%s/%s.git"
-                   git-bin user-org package-name)))
-        ;; return value for renaming
-        (concat clone-root "/" package-name "/"))
+      (let ((default-directory clone-root)
+            (output (get-buffer-create "erk-clone")))
+        (call-process
+         git-bin nil output nil
+         "clone"
+         (format "https://github.com/%s/%s.git"
+                 erk-github-userorg erk-github-package-name)
+         (concat default-directory "/" package-name))
+        (let ((default-directory (concat clone-root "/" package-name)))
+          (when rev (call-process git-bin nil output nil "checkout" rev))
+          (call-process git-bin nil output nil "remote" "rm" "origin")
+          (call-process git-bin nil output nil "remote" "add" "origin"
+                        (format "git@github.com:%s/%s.git"
+                                user-org package-name))
+          ;; return value for renaming
+          (concat clone-root "/" package-name "/")))
     (error "Could not find git executible")))
 
 ;;;###autoload
