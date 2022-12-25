@@ -52,6 +52,7 @@
 (require 'auto-compile)
 (require 'dash)
 (require 'ert)
+(require 'vc)
 
 (eval-when-compile (require 'subr-x))
 
@@ -267,7 +268,7 @@ clobbered."
                 (replacement-filename (pop rename-map)))
             (let ((new-name (or replacement-filename
                                 (replace-regexp-in-string old-package new-package filename))))
-              (rename-file (concat dir filename) (concat dir new-name) t))))
+              (vc-rename-file (concat dir filename) (concat dir new-name)))))
         erk--rename-maps))
 
 (defun erk--nodash (prefix)
