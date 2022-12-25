@@ -1,4 +1,4 @@
-;;; erk.el --- Elisp (Github) Repository Kit  -*- lexical-binding: t; -*-
+;;; erk.el --- Elisp (GitHub) Repository Kit  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022 Positron Solutions
 
@@ -37,7 +37,7 @@
 ;; The package also uses its own hosted source as a substrate for creating new
 ;; packages.  It will clone its source respository and then perform renaming &
 ;; relicensing.  Simply call `erk-new' to start a new package.  The
-;; README documents remaining setup steps on Github and in preparation for
+;; README documents remaining setup steps on GitHub and in preparation for
 ;; publishing on MELPA.
 ;;
 ;; As a development aid, the package is versatile enough to work on some elisp
@@ -58,7 +58,7 @@
 (defgroup erk nil "Elisp repository kit." :prefix 'erk :group 'erk)
 
 (defcustom erk-github-package-name "elisp-repo-kit"
-  "Default Github <project> for cloning templates.
+  "Default GitHub <project> for cloning templates.
 If you rename this repository after forking, you need to set this
 to clone from within the fork."
   :group 'erk
@@ -70,7 +70,7 @@ to clone from within the fork."
   :type 'string)
 
 (defcustom erk-github-userorg "positron-solutions"
-  "Default Github <user-or-org> for cloning templates.
+  "Default GitHub <user-or-org> for cloning templates.
 If you fork this repository, you need to set this to clone it
 from within the fork."
   :group 'erk
@@ -197,7 +197,7 @@ for development, and being lenient for degenerate cases is fine."
 
 ;;;###autoload
 (defun erk-ert-rerun-this-no-reload ()
-  "Rerun the ert test at point, but don't reaload anything.
+  "Rerun the ert test at point, but don't reload anything.
 Use this when debugging with external state or debugging elisp
 repo kit itself, which may behave strangely if reloaded in the
 middle of a command."
@@ -227,7 +227,7 @@ Will reload all features and test features."
 (defun erk-ert-project-selector ()
   "Return a selector for just this project's ERT test.
 This selector generates the symbols list before that selector
-will run, so new features or new symbols only avaialble after
+will run, so new features or new symbols only available after
 reload will not be picked up.  Run this after any necessary
 feature reloading."
   (let* ((test-features (erk--test-features))
@@ -345,7 +345,7 @@ package headers."
 (defun erk-clone (clone-root package-name user-org &optional rev)
   "Clone elisp-repo-kit to CLONE-ROOT and apply rename.
 PACKAGE-NAME will instruct git how to name the clone.  USER-ORG
-is the user or organization you will use for your Github
+is the user or organization you will use for your GitHub
 repository.  REV can be used to check out a specific revision.
 Warning!  The revision may have lost compatibility with the
 rename script.  Each rev is intended only to be able to rename
@@ -395,7 +395,7 @@ Finally, MIT licenses are swapped with GPL3 license notices.
 Re-licensing is fully permitted by the MIT license and intended
 by the author of this repository."
   (interactive "DCloned directory: \nsPackage name: \nsAuthor: \
-\nsGithub organization or username: \nsEmail: ")
+\nsGitHub organization or username: \nsEmail: ")
   (erk--replace-strings
    clone-dir package-name package-prefix author user-org email)
   (erk--rename-package clone-dir erk-package-prefix package-name))
