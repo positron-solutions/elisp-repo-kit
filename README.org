@@ -4,13 +4,13 @@
 #+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/ci.yml/badge.svg" alt="CI workflow status"></a>
 #+HTML: <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=Developer+Certificate+of+Origin"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/dco.yml/badge.svg" alt="DCO Check"></a>
 
-This repository is a kit to start a new elisp package repository on Github.  The
+This repository is a kit to start a new elisp package repository on GitHub.  The
 package contained has commands to streamline elisp development.
 
-* Quickly set up an Emacs Lisp repository on Github with:
+* Quickly set up an Emacs Lisp repository on GitHub with:
 
 - An [[https://www.youtube.com/watch?v=RQK_DaaX34Q&list=PLEoMzSkcN8oPQtn7FQEF3D7sroZbXuPZ7][elisp]] package
-- CI with [[https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs][Github Actions]], configured for Darwin (MacOS) and Linux
+- CI with [[https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs][GitHub Actions]], configured for Darwin (MacOS) and Linux
 - [[https://nixos.org/#examples][Nix]] environment for obtaining dependencies or reproducibly developing CI
   locally
 - Licensing, [[https://developercertificate.org/][DCO]], DCO sign-off checks, PR template and [[./CONTRIBUTING.org][CONTRIBUTING]] instructions
@@ -51,7 +51,7 @@ answer all the questions.
   - Package name
   - Package prefix
   - Author name
-  - Github user or organization
+  - GitHub user or organization
   - Email address
 
   The =erk-new= calls =erk-rename-relicense= to rename all of the files, string
@@ -86,7 +86,7 @@ answer all the questions.
   - [[#run-tests][Run tests]]
   - [[#loading-and-re-loading-your-package][Loading and re-loading your package]]
   - [[#duplicating-ci-locally][Duplicating CI Locally]]
-- [[#finish-setting-up-your-new-github-repo][Finish setting up your new Github repo]]
+- [[#finish-setting-up-your-new-github-repo][Finish setting up your new GitHub repo]]
   - [[#optional-steps][Optional Steps]]
 - [[#overview-of-file-contents-and-structure][Overview of file contents and structure]]
 - [[#customizing-ci][Customizing CI]]
@@ -130,18 +130,18 @@ answer all the questions.
    development instructions in your new repository.  The [[./CONTRIBUTING.org][CONTRIBUTING]] guide
    contains instructions to reproduce the CI behavior.
 
-* Finish setting up your new Github repo
+* Finish setting up your new GitHub repo
 
   You can copy this checklist to your org agenda files:
 
   - [X] Create a repository (from [[#Install erk][install]] instructions)
-  - [ ] Create an empty Github repository and check the git remote configuration
+  - [ ] Create an empty GitHub repository and check the git remote configuration
   - [ ] Set up your git commit signing (and verification so that it's obvious)
     *and* [[#sign-off][sign-off]] so that it will be [[#Footnote-on-FSF-and-Emacs-Core-Licensing][straightforward]] for for FSF to pull in your
     changes if they later change to DCO instead of copyright assignment.
   - [ ] Sign up for [[https://app.cachix.org/][cachix]] and, create a binary cache with API tokens and public
     read access
-  - [ ] Add repository secrets necessary for your Github actions =CACHIX_AUTH_TOKEN= and
+  - [ ] Add repository secrets necessary for your GitHub actions =CACHIX_AUTH_TOKEN= and
     =CACHIX_CACHE_NAME= (settings -> secrets -> new repository secret)
   - [ ] Enable actions and add the following actions to your allowed actions
     list:
@@ -174,7 +174,7 @@ answer all the questions.
    repository permissions at read-only
 
  Cachix is somewhat optional.  It's free for open-source projects.  It's about as
- easy to sign up and generate the token as to remove the step from the Github
+ easy to sign up and generate the token as to remove the step from the GitHub
  actions, so you won't save much time by avoiding it.
 
 * Overview of file contents and structure
@@ -307,7 +307,7 @@ answer all the questions.
 
    You need a tag on your default (usually master) branch of your repo,
    =positron-solutions/elisp-repo-kit=. Use =git tag -S v0.1.0= and =git push
-   origin v0.1.0=.  You can also just create a release in the Github interface.
+   origin v0.1.0=.  You can also just create a release in the GitHub interface.
 
    #+begin_src shell
 
