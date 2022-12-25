@@ -281,7 +281,7 @@ clobbered."
 (defun erk--nodash (prefix)
   "Strip dash from PREFIX if present."
   (if (string-match-p (rx "-" eol) prefix)
-      (substring prefix 0 (length prefix))
+      (substring prefix 0 (1- (length prefix)))
     prefix))
 
 (defun erk--prefix-match (prefix)
