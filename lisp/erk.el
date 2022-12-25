@@ -293,7 +293,7 @@ package headers."
         (erk-github-path (concat erk-github-userorg "/"
                                  erk-github-package-name))
         (github-path (concat user-org "/" package-name))
-        (package-prefix (erk--nodash package-prefix))
+        (package-prefix package-prefix)
         (replace-prefix (erk--prefix-match erk-package-prefix))
         (capitalized-package-title
          (string-join (mapcar #'capitalize
@@ -421,8 +421,9 @@ implementation information and more details about argument usage."
           (format "Package name, such as %s: " erk-github-package-name)
           "foo"))
         (package-prefix
-         (read-string
-          (format "Package prefix, such as %s: " erk-package-prefix)))
+         (erk--nodash
+          (read-string
+           (format "Package prefix, such as %s: " erk-package-prefix))))
         (clone-root
          (directory-file-name
           (read-directory-name "Clone root: " default-directory)))
