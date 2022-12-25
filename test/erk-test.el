@@ -54,7 +54,8 @@
 
 (ert-deftest erk-clone-and-rename-test ()
   "Clone the repo and rename it, single step."
-  (let ((rev (getenv "GITHUB_SHA"))
+  (let ((rev (string-trim
+              (shell-command-to-string "git rev-parse HEAD")))
         (clone-root (make-temp-file "erk-clone-test-" t)))
     (erk-new
      "new-project" ; package-name

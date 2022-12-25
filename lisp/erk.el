@@ -52,6 +52,7 @@
 (require 'auto-compile)
 (require 'dash)
 (require 'ert)
+(require 'vc)
 
 (eval-when-compile (require 'subr-x))
 
@@ -250,6 +251,14 @@ feature reloading."
   (erk-reload-project-tests)
   (ert (erk-ert-project-selector)))
 
+(defmacro erk--nze (process-form error)
+  "Error if there is a non-zero exit.
+PROCESS-FORM is the process call that should return zero.
+ERROR is the error message."
+  `(unless (eq ,process-form 0)
+     (pop-to-buffer "erk-clone")
+     (error ,error)))
+
 (defun erk--rename-package (dir old-package new-package)
   "Rename FILES in DIR.
 `erk--rename-map' is a list of (subdir filename
@@ -262,18 +271,27 @@ clobbered."
         erk--delete-files)
 
   (mapc (lambda (rename-map)
-          (let ((dir (concat dir (or (pop rename-map) "")))
-                (filename (pop rename-map))
-                (replacement-filename (pop rename-map)))
-            (let ((new-name (or replacement-filename
-                                (replace-regexp-in-string old-package new-package filename))))
-              (rename-file (concat dir filename) (concat dir new-name) t))))
+          (let* ((dir (concat dir (or (pop rename-map) "")))
+                 (src (pop rename-map))
+                 (replacement-filename (pop rename-map))
+                 (git-bin (executable-find "git"))
+                 (output (get-buffer-create "erk-clone"))
+                 (dest (or replacement-filename
+                           (replace-regexp-in-string old-package new-package src)))
+                 (default-directory dir))
+            (when (file-exists-p dest)
+              (erk--nze
+               (call-process git-bin nil output nil "rm" dest)
+               (format "Could not delete: %s" dest)))
+            (erk--nze
+             (call-process git-bin nil output nil "mv" src dest)
+             (format "Could not move: %s to %s" src dest))))
         erk--rename-maps))
 
 (defun erk--nodash (prefix)
   "Strip dash from PREFIX if present."
   (if (string-match-p (rx "-" eol) prefix)
-      (substring prefix 0 (length prefix))
+      (substring prefix 0 (1- (length prefix)))
     prefix))
 
 (defun erk--prefix-match (prefix)
@@ -293,7 +311,7 @@ package headers."
         (erk-github-path (concat erk-github-userorg "/"
                                  erk-github-package-name))
         (github-path (concat user-org "/" package-name))
-        (package-prefix (erk--nodash package-prefix))
+        (package-prefix package-prefix)
         (replace-prefix (erk--prefix-match erk-package-prefix))
         (capitalized-package-title
          (string-join (mapcar #'capitalize
@@ -310,14 +328,15 @@ package headers."
          (print (format "visiting: %s" (buffer-file-name)))
          (mapc (lambda (s)
                  (while (re-search-forward (rx (literal s)) nil t)
-                   (replace-match "")))
+                   (replace-match "")
+                   (goto-char (point-min))))
                erk--remove-strings)
-         (when (re-search-forward ";; Copyright" nil t)
+         (when (re-search-forward (rx bol ";; Copyright") nil t)
            (end-of-line)
            (insert ", " author))
          (goto-char (point-min))
-         (when (re-search-forward "<author>" nil t)
-           (replace-match (concat author ", <" email ">") nil t))
+         (when (re-search-forward (rx "<author>" eol) nil t)
+           (replace-match (concat author " <" email ">") nil t))
          (goto-char (point-min))
          ;; replace license with GPL3 notice
          (when (re-search-forward ";; Permission \\(.\\|\n\\)*SOFTWARE.$" nil t)
@@ -354,18 +373,27 @@ itself, as a quine and for forking as a new template repository."
   (if-let ((git-bin (executable-find "git")))
       (let ((default-directory clone-root)
             (output (get-buffer-create "erk-clone")))
-        (call-process
-         git-bin nil output nil
-         "clone"
-         (format "https://github.com/%s/%s.git"
-                 erk-github-userorg erk-github-package-name)
-         (concat default-directory "/" package-name))
-        (let ((default-directory (concat clone-root "/" package-name)))
-          (when rev (call-process git-bin nil output nil "checkout" rev))
-          (call-process git-bin nil output nil "remote" "rm" "origin")
-          (call-process git-bin nil output nil "remote" "add" "origin"
-                        (format "git@github.com:%s/%s.git"
-                                user-org package-name))
+        (erk--nze
+         (call-process
+          git-bin nil output nil
+          "clone"
+          (format "https://github.com/%s/%s.git"
+                  erk-github-userorg erk-github-package-name)
+          (concat default-directory "/" package-name))
+         "Clone failed")
+        (let ((default-directory (concat clone-root "/" package-name))
+              (rev (when rev (if (string-empty-p rev) nil rev))))
+          (when rev (erk--nze
+                     (call-process git-bin nil output nil "checkout" rev)
+                     (format "Checkout %s failed." rev)))
+          (erk--nze
+           (call-process git-bin nil output nil "remote" "rm" "origin")
+           "Removal of remote failed.")
+          (erk--nze
+           (call-process git-bin nil output nil "remote" "add" "origin"
+                         (format "git@github.com:%s/%s.git"
+                                 user-org package-name))
+           "Adding new remote failed.")
           ;; return value for renaming
           (concat clone-root "/" package-name "/")))
     (error "Could not find git executible")))
@@ -421,8 +449,9 @@ implementation information and more details about argument usage."
           (format "Package name, such as %s: " erk-github-package-name)
           "foo"))
         (package-prefix
-         (read-string
-          (format "Package prefix, such as %s: " erk-package-prefix)))
+         (erk--nodash
+          (read-string
+           (format "Package prefix, such as %s: " erk-package-prefix))))
         (clone-root
          (directory-file-name
           (read-directory-name "Clone root: " default-directory)))
