@@ -52,6 +52,7 @@
 (require 'auto-compile)
 (require 'dash)
 (require 'ert)
+(require 'vc)
 
 (eval-when-compile (require 'subr-x))
 
@@ -265,9 +266,16 @@ clobbered."
           (let ((dir (concat dir (or (pop rename-map) "")))
                 (filename (pop rename-map))
                 (replacement-filename (pop rename-map)))
-            (let ((new-name (or replacement-filename
-                                (replace-regexp-in-string old-package new-package filename))))
-              (rename-file (concat dir filename) (concat dir new-name) t))))
+            (let* ((new-name (or replacement-filename
+                                 (replace-regexp-in-string old-package new-package filename)))
+                   (dest (concat dir new-name))
+                   (src (concat dir filename)))
+              (when (file-exists-p dest)
+                (delete-file dest)
+                (let ((default-directory (file-name-directory dest)))
+                  (vc-call-backend 'Git 'delete-file dest)))
+              (vc-update)
+              (vc-rename-file src dest))))
         erk--rename-maps))
 
 (defun erk--nodash (prefix)
