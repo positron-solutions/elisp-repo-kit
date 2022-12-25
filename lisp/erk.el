@@ -251,6 +251,14 @@ feature reloading."
   (erk-reload-project-tests)
   (ert (erk-ert-project-selector)))
 
+(defmacro erk--nze (process-form error)
+  "Error if there is a non-zero exit.
+PROCESS-FORM is the process call that should return zero.
+ERROR is the error message."
+  `(unless (eq ,process-form 0)
+     (pop-to-buffer "erk-clone")
+     (error ,error)))
+
 (defun erk--rename-package (dir old-package new-package)
   "Rename FILES in DIR.
 `erk--rename-map' is a list of (subdir filename
@@ -263,19 +271,21 @@ clobbered."
         erk--delete-files)
 
   (mapc (lambda (rename-map)
-          (let ((dir (concat dir (or (pop rename-map) "")))
-                (filename (pop rename-map))
-                (replacement-filename (pop rename-map)))
-            (let* ((new-name (or replacement-filename
-                                 (replace-regexp-in-string old-package new-package filename)))
-                   (dest (concat dir new-name))
-                   (src (concat dir filename)))
-              (when (file-exists-p dest)
-                (delete-file dest)
-                (let ((default-directory (file-name-directory dest)))
-                  (vc-call-backend 'Git 'delete-file dest)))
-              (vc-update)
-              (vc-rename-file src dest))))
+          (let* ((dir (concat dir (or (pop rename-map) "")))
+                 (src (pop rename-map))
+                 (replacement-filename (pop rename-map))
+                 (git-bin (executable-find "git"))
+                 (output (get-buffer-create "erk-clone"))
+                 (dest (or replacement-filename
+                           (replace-regexp-in-string old-package new-package src)))
+                 (default-directory dir))
+            (when (file-exists-p dest)
+              (erk--nze
+               (call-process git-bin nil output nil "rm" dest)
+               (format "Could not delete: %s" dest)))
+            (erk--nze
+             (call-process git-bin nil output nil "mv" src dest)
+             (format "Could not move: %s to %s" src dest))))
         erk--rename-maps))
 
 (defun erk--nodash (prefix)
@@ -349,14 +359,6 @@ package headers."
          (save-buffer 0)
          (kill-buffer)))
      erk--files-with-strings)))
-
-(defmacro erk--nze (process-form error)
-  "Error if there is a non-zero exit.
-PROCESS-FORM is the process call that should return zero.
-ERROR is the error message."
-  `(unless (eq ,process-form 0)
-     (pop-to-buffer "erk-clone")
-     (error ,error)))
 
 ;;;###autoload
 (defun erk-clone (clone-root package-name user-org &optional rev)
