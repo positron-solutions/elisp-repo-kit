@@ -343,6 +343,14 @@ package headers."
          (kill-buffer)))
      erk--files-with-strings)))
 
+(defmacro erk--nze (process-form error)
+  "Error if there is a non-zero exit.
+PROCESS-FORM is the process call that should return zero.
+ERROR is the error message."
+  `(unless (eq ,process-form 0)
+     (pop-to-buffer "erk-clone")
+     (error ,error)))
+
 ;;;###autoload
 (defun erk-clone (clone-root package-name user-org &optional rev)
   "Clone elisp-repo-kit to CLONE-ROOT and apply rename.
@@ -356,18 +364,27 @@ itself, as a quine and for forking as a new template repository."
   (if-let ((git-bin (executable-find "git")))
       (let ((default-directory clone-root)
             (output (get-buffer-create "erk-clone")))
-        (call-process
-         git-bin nil output nil
-         "clone"
-         (format "https://github.com/%s/%s.git"
-                 erk-github-userorg erk-github-package-name)
-         (concat default-directory "/" package-name))
-        (let ((default-directory (concat clone-root "/" package-name)))
-          (when rev (call-process git-bin nil output nil "checkout" rev))
-          (call-process git-bin nil output nil "remote" "rm" "origin")
-          (call-process git-bin nil output nil "remote" "add" "origin"
-                        (format "git@github.com:%s/%s.git"
-                                user-org package-name))
+        (erk--nze
+         (call-process
+          git-bin nil output nil
+          "clone"
+          (format "https://github.com/%s/%s.git"
+                  erk-github-userorg erk-github-package-name)
+          (concat default-directory "/" package-name))
+         "Clone failed")
+        (let ((default-directory (concat clone-root "/" package-name))
+              (rev (when rev (if (string-empty-p rev) nil rev))))
+          (when rev (erk--nze
+                     (call-process git-bin nil output nil "checkout" rev)
+                     (format "Checkout %s failed." rev)))
+          (erk--nze
+           (call-process git-bin nil output nil "remote" "rm" "origin")
+           "Removal of remote failed.")
+          (erk--nze
+           (call-process git-bin nil output nil "remote" "add" "origin"
+                         (format "git@github.com:%s/%s.git"
+                                 user-org package-name))
+           "Adding new remote failed.")
           ;; return value for renaming
           (concat clone-root "/" package-name "/")))
     (error "Could not find git executible")))
