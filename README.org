@@ -177,6 +177,11 @@ answer all the questions.
  easy to sign up and generate the token as to remove the step from the GitHub
  actions, so you won't save much time by avoiding it.
 
+ *If you opt out of cachix or any other binary cache, you will
+ definitely want to turn off tests for =emacsGit= etc because the
+ build times are about 30min-1hr per run when a fresh Emacs must be
+ built.*
+
 * Overview of file contents and structure
 
   /After cloning and renaming,/ you will have a file tree like this:
