@@ -1,5 +1,6 @@
 **.direnv/
 **.elc
-**.el~
 ***autoloads.el
 **trash
+**~
+**.~undo-tree
