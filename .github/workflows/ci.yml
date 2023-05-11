@@ -25,7 +25,7 @@ on: # trigger this workflow on
     paths-ignore:
       - 'README.org'
       - 'CONTRIBUTING.org'
-  pull_request: # or every pull request, from any branch to any branch
+  pull_request_target: # or every pull request, from any branch to any branch
     paths-ignore:
       - 'README.org'
       - 'CONTRIBUTING.org'
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v3.2.0
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: cachix/install-nix-action@v18
+      - uses: cachix/install-nix-action@v20
         with:
           extra_nix_config: |
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}

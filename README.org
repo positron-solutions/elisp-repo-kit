@@ -27,19 +27,13 @@ answer all the questions.
 
     (use-package erk) ; vanilla
 
-    ;; using elpaca
-    (elpaca-use-package
-     (erk :host github
-          :repo "positron-solutions/elisp-repo-kit"))
-
-    ;; straight without `straight-use-package-by-default'
-    (straight-use-package '(erk :type git :host github
-                                :repo "positron-solutions/elisp-repo-kit"))
-
-    ;; straight with `straight-use-package-by-default' t
+    ;; using elpaca's with explicit recipe
     (use-package erk
-      :straight
-      (erk :type git :host github :repo "positron-solutions/elisp-repo-kit"))
+      :elpaca (erk :host github :repo "positron-solutions/elisp-repo-kit"))
+
+    ;; straight with explicit recipe
+    (use-package erk
+      :straight (erk :type git :host github :repo "positron-solutions/elisp-repo-kit"))
 
     ;; or use melpa, manual load-path & require, you brave yak shaver
 
@@ -150,7 +144,7 @@ answer all the questions.
 
     actions/checkout@v3.2.0,
     cachix/cachix-action@v12,
-    cachix/install-nix-action@v18,
+    cachix/install-nix-action@v20,
     actions/setup-python@v4,
 
     #+end_src
