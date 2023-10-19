@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2022 Positron Solutions
 
-;; Author:  <author>
+;; Author:  Positron Solutions <contact@positron.solutions>
 
 ;; Permission is hereby granted, free of charge, to any person obtaining a copy of
 ;; this software and associated documentation files (the "Software"), to deal in
@@ -54,17 +54,19 @@
 
 (ert-deftest erk-clone-and-rename-test ()
   "Clone the repo and rename it, single step."
-  (let ((rev (string-trim
+  (let ((enable-local-variables nil)
+        (rev (string-trim
               (shell-command-to-string "git rev-parse HEAD")))
         (clone-root (make-temp-file "erk-clone-test-" t)))
+    ;; TODO This test is fragile and should use repository as the clone source.
     (erk-new
-     "new-project" ; package-name
-     "nupro" ; package-prefix
+     "new-project"                      ; package-name
+     "nupro"                            ; package-prefix
      clone-root
-     "Selindis Raszagal" ; Author
-     "new-shakuras" ; user-org
-     "selindis.r@new-shakuras.planet" ; email
-     rev) ; possibly nil
+     "Selindis Raszagal"                ; Author
+     "new-shakuras"                     ; user-org
+     "selindis.r@new-shakuras.planet"   ; email
+     rev)                               ; possibly nil
     (delete-directory clone-root t)))
 
 (provide 'erk-test)

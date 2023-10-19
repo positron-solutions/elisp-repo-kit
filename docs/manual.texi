@@ -1,0 +1,1163 @@
+\input texinfo    @c -*- texinfo -*-
+@c %**start of header
+@setfilename manual.info
+@settitle Elisp Repo Kit
+@documentencoding UTF-8
+@documentlanguage en
+@comment !!!THIS FILE HAS BEEN GENERATED!!! Edit manual.org instead!
+@c %**end of header
+
+@copying
+Copyright (C) 2022 Positron Solutions
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the ``Software''), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED ``AS IS'', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT@. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE@.
+@end copying
+
+@dircategory Emacs
+@direntry
+* Elisp Repo Kit: (erk). Create, distribute, and maintain Emacs Lisp packages.
+@end direntry
+
+@finalout
+@titlepage
+@title Elisp Repo Kit
+@subtitle for version 0.4.0
+@author Positron Solutions
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top Elisp Repo Kit
+
+Setting up a @emph{complete} Emacs Lisp package doesn't need to be a lot of work.
+Elisp Repo Kit provides a convenient starting point for collaborating on a
+public Elisp package repository:
+
+@itemize
+@item
+An Elisp package
+@item
+Tests
+@item
+CI & dependency management
+@item
+README and manual
+@item
+Licensing
+@end itemize
+
+Furthermore, to get rid of pitfalls and streamline productive workflows when
+working with Elisp packages, Elisp Repo Kit provides shortcuts:
+
+@itemize
+@item
+Loading and unloading modules
+@item
+Compiling
+@item
+Running tests
+@item
+Re-generating documentation
+@item
+Navigating the project
+@end itemize
+@end ifnottex
+
+@menu
+* High Level Overview::
+* Install ERK::
+* Creating Packages::
+* Using ERK for development::
+* Documenting Your Package::
+* Distributing Your Package::
+* Nix::
+* Indices: Indices (1). 
+
+@detailmenu
+--- The Detailed Node Listing ---
+
+High Level Overview
+
+* File contents and structure::
+* Developing::
+* Documenting::
+* Distributing::
+
+Install ERK
+
+* Manual cloning::
+* Manually add just CI::
+
+Using ERK for development
+
+* Find Files::
+
+Documenting Your Package
+
+* What makes a good manual::
+* Re-Generating::
+* Formatting::
+* Indices::
+
+What makes a good manual
+
+* Generative AI and manuals::
+* Automatic indexing::
+
+Re-Generating
+
+* Finding and Editing::
+* Previewing::
+
+Formatting
+
+* Quoting symbols::
+* Elisp Source Blocks::
+* Links::
+
+Indices
+
+* Creating Indices::
+* Adding Entries::
+* Render the Index::
+
+Distributing Your Package
+
+* Setting Up Your Github Repository::
+* Customizing CI::
+* Licensing, Developer Certificate of Origin: Licensing Developer Certificate of Origin. 
+* Publishing to MELPA::
+
+Setting Up Your Github Repository
+
+* Optional Steps::
+
+Publishing to MELPA
+
+* Creating the recipe::
+* Testing package build::
+* Testing stable package build::
+* MELPA Lints::
+
+Nix
+
+* Maintaining versions::
+* Customizing Versions::
+* Reproducing Issues::
+
+Indices
+
+* Command and Function index::
+* Concept index::
+
+@end detailmenu
+@end menu
+
+@node High Level Overview
+@chapter High Level Overview
+
+@itemize
+@item
+As a repository, Elisp Repo Kit is a template for how to organize and
+distribute your project.
+
+@item
+As an Elisp package, Elisp Repo Kit (erk) provides shortcuts for working on
+package using the Elisp Repo Kit organization structure (as well as other
+Elisp packages).
+@end itemize
+
+@menu
+* File contents and structure::
+* Developing::
+* Documenting::
+* Distributing::
+@end menu
+
+@node File contents and structure
+@section File contents and structure
+
+@cindex project layout
+
+@emph{After cloning and renaming,} you will have a file tree like this:
+
+@example
+
+├── .gitignore                        # ignores for byte compiles, autoloads etc
+│
+├── README.md                         # this file
+├── CONTRIBUTING.md                   # typical instructions for development
+├── COPYING                           # a GPL3 license
+├── DCO                               # Developer Certificate of Origin
+│
+├── .github
+│   ├── .envrc                        # direnv integration with `nix develop`
+│   ├── flake.nix                     # dependencies for this project
+│   ├── flake.lock                    # version controlled lock of flake.nix input versions
+│   ├── run-shim.el                   # elisp script with test & lint routines
+│   ├── pull_request_template.md      # reminders for PR contributors
+│   └── workflows
+│       ├── ci.yml                    # workflow for lints and tests
+│       └── dco.yml                   # workflow to check DCO sign-offs
+│
+├── docs
+│   ├── README.org                    # generates README.md
+│   ├── CONTRIBUTING.org              # generates CONTRIBUTING.md
+│   ├── manual.org                    # actual manual
+│   └── manual.texi                   # generated manual for distribution
+│
+├── lisp
+│   └── erk.el                        # the package
+│
+└── test
+    └── erk-test.el                   # ERT unit tests for the package
+
+@end example
+
+You can use either a multi-file or flat layout for lisp.  Just name test files
+@code{something-test.el} and keep all lisp files in root, @code{/lisp} or @code{/test}
+directories.
+
+@node Developing
+@section Developing
+
+@itemize
+@item
+The package is stored in /lisp and its tests in /test.
+@item
+Many shortcuts are provided to run tests or rebuild and reload the package
+or to visit the unit tests for a function under point etc.
+@item
+Most of the Elisp shortcuts lean on Emacs settings or packages such as
+@code{auto-compile} and @code{ert}.
+@end itemize
+
+@node Documenting
+@section Documenting
+
+@itemize
+@item
+The document inputs are stored in /docs.
+@item
+They are @strong{written} in org format
+@item
+The README for the Github home page is @strong{exported} to markdown
+@item
+The Manual, which can be used to supplement the README, is itself
+@strong{exported} to texi which is converted to info for viewing within Emacs
+@item
+The CONTRIBUTING guide is @strong{exported} to markdown
+@end itemize
+
+@node Distributing
+@section Distributing
+
+@itemize
+@item
+The repository is designed to be hosted on Github
+@item
+All CI files are stored under @uref{../.github/, ./github}.  (You can include this directory
+with minor modifications into other Elisp projects.)
+@item
+Github actions are included for CI@.
+@item
+Dependencies for CI are obtained via Nix.
+@item
+You are free to submit your package for distribution on MELPA etc.  This
+package is made available on MELPA partly to maintain the structure and
+workflows for doing so.
+@end itemize
+
+@node Install ERK
+@chapter Install ERK
+
+@lisp
+
+(use-package erk) ; vanilla
+
+;; using elpaca's with explicit recipe
+(use-package erk
+  :elpaca (erk :host github :repo "positron-solutions/elisp-repo-kit"))
+
+;; straight with explicit recipe
+(use-package erk
+  :straight (erk :type git :host github :repo "positron-solutions/elisp-repo-kit"))
+
+;; or use melpa, manual load-path & require, you brave yak shaver
+
+@end lisp
+
+@menu
+* Manual cloning::
+* Manually add just CI::
+@end menu
+
+@node Manual cloning
+@section Manual cloning
+
+@findex erk-clone
+The standalone command, @code{erk-clone} will clone without renaming.
+
+This repo is also a @uref{https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template, template repository}, so you can fork without forking
+(Bruce Lee).
+
+@findex erk-rename
+If you create via template or clone manually, it's presumed you know what
+you're doing at that point.  Call @code{erk-rename} on its own to rename
+in these cases.
+
+There are some customize options that cause the renaming to be transitively
+consistent.
+
+@node Manually add just CI
+@section Manually add just CI
+
+Copy the .github folder and the contributing guide to your package.  Set up
+your secrets for Cachix. Read the CI customization section.
+
+@node Creating Packages
+@chapter Creating Packages
+
+@findex erk-new
+The simplest and intended way is to call @code{erk-new}.  It will first
+ask you for:
+
+@itemize
+@item
+Root directory you want to clone to
+@item
+Package name
+@item
+Package prefix
+@item
+Author name
+@item
+GitHub user or organization
+@item
+Email address
+@end itemize
+
+@findex erk-rename-relicense
+@code{erk-new} also calls @code{erk-rename-relicense} to rename all of the files, string
+replace names, and re-license to GPL3.  It also changes the author and resets
+the git history.  Now just follow the steps in Have fun!
+
+@node Using ERK for development
+@chapter Using ERK for development
+
+Elisp repo kit contains some convenience functions to reload your package and
+to discover and run ert tests.  These shortcuts just make common cases faster.
+@itemize
+@item
+Loading and re-loading your package
+@findex erk-reload-project-package
+@code{erk-reload-project-package} will unload and recompile your package if
+necessary and then reload it.
+
+@findex erk-reload-project-tests
+@code{erk-reload-project-tests} is the complementary command for reloading tests.
+@end itemize
+@itemize
+@item
+Run tests
+@findex erk-ert-project~
+@code{erk-ert-project} will discover, rebuild & reload if necessary, and run
+tests.  There are a few other commands to augment the @uref{https://www.gnu.org/software/emacs/manual/html_node/ert/, ert} package.
+
+@item
+Duplicating CI Locally
+The CI configuration is all stored in @uref{../.github/, .github}.  Usually you will want
+development instructions in your new repository.  The @uref{./CONTRIBUTING.org, CONTRIBUTING} guide
+contains instructions to reproduce the CI behavior.
+@end itemize
+
+@menu
+* Find Files::
+@end menu
+
+@node Find Files
+@section Find Files
+
+Accidentally editing generated files or forgetting the path to a file is
+annoying.  ERK provides a helper to find files based on their purpose.
+
+@findex erk-find
+@code{erk-find} will ask you to pick the file based on what it does.  It's
+choices:
+
+@itemize
+@item
+ci-dco
+@item
+ci-nix-flake
+@item
+ci-run-shim
+@item
+ci-tests
+@item
+docs-contributing
+@item
+docs-manual
+@item
+docs-readme
+@end itemize
+
+Generated files or extremely common files are not included.  For each one of
+these choices, there is a corresponding command:
+
+@findex erk-find-ci-dco
+@itemize
+@item
+@code{erk-find-ci-dco}
+@end itemize
+@findex erk-find-ci-nix-flake
+@itemize
+@item
+@code{erk-find-ci-nix-flake}
+@end itemize
+@findex erk-find-ci-run-shim
+@itemize
+@item
+@code{erk-find-ci-run-shim}
+@end itemize
+@findex erk-find-ci-test
+@itemize
+@item
+@code{erk-find-ci-test}
+@end itemize
+@findex erk-find-docs-contributing
+@itemize
+@item
+@code{erk-find-docs-contributing}
+@end itemize
+@findex erk-find-docs-manual
+@itemize
+@item
+@code{erk-find-find-docs-manual}
+@end itemize
+@findex erk-find-docs-readme
+@itemize
+@item
+@code{erk-find-docs-readme}
+@end itemize
+
+@node Documenting Your Package
+@chapter Documenting Your Package
+
+@cindex document re-structuring
+@cindex document export
+How this manual is created and maintained.  Elisp Repo Kit's manual scheme
+overview:
+@itemize
+@item
+Contents for the README and built-in manual are mostly stored in
+@uref{./manual.org, /docs/manual.org}
+@item
+Each document stitches together the contents of @uref{./manual.org, /docs/manual.org} using
+@samp{#+include:} directives.  Some of the header, footer, and export information
+just controls formatting.
+@item
+The @uref{../README.md, README.md} for your repository's home page is generated from @uref{./README.org, /docs/README.org}
+@item
+The @uref{./manual.texi} is generated from @uref{./manual.org, /docs/manual.org}
+@item
+Re-generation-on-save is automatically configured at the end of each document
+@item
+The .gitignore will ignore any intermediate outputs, so there's no need to
+store them in /tmp or clean them
+@end itemize
+
+@menu
+* What makes a good manual::
+* Re-Generating::
+* Formatting::
+* Indices::
+@end menu
+
+@node What makes a good manual
+@section What makes a good manual
+
+@cindex what makes a good manual
+Manuals can do four things that code and code-based automatic indices are
+fundamentally terrible at:
+
+@itemize
+@item
+Describe ideas at higher levels of abstraction, concepts which may have no
+correct docstring to live in.  This includes providing several levels of
+abstraction or abstraction from different perspectives.
+@item
+Describe behavior or state models in implementations or external systems,
+things that aren't even apparent from reading the code.  Think
+microprocessor behavior, 3rd party API behavior, or a code convention
+implemented in multiple functions
+@item
+Examples that distill and illustrate ideas in isolation instead of how they
+are naturally composed and become complex when applied in practice.
+@item
+Illuminate workflows and paths of understanding that do not follow the
+linear ordering of code or any natural automatic index.
+
+In short, a good manual ties together the very large or uncovers what is
+opaque.  Neither of these types of information have a 1:1 correspondence to
+the definitions in your code.
+
+From this lack of correspondence, we can also conclude that good manuals are
+in fact @strong{not exhaustive}.  Exhaustive manuals are merely @strong{exhausting},
+requiring tremendous maintenance to do what is already available through
+automation or even just reading the code.
+@end itemize
+
+@menu
+* Generative AI and manuals::
+* Automatic indexing::
+@end menu
+
+@node Generative AI and manuals
+@subsection Generative AI and manuals
+
+One thing manuals had been good at was linking to concepts based on
+conceptual relationship.  While semantic search queries have been around for
+a while, large language models have transformed the process, providing the
+semantic output to the semantic search.  As semantic search and semantic synthesis of
+output become more accessible, it's becoming less important to conceptually
+relating information to bridge the limitations of more exact types of search.
+
+Increasingly, machine learning is becoming able to synthesize information
+from numerous sources and present it via @strong{natural language queryable
+indices}.  Keep in mind, when writing a manual, if the information you are
+providing doesn't add information that is easily decideable from the other
+information already available about your package, your manual is likely to
+become increasingly redundant information.
+
+@node Automatic indexing
+@subsection Automatic indexing
+
+Your package's code also already has a ton of automatic indexing via Emacs
+discovery:
+
+@itemize
+@item
+@code{describe-function} etc
+@item
+completions for functions, variables, commands, macros etc
+@item
+signature hints from eldoc
+@item
+searching within the code
+@item
+symbol-based navigation within the code
+@end itemize
+
+Documenting full enumerations of things in the same order that they live in
+code or in the same order as automatic indexing commonly produces throughout
+normal development is rarely useful.  This information @strong{does} have a natural
+1:1 correspondence to readily available information, and is therefore likely
+redundant.  If you wind up with a manual like this, it would be better to
+leave the information in the code and generate the manual from the docstrings.
+
+@node Re-Generating
+@section Re-Generating
+
+Re-generation is configured to occur on save at the end of each document.
+You can manually re-generate the documentation using the elisp-repo-kit
+commands:
+
+@findex erk-export-contributing
+@itemize
+@item
+@code{erk-export-contributing}
+@end itemize
+@findex erk-export-manual
+@itemize
+@item
+@code{erk-export-manual}
+@end itemize
+@findex erk-export-readme
+@itemize
+@item
+@code{erk-export-readme}
+@end itemize
+@findex erk-export-docs
+@itemize
+@item
+@code{erk-export-docs} is just a shortcut to just export all documents.
+@end itemize
+
+With a prefix argument, the export commands will also show the resulting
+output.
+
+@menu
+* Finding and Editing::
+* Previewing::
+@end menu
+
+@node Finding and Editing
+@subsection Finding and Editing
+
+The inputs for exported documentation has shortcuts:
+@itemize
+@item
+@code{erk-find-readme}
+@item
+@code{erk-find-manual}
+@end itemize
+Using Org mode settings, these manuals will automatically trigger
+re-generation when you save, helping you avoid shipping a stale or broken
+manual.
+
+@node Previewing
+@subsection Previewing
+
+Additionally, if you want to re-export and preview in one command, there are
+shortcuts that export and then open the result, either in view mode for
+markdown or info mode for the manual.
+
+@findex erk-export-preview-manual
+@itemize
+@item
+@code{erk-export-preview-manual}
+This will export the manual.org to texi, process it to info, and finally
+load the manual.info file.
+@end itemize
+@findex erk-export-preview-contributing
+@itemize
+@item
+@code{erk-export-preview-contributing}
+@end itemize
+@findex erk-export-preview-readme
+@itemize
+@item
+@code{erk-export-preview-readme}
+@end itemize
+
+@node Formatting
+@section Formatting
+
+@cindex document formatting
+Texi supports a lot of features specific to automatic manual maintenance.  Be
+sure that your beautiful org document also generates a useful manual.
+
+@menu
+* Quoting symbols::
+* Elisp Source Blocks::
+* Links::
+@end menu
+
+@node Quoting symbols
+@subsection Quoting symbols :item:
+
+Symbols will \~display\~ `quoted' in the manual.  Mentioning a symbol will
+@strong{not} place it in the manual's index.
+
+@node Elisp Source Blocks
+@subsection Elisp Source Blocks :item:
+
+@lisp
+(let ((truth "Source blocks will render inside the manual like this"))
+  (message true))
+@end lisp
+
+You can use @code{org-insert-structure-template} etc to create these easily.
+
+@node Links
+@subsection Links :item:
+
+Hyperlinks thankfully can be written like you expect, though many org
+formats such as running elisp expressions through links may not work.
+
+@uref{https://git.sr.ht/~ushin/hyperdrive.el/tree/master/item/doc/hyperdrive-manual.org, This link to the hyperdrive manual} works like you expect.
+
+The syntax is @samp{[[http://somewhere.com][label for my link]]} if you are
+unfamiliar.
+
+@node Indices
+@section Indices
+
+@cindex document indices
+Texi has a lot of built-in support for indexes.  Until we have GPT for your
+manual, indexes are a good way to provide alternative views into your
+manual, arranged by entities of similar type.
+
+Have a look at the docs generation for org, magit, transient, and
+hyperdrive for more extensive examples.  Typically the are using a setup file
+to declare export options.
+
+@menu
+* Creating Indices::
+* Adding Entries::
+* Render the Index::
+@end menu
+
+@node Creating Indices
+@subsection Creating Indices :item:
+
+Texinfo includes six @strong{predefined} index types:
+
+@itemize
+@item
+concept
+@item
+function
+@item
+variables
+@item
+keystroke
+@item
+program
+@item
+data type
+@end itemize
+
+You can also declare a new index with @@defindex or @@defcodeindex.  The only
+difference is that a code index will render entries in monospace, like
+code.
+
+@example
+#+TEXINFO_HEADER: @@defindex foo
+#+TEXINFO_HEADER: @@defcodeindex foo
+@end example
+
+Creating entries with a custom index could be tricky.  Good luck!
+
+@node Adding Entries
+@subsection Adding Entries :item:
+
+Quoting a symbol will not result in an index entry.  Which quoted symbol
+would such an index point to?  You have to manually create index entries.
+
+To cause an index entry to be created and to link to a heading, add a
+property within that heading.  Adding to the predefined indexes:
+
+@itemize
+@item
+#+cindex: my-concept
+@item
+#+findex: my-function
+@item
+#+vindex: my-variable
+@item
+#+kindex: my-key
+@item
+#+pindex: my-program
+@item
+#+tindex: my-type
+@end itemize
+
+These will create index entries that can be used to navigate your manual by
+listings of related entities.
+
+@node Render the Index
+@subsection Render the Index :item:
+
+Just use a regular header like so:
+
+@example
+** Keystroke index
+:PROPERTIES:
+:INDEX: ky
+:END:
+@end example
+
+The built-in index keys are @samp{ky}, @samp{fn}, @samp{vr}, @samp{cp}, @samp{pg}, and @samp{tp}.
+
+@node Distributing Your Package
+@chapter Distributing Your Package
+
+@menu
+* Setting Up Your Github Repository::
+* Customizing CI::
+* Licensing, Developer Certificate of Origin: Licensing Developer Certificate of Origin. 
+* Publishing to MELPA::
+@end menu
+
+@node Setting Up Your Github Repository
+@section Setting Up Your Github Repository
+
+You can copy this checklist to your org agenda files:
+
+@itemize
+@item
+Create a repository (from @ref{Install ERK, , install} instructions)
+@item
+Create an empty GitHub repository and check the git remote configuration
+@item
+Set up your git commit signing (and verification so that it's obvious)
+@strong{and} @ref{Licensing Developer Certificate of Origin, , sign-off} so that it will be hypothetically @uref{README.org, straightforward} for for FSF
+to pull in your changes if they later change to DCO instead of copyright
+assignment.
+@item
+Sign up for @uref{https://app.cachix.org/, cachix} and, create a binary cache with API tokens and public
+read access
+@end itemize
+#+cindex nix enabling cachix
+#+cindex github adding secrets
+@itemize
+@item
+Add repository secrets necessary for your GitHub actions
+@code{CACHIX_AUTH_TOKEN} and @code{CACHIX_CACHE_NAME} (settings -> secrets -> new
+repository secret)
+@end itemize
+#+cindex github enabling actions
+@itemize
+@item
+Enable actions and add the following actions to your allowed actions list:
+
+@example
+
+actions/checkout@@v3.2.0,
+cachix/cachix-action@@v12,
+cachix/install-nix-action@@v20,
+actions/setup-python@@v4,
+
+@end example
+
+@strong{Note}, Python is used to run a DCO check script, nothing more.
+
+@item
+Get your package working, pushed, actions run, and CI badges all green
+@item
+@ref{Publishing to MELPA, , Publish} to MELPA
+@item
+Make a post on @uref{https://reddit.com/r/emacs/, reddit} and @uref{https://emacs.ch/, mastodon} about your new package
+@end itemize
+
+@menu
+* Optional Steps::
+@end menu
+
+@node Optional Steps
+@subsection Optional Steps :item:
+
+@cindex security github actions
+@itemize
+@item
+Branch protect and enable check requirements for your default branch
+(usually master).  Merge commits, verified only, and no force push are
+recommended settings.
+@item
+Enable requiring contributors to sign-off on web-based commits
+@item
+For @strong{security} of your Cachix secrets and any other secrets you may someday
+add, require Actions approval for all outside contributors and leave
+repository permissions at read-only
+@end itemize
+
+Cachix is somewhat optional.  It's free for open-source projects.  It's
+about as easy to sign up and generate the token as to remove the step from
+the GitHub actions, so you won't save much time by avoiding it.
+
+If you opt out of cachix or any other binary cache, you will definitely want
+to turn off tests for @code{emacsGit} etc because the build times are about
+30min-1hr per run when a fresh Emacs must be built.
+
+@node Customizing CI
+@section Customizing CI
+
+The @uref{../.github/run-shim.el, run-shim.el} script is just provides a CLI interface for adding commands in
+the @uref{../.github/workflows/ci.yml, ci.yml} CI declaration.  Each action step just loads the shell, declared in
+the @uref{../.github/flake.nix, flake.nix} and then runs the shim in Emacs.  The shim consumes the CLI
+command arguments, so you can parameterize the invocations that way.
+
+@itemize
+@item
+If you need extra elisp dependencies during CI, add them to the @code{epkgs} list
+in the flake.nix.
+@item
+If you need extra 3rd party dependencies, add them to @code{packages} in the call
+to @code{mkShell}.
+@item
+To invoke different elisp operations, add / modify the commands in
+@uref{../.github/run-shim.el, run-shim.el}.
+@end itemize
+
+There's more information in @uref{../CONTRIBUTING.md, CONTRIBUTING} about running commands locally.  You
+will want this information in your new repository.
+
+@node Licensing Developer Certificate of Origin
+@section Licensing, Developer Certificate of Origin
+
+This template project is distributed with the MIT license. @code{erk-new} will also
+run @code{erk-rename-relicense}, which will automatically switch to the GPL3
+license.  @strong{The MIT license allows re-licensing, and so this change is
+compatible.} If you accept non-trivial changes to your project, it will be
+very hard to change to the GPL3 later, so consider this choice.
+
+The new repository will also come with DCO sign-off checking on PR's.  The
+instructions are in the @uref{../CONTRIBUTING.md, CONTRIBUTING} guide.  A DCO sign-off policy will give
+your project a clear attestation of sufficient direct or transitive authority
+from each contributor to submit changes under the terms of your project's
+license.  This can only improve your legal protection from incidentally
+handling copyrighted code.
+
+The DCO choice in this repository is also meant to encourage & push stodgy
+organizations whose responsibility it was to invent better processes towards
+lower friction paths to contribute code.  If you fail to implement the DCO
+sign-off scheme, there is less hope that the FSF will someday independently
+merge changes that accumulate in your package because there will not be a
+clear chain of license compliance.
+
+@node Publishing to MELPA
+@section Publishing to MELPA
+
+If you have green CI, you have already passed many requirements of publishing a
+MELPA package.  @strong{You still need to build your package and verify your recipe.}
+You are going to clone melpa in order to make your PR@.  You can use the clone to
+verify the recipe.
+
+@menu
+* Creating the recipe::
+* Testing package build::
+* Testing stable package build::
+* MELPA Lints::
+@end menu
+
+@node Creating the recipe
+@subsection Creating the recipe
+
+Fork MELPA personally (not for organization) and clone it to wherever you keep
+your upstreams.  It's a good idea to separate upstreams from projects you
+actively maintain so you can see and delete upstreams when not in use.
+
+@example
+
+mkdir -p upstream
+cd upstream
+git clone git@@github.com:$GITHUB_USER/melpa.git  # replace $GITHUB_USER
+
+@end example
+
+Install package-build
+
+@lisp
+(use-package package-build)
+@end lisp
+
+@code{package-build-create-recipe} will give you something like:
+
+@lisp
+(erk :fetcher github :repo "positron-solutions/elisp-repo-kit")
+@end lisp
+
+The following template can be filled in and pull-requested to MELPA to publish.
+You don't need to touch @code{:files}.  The @code{commit} and @code{branch} are optional
+depending on how you version / develop / tag your releases.
+
+Copy the recipe into @samp{recipes/erk} inside your MELPA clone.
+
+@node Testing package build
+@subsection Testing package build
+
+Inside the MELPA clone root:
+
+@example
+
+# Builds the package
+make recipes/erk
+# Test sandbox installation (will affect ~/.emacs.d/elpa  So much for sandbox ¯\_(ツ)_/¯
+EMACS_COMMAND=$(which emacs) make sandbox INSTALL=erk
+
+@end example
+
+@node Testing stable package build
+@subsection Testing stable package build
+
+You need a tag on your default (usually master) branch of your repo,
+@samp{positron-solutions/elisp-repo-kit}. Use @code{git tag -S v0.1.0} and @code{git push
+    origin v0.1.0}.  You can also just create a release in the GitHub interface.
+
+@example
+
+# Test stable builds against your tags
+STABLE=t make recipes/erk
+
+@end example
+
+@node MELPA Lints
+@subsection MELPA Lints
+
+Lastly, install @uref{https://github.com/riscy/melpazoid, melpazoid} and call @samp{melpazoid} on your main feature.  It does
+some additional lints.  You may need to install @samp{package-lint} if you don't have
+it.  It's not declared in melpazoid's requirements.  Getting the package in Nix
+is not easy yet since melpazoid is not yet on Melpa.
+
+@lisp
+
+;; using elpaca's with explicit recipe
+(use-package melapzoid
+  :elpaca (melpazoid :host github :repo "riscy/melpazoid"))
+
+;; using straight
+(straight-use-package
+ '(melpazoid :type git :host github :repo "riscy/melpazoid" :files ("melpazoid/melpazoid.el")))
+
+@end lisp
+
+If everything works, you are ready to make a pull request to MELPA@.  Push your
+changes and check all the boxes in the PR template except the one that requires
+you to read the instructions.
+
+@node Nix
+@chapter Nix
+
+By using Nix, your repository can declare a fixed set of dependencies for
+development and testing.  Not just Elisp dependencies, but also 3rd party
+dependencies.
+
+@menu
+* Maintaining versions::
+* Customizing Versions::
+* Reproducing Issues::
+@end menu
+
+@node Maintaining versions
+@section Maintaining versions
+
+@cindex nix dependency updating
+
+The Nix @uref{../github/flake.nix, flake.nix} is where versions are declared.  The @uref{../.github/flake.lock, flake.lock} stores a
+fixed value for these declarations.  These fixed versions need periodic
+update.  Nixpkgs has a new release about every six months.  You can check
+their @uref{https://github.com/NixOS/nixpkgs/branches, branches} and @uref{https://github.com/NixOS/nixpkgs/tags, tags} to see what's current.  The effect is similar to
+updating linux versions.  The @code{nix} command has a lot of support for
+specifying versions besides just updating.
+
+@example
+nix flake lock --update-input nixpkgs
+@end example
+
+The @code{emacs-overlay}, which contains fixed versions of Emacs and snapshots of
+Elisp repository package sets can be updated by running:
+
+@example
+nix flake lock --update-input emacs-overlay
+@end example
+
+@node Customizing Versions
+@section Customizing Versions
+
+@cindex nix custom Emacs versions
+There are a lot of ways to declare specific versions of Emacs in Nix.  You
+can customize the build as much as you want if you go deep.
+
+The @code{emacs-overlay} already contains many versions, which are updated over
+time.  You can view which attributes are available by inspecting the current
+version of the flake in the @code{nix repl}:
+
+@example
+
+# <nixpkgs> is known in your flake registry
+pkgs = import <nixpkgs> @{ system = builtins.currentSystem; overlays = [ (builtins.getFlake ("emacs-overlay")).overlay ];@}
+
+# pkgs.emacs will tab complete
+pkgs.version
+# "28.2"
+pkgs.emacsUnstable.version
+# "29.1"
+
+# Have fun inspecting the various versions.  Checking their declarations in
+# emacs-overlay source can be insightful.
+
+@end example
+
+To obtain truly specific Emacs versions, specify the Emacs source as a flake
+input and then override the attributes of an Emacs package:
+
+@example
+
+inputs = @{
+  # declare the exact source you want
+  emacs29-src = @{
+    url = "github:emacs-mirror/emacs/emacs-29.1";
+    flake = false;
+  @};
+  #... other inputs
+@};
+
+# In your outputs, override one of the existing Emacs to make a new one:
+emacs29 = pkgs.emacs.overrideAttrs (old: @{
+  name = "emacs29";
+  version = emacs29-src.shortRev;
+  src = emacs29-src;
+@});
+# It's nix expressions.  It's programming.
+# Ask your favorite large langauge model!
+
+@end example
+
+@cindex nix binary cache
+@cindex security binary cache
+Just keep in mind that highly specific versions also means that the first
+CI run with those versions will not be cached.  You can use Cachix or you own
+binary cache to share builds among users.  @strong{Only trusted users should ever be
+authorized to push to a binary cache.}
+
+MacOS tends to get a little less test emphasis, and so
+@code{nixpkgs-darwin-<version>} branches exist and are required to pass more
+Darwin tests before merging.  This is more stable if you are on
+MacOS@.
+
+@code{nixpkgs-unstable} or @code{master} are your other less common choices.  Usually
+when you need bleeding-edge or custom packages, instead of changing the whole
+nixpkgs version, you override the specific packages by writing an overlay.
+If you need help, file an issue and @uref{https://github.com/sponsors/positron-solutions, consider donating to maintenance}.
+
+@node Reproducing Issues
+@section Reproducing Issues
+
+@cindex nix handling version mismaches
+
+Without Nix, users may have difficulty reproducing or describing exact
+situations.  This creates two issues:
+
+@itemize
+@item
+They can't tell you if the issue is caused by version mismatches
+@item
+They can't give you a method to reproduce their issue using versions that
+would allow you to confirm a fix
+@end itemize
+
+By changing the versions within the flake to match the versions in question
+that are breaking, the user can try versions to confirm a version mismatch and
+then give you their flake so that you can reproduce and confirm a fix.
+
+@node Indices (1)
+@chapter Indices
+
+@menu
+* Command and Function index::
+* Concept index::
+@end menu
+
+@node Command and Function index
+@section Command and Function index
+
+@printindex fn
+
+@node Concept index
+@section Concept index
+
+@printindex cp
+
+@bye

@@ -1,10 +1,10 @@
 ;;; erk.el --- Elisp (GitHub) Repository Kit  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 Positron Solutions
+;; Copyright (C) 2023 Positron Solutions <contact@positron.solutions>
 
-;; Author:  <author>
-;; Keywords: convenience
-;; Version: 0.2.0
+;; Author:  Positron Solutions <contact@positron.solutions>
+;; Keywords: convenience, programming
+;; Version: 0.4.0
 ;; Package-Requires: ((emacs "28.1") (auto-compile "1.2.0") (dash "2.18.0"))
 ;; Homepage: http://github.com/positron-solutions/elisp-repo-kit
 
@@ -48,30 +48,39 @@
 ;;; Code:
 
 ;; see flake.nix for providing dependencies for CI and local development.
-(require 'project)
 (require 'auto-compile)
 (require 'dash)
 (require 'ert)
+(require 'finder)
+(require 'lisp-mnt)
+(require 'project)
 (require 'vc)
+(require 'org)
+(require 'info)
 
 (eval-when-compile (require 'subr-x))
 
-(defgroup erk nil "Elisp repository kit." :prefix 'erk :group 'erk)
+(defgroup erk nil "Elisp repository kit." :prefix 'erk :group 'programming)
 
-(defcustom erk-github-package-name "elisp-repo-kit"
-  "Default GitHub <project> for cloning templates.
+(defcustom erk-replace-author "Positron Solutions <contact@positron.solutions>"
+  "Default author for renaming."
+  :group 'erk
+  :type 'string)
+
+(defcustom erk-replace-github-package-name "elisp-repo-kit"
+  "Default GitHub project for renaming.
 If you rename this repository after forking, you need to set this
 to clone from within the fork."
   :group 'erk
   :type 'string)
 
-(defcustom erk-package-prefix "erk"
+(defcustom erk-replace-package-prefix "erk"
   "The prefix is used to features and file names."
   :group 'erk
   :type 'string)
 
-(defcustom erk-github-userorg "positron-solutions"
-  "Default GitHub <user-or-org> for cloning templates.
+(defcustom erk-replace-github-userorg "positron-solutions"
+  "Default GitHub user-or-org for renaming.
 If you fork this repository, you need to set this to clone it
 from within the fork."
   :group 'erk
@@ -98,8 +107,8 @@ you can redistribute it and/or modify
   "List of (directory file replacement-file) forms.")
 
 (defconst erk--files-with-strings
-  '("README.org"
-    "CONTRIBUTING.org"
+  '(;; "docs/manual.org"
+    ;; "docs/README.org"
     "lisp/erk.el"
     "test/erk-test.el"
     ".github/run-shim.el"))
@@ -156,11 +165,47 @@ This assumes the convention of one elisp file per feature and
 feature name derived file name"
   (erk--dir-features (concat (erk--project-root) "lisp" )))
 
+(defun erk--package-root-feature ()
+  "Return the shortest feature in the package root."
+  (car (sort (erk--package-features)
+             (lambda (l r)
+               (< (length (symbol-name l))
+                  (length (symbol-name r)))))))
+
 (defun erk--test-features ()
   "List the features defined in project's test packages.
 This assumes the convention of one elisp file per feature and
 feature name derived file name"
   (erk--dir-features (concat (erk--project-root) "test" )))
+
+(defun erk--project-elisp-dir ()
+  "Return the location of elisp files.
+Only understands project root or root/lisp."
+  (let* ((project-root (erk--project-root))
+         (lisp-subdir (concat project-root "lisp")))
+    (if (file-exists-p lisp-subdir) lisp-subdir
+      project-root)))
+
+(defun erk--project-root-feature-file ()
+  "Return the path of the root feature for the project."
+  (let* ((project-elisp-dir (erk--project-elisp-dir))
+         (package-files (directory-files project-elisp-dir nil (rx ".el" string-end)))
+         (package-files (->> package-files
+                             (--reject (string-match-p (rx "autoloads.el" string-end) it))))
+         (root-feature-file (car (sort package-files #'string<))))
+    (concat project-elisp-dir "/" root-feature-file)))
+
+(defun erk-package-author ()
+  "Return the author of this project's package."
+  (car (car (lm-authors (erk--project-root-feature-file)))))
+
+(defun erk-package-email ()
+  "Return the email of this project's package."
+  (cdr (car (lm-authors (erk--project-root-feature-file)))))
+
+(defun erk-package-version ()
+  "Return the version of this project's package."
+  (lm-version (erk--project-root-feature-file)))
 
 ;;;###autoload
 (defun erk-reload-project-package ()
@@ -308,18 +353,18 @@ used in copyright notices.  USER-ORG will be used as the first
 part of the new github path.  EMAIL is shown after AUTHOR in
 package headers."
   (let ((default-directory dir)
-        (erk-github-path (concat erk-github-userorg "/"
-                                 erk-github-package-name))
+        (erk-github-path (concat erk-replace-github-userorg "/"
+                                 erk-replace-github-package-name))
         (github-path (concat user-org "/" package-name))
         (package-prefix package-prefix)
-        (replace-prefix (erk--prefix-match erk-package-prefix))
+        (replace-prefix (erk--prefix-match erk-replace-package-prefix))
         (capitalized-package-title
          (string-join (mapcar #'capitalize
                               (split-string package-name "-"))
                       " "))
         (replace-package-title
          (string-join (mapcar #'capitalize
-                              (split-string erk-github-package-name "-"))
+                              (split-string erk-replace-github-package-name "-"))
                       " ")))
     (mapc
      (lambda (file)
@@ -335,7 +380,7 @@ package headers."
            (end-of-line)
            (insert ", " author))
          (goto-char (point-min))
-         (when (re-search-forward (rx "<author>" eol) nil t)
+         (when (re-search-forward (rx (literal erk-replace-author) eol) nil t)
            (replace-match (concat author " <" email ">") nil t))
          (goto-char (point-min))
          ;; replace license with GPL3 notice
@@ -351,7 +396,7 @@ package headers."
            (replace-match package-prefix nil t nil 1))
          (goto-char (point-min))
          ;; update remaining package name strings.
-         (while (re-search-forward erk-github-package-name nil t)
+         (while (re-search-forward erk-replace-github-package-name nil t)
            (replace-match package-name nil t))
          (goto-char (point-min))
          (while (re-search-forward replace-package-title nil t)
@@ -378,7 +423,7 @@ itself, as a quine and for forking as a new template repository."
           git-bin nil output nil
           "clone"
           (format "https://github.com/%s/%s.git"
-                  erk-github-userorg erk-github-package-name)
+                  erk-replace-github-userorg erk-replace-github-package-name)
           (concat default-directory "/" package-name))
          "Clone failed")
         (let ((default-directory (concat clone-root "/" package-name))
@@ -429,7 +474,9 @@ by the author of this repository."
 \nsGitHub organization or username: \nsEmail: ")
   (erk--replace-strings
    clone-dir package-name package-prefix author user-org email)
-  (erk--rename-package clone-dir erk-package-prefix package-name))
+  (erk--rename-package clone-dir erk-replace-package-prefix package-name)
+  (let ((default-directory clone-dir))
+    (erk-export-docs)))
 
 ;;;###autoload
 (defun erk-new (package-name package-prefix clone-root author user-org email &optional rev)
@@ -450,12 +497,12 @@ implementation information and more details about argument usage."
    (let*
        ((package-name
          (read-string
-          (format "Package name, such as %s: " erk-github-package-name)
+          (format "Package name, such as %s: " erk-replace-github-package-name)
           "foo"))
         (package-prefix
          (erk--nodash
           (read-string
-           (format "Package prefix, such as %s: " erk-package-prefix))))
+           (format "Package prefix, such as %s: " erk-replace-package-prefix))))
         (clone-root
          (directory-file-name
           (read-directory-name "Clone root: " default-directory)))
@@ -476,6 +523,164 @@ implementation information and more details about argument usage."
   (erk-rename-relicense
    (erk-clone clone-root package-name user-org rev)
    package-name package-prefix author user-org email))
+
+;;;###autoload
+(defun erk-insert-package-keyword (keyword)
+  "Insert package KEYWORD, from `finder-known-keywords'.
+This list's name is easy to forget, so here's a shortcut."
+  (interactive
+   (list
+    (completing-read
+     "Insert package keyword:"
+     finder-known-keywords
+     nil t nil nil
+     (lambda (item)
+       (format "%s\t%s" (car item) (cdr item))))))
+  (insert (format "\"%s\"" keyword)))
+
+(defvar erk--find-paths
+  '((ci-dco . ".github/workflows/dco.yml")
+    (ci-nix-flake . ".github/flake.nix")
+    (ci-run-shim . ".github/run-shim.el")
+    (ci-tests . ".github/workflows/ci.yml")
+    (docs-contributing . "docs/CONTRIBUTING.org")
+    (docs-manual . "docs/manual.org")
+    (docs-readme . "docs/README.org"))
+  "Paths that exist in an ERK style project.")
+
+;;;###autoload
+(defun erk-find (file)
+  "Find FILE within projects using erk's project structure."
+  (interactive (list (completing-read "Select file" erk--find-paths)))
+  (find-file (concat (erk--project-root) (cdr (assoc-string file erk--find-paths)))))
+
+;;;###autoload
+(defun erk-find-ci-dco ()
+  "Shortcut for `erk-find'."
+  (interactive)
+  (erk-find "ci-dco"))
+
+;;;###autoload
+(defun erk-find-ci-nix-flake ()
+  "Shortcut for `erk-find'."
+  (interactive)
+  (erk-find "ci-nix-flake"))
+
+;;;###autoload
+(defun erk-find-ci-run-shim ()
+  "Shortcut for `erk-find'."
+  (interactive)
+  (erk-find "ci-run-shim"))
+
+;;;###autoload
+(defun erk-find-ci-tests ()
+  "Shortcut for `erk-find'."
+  (interactive)
+  (erk-find "ci-tests"))
+
+;;;###autoload
+(defun erk-find-docs-contributing ()
+  "Shortcut for `erk-find'."
+  (interactive)
+  (erk-find "docs-contributing"))
+
+;;;###autoload
+(defun erk-find-docs-manual ()
+  "Shortcut for `erk-find'."
+  (interactive)
+  (erk-find "docs-manual"))
+
+;;;###autoload
+(defun erk-find-docs-readme ()
+  "Shortcut for `erk-find'."
+  (interactive)
+  (erk-find "docs-readme"))
+
+
+(defun erk--export (filename export-fun)
+  "Export FILENAME to markdown using EXPORT-FUN."
+  (let* ((buffer (find-buffer-visiting filename))
+         (buffer (or buffer (find-file-noselect filename))))
+    (set-buffer buffer)
+    (when (buffer-modified-p buffer)
+      (when (yes-or-no-p "Save buffer? ")
+        ;; The docs all have a save hook we want to ignore
+        (let ((enable-local-variables nil)) (save-buffer))))
+    (save-restriction
+      (widen)
+      (save-excursion
+        (when (region-active-p) (deactivate-mark))
+        (funcall export-fun)))))
+
+;;;###autoload
+(defun erk-export-contributing (&optional preview)
+  "Export the contributing doc to markdown.
+With prefix argument, PREVIEW the buffer."
+  (interactive "P")
+  (erk--export
+   (concat (erk--project-root)
+           (cdr (assoc 'docs-contributing erk--find-paths)))
+   #'org-md-export-to-markdown)
+  (when preview
+    (find-file-read-only-other-window
+     (concat (erk--project-root)
+             "CONTRIBUTING.md"))))
+
+;;;###autoload
+(defun erk-export-manual (&optional preview)
+  "Export the manual doc to markdown.
+With prefix argument, PREVIEW the buffer."
+  (interactive "P")
+  (erk--export
+   (concat (erk--project-root)
+           (cdr (assoc 'docs-manual erk--find-paths)))
+   #'org-texinfo-export-to-info)
+  (when preview
+    (let ((exported-path (concat (erk--project-root)
+                                 "docs/manual.info")))
+      (info-initialize)
+      (info-other-window (Info-find-file exported-path)
+                         (generate-new-buffer-name "*info*")))))
+
+;;;###autoload
+(defun erk-export-readme (&optional preview)
+  "Export the readme doc to markdown.
+With prefix argument, PREVIEW the buffer."
+  (interactive "P")
+  (erk--export
+   (concat (erk--project-root)
+           (cdr (assoc 'docs-readme erk--find-paths)))
+   #'org-md-export-to-markdown)
+  (when preview
+    (find-file-read-only-other-window
+     (concat (erk--project-root)
+             "README.md"))))
+
+;;;###autoload
+(defun erk-export-docs ()
+  "Shortcut to export all docs."
+  (interactive)
+  (erk-export-contributing)
+  (erk-export-readme)
+  (erk-export-manual))
+
+;;;###autoload
+(defun erk-preview-contributing ()
+  "Export and show the contributing."
+  (interactive)
+  (let ((current-prefix-arg '(4))) (call-interactively #'erk-export-contributing)))
+
+;;;###autoload
+(defun erk-preview-manual ()
+  "Export and show the manual."
+  (interactive)
+  (let ((current-prefix-arg '(4))) (call-interactively #'erk-export-manual)))
+
+;;;###autoload
+(defun erk-preview-readme ()
+  "Export and show the readme."
+  (interactive)
+  (let ((current-prefix-arg '(4))) (call-interactively #'erk-export-readme)))
 
 (provide 'erk)
 ;;; erk.el ends here

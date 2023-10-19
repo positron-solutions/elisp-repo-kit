@@ -95,6 +95,12 @@
                   # needed by your repo after cloning.
                   epkgs.elpaPackages.project
                   epkgs.melpaPackages.auto-compile
+
+                  # Optionally override derivations.
+                  # melpaPackages.weechat.overrideAttrs(old: {
+                  #   # probably you want to override the src attribute
+                  #   patches = [ ./weechat-el.patch ];
+                  # })
                 ]))
             ];
           });
