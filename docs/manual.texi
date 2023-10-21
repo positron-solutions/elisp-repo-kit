@@ -90,7 +90,7 @@ Navigating the project
 * Using ERK for development::
 * Documenting Your Package::
 * Distributing Your Package::
-* Nix::
+* Maintaining Your Package::
 * Indices: Indices (1). 
 
 @detailmenu
@@ -159,6 +159,11 @@ Publishing to MELPA
 * Testing stable package build::
 * MELPA Lints::
 
+Maintaining Your Package
+
+* Upgrading ERK::
+* Nix::
+
 Nix
 
 * Maintaining versions::
@@ -178,8 +183,8 @@ Indices
 
 @itemize
 @item
-As a repository, Elisp Repo Kit is a template for how to organize and
-distribute your project.
+Elisp Repo Kit provides a scheme for how to organize and distribute your
+project, which it also uses in its own repository.
 
 @item
 As an Elisp package, Elisp Repo Kit (erk) provides shortcuts for working on
@@ -283,6 +288,12 @@ Github actions are included for CI@.
 @item
 Dependencies for CI are obtained via Nix.
 @item
+Actions call into Elisp by running Emacs with arguments passed to
+@uref{../.github/ruh-shim.el, .github/run-shim.el}.
+@item
+Many people install packages directly from repositories (because we like
+supply-chain attacks), so keep your installation instructions up to date.
+@item
 You are free to submit your package for distribution on MELPA etc.  This
 package is made available on MELPA partly to maintain the structure and
 workflows for doing so.
@@ -293,7 +304,7 @@ workflows for doing so.
 
 @lisp
 
-(use-package erk) ; vanilla
+(use-package erk) ; vanilla, assuming you have MELPA configured
 
 ;; using elpaca's with explicit recipe
 (use-package erk
@@ -303,7 +314,7 @@ workflows for doing so.
 (use-package erk
   :straight (erk :type git :host github :repo "positron-solutions/elisp-repo-kit"))
 
-;; or use melpa, manual load-path & require, you brave yak shaver
+;; or use manual load-path & require, you brave yak shaver
 
 @end lisp
 
@@ -318,13 +329,10 @@ workflows for doing so.
 @findex erk-clone
 The standalone command, @code{erk-clone} will clone without renaming.
 
-This repo is also a @uref{https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template, template repository}, so you can fork without forking
-(Bruce Lee).
-
 @findex erk-rename
-If you create via template or clone manually, it's presumed you know what
-you're doing at that point.  Call @code{erk-rename} on its own to rename
-in these cases.
+If you create via @uref{https://github.com/positron-solutions/erk-basic, a template} or clone manually, it's presumed you know what
+you're doing at that point.  Call @code{erk-rename} on its own to rename in these
+cases.
 
 There are some customize options that cause the renaming to be transitively
 consistent.
@@ -344,17 +352,21 @@ ask you for:
 
 @itemize
 @item
+Choose a template
+@item
 Root directory you want to clone to
 @item
-Package name
+Package title
+@item
+Package feature
 @item
 Package prefix
 @item
 Author name
 @item
-GitHub user or organization
-@item
 Email address
+@item
+GitHub user or organization
 @end itemize
 
 @findex erk-rename-relicense
@@ -800,7 +812,7 @@ You can copy this checklist to your org agenda files:
 @item
 Create a repository (from @ref{Install ERK, , install} instructions)
 @item
-Create an empty GitHub repository and check the git remote configuration
+Create an empty GitHub repository configure it as your git remote
 @item
 Set up your git commit signing (and verification so that it's obvious)
 @strong{and} @ref{Licensing Developer Certificate of Origin, , sign-off} so that it will be hypothetically @uref{README.org, straightforward} for for FSF
@@ -818,7 +830,7 @@ Add repository secrets necessary for your GitHub actions
 @code{CACHIX_AUTH_TOKEN} and @code{CACHIX_CACHE_NAME} (settings -> secrets -> new
 repository secret)
 @end itemize
-#+cindex github enabling actions
+#+cindex github allowed actions
 @itemize
 @item
 Enable actions and add the following actions to your allowed actions list:
@@ -847,9 +859,9 @@ Make a post on @uref{https://reddit.com/r/emacs/, reddit} and @uref{https://emac
 @end menu
 
 @node Optional Steps
-@subsection Optional Steps :item:
+@subsection Optional Steps
 
-@cindex security github actions
+@cindex security github branch protect
 @itemize
 @item
 Branch protect and enable check requirements for your default branch
@@ -857,10 +869,13 @@ Branch protect and enable check requirements for your default branch
 recommended settings.
 @item
 Enable requiring contributors to sign-off on web-based commits
+@end itemize
+@cindex security github actions
+@itemize
 @item
-For @strong{security} of your Cachix secrets and any other secrets you may someday
-add, require Actions approval for all outside contributors and leave
-repository permissions at read-only
+For @strong{security} of your Cachix secrets (and any others), require
+Actions approval for all outside contributors.  Disabling write and
+disabling creation & approval of PR's is least privilege.
 @end itemize
 
 Cachix is somewhat optional.  It's free for open-source projects.  It's
@@ -883,6 +898,9 @@ command arguments, so you can parameterize the invocations that way.
 @item
 If you need extra elisp dependencies during CI, add them to the @code{epkgs} list
 in the flake.nix.
+@end itemize
+@cindex nix adding 3rd party dependencies
+@itemize
 @item
 If you need extra 3rd party dependencies, add them to @code{packages} in the call
 to @code{mkShell}.
@@ -897,11 +915,12 @@ will want this information in your new repository.
 @node Licensing Developer Certificate of Origin
 @section Licensing, Developer Certificate of Origin
 
-This template project is distributed with the MIT license. @code{erk-new} will also
-run @code{erk-rename-relicense}, which will automatically switch to the GPL3
-license.  @strong{The MIT license allows re-licensing, and so this change is
-compatible.} If you accept non-trivial changes to your project, it will be
-very hard to change to the GPL3 later, so consider this choice.
+This project and its derivative templates are distributed with an MIT
+license. @code{erk-new} will also run @code{erk-rename-relicense}, which will
+automatically switch to the GPL3 license.  @strong{The MIT license allows
+re-licensing, and so this change is compatible.} If you accept non-trivial
+changes to your project, it will be very hard to change to the GPL3 later, so
+consider this choice.
 
 The new repository will also come with DCO sign-off checking on PR's.  The
 instructions are in the @uref{../CONTRIBUTING.md, CONTRIBUTING} guide.  A DCO sign-off policy will give
@@ -1017,8 +1036,77 @@ If everything works, you are ready to make a pull request to MELPA@.  Push your
 changes and check all the boxes in the PR template except the one that requires
 you to read the instructions.
 
+@node Maintaining Your Package
+@chapter Maintaining Your Package
+
+Keeping your project fresh.
+
+@menu
+* Upgrading ERK::
+* Nix::
+@end menu
+
+@node Upgrading ERK
+@section Upgrading ERK
+
+After creating an ERK project, it becomes independent with respect to version
+control and is not expected to maintain commit compatibility (this is a
+terrible idea, so don't try it).
+
+Many files don't actually change much from project to project.  Here's a list
+of files that you generally can just copy and enjoy the updates for:
+
+@itemize
+@item
+.github/pull_request_template.md
+@item
+docs/CONTRIBUTING.org
+@end itemize
+
+Some files are usually tweaked, but only a little bit.  Drastic overhauls
+will be mentioned in change notes.  You probably want to update by hand:
+
+@itemize
+@item
+.github/run-shim.el
+@item
+.github/workflows/dco.yml
+@item
+.github/workflows/ci.yml
+@item
+.github/flake.nix
+@end itemize
+
+Upgrades to ERK will mention if any values need to be changed before copying
+any project-indpendent files.  @strong{Changes to github actions will require you to
+update the approved actions setting.}
+
+Other files which occasionally receive updates, but changes that you likely
+@strong{do not} want at all:
+
+@itemize
+@item
+docs/README.org
+@item
+docs/manual.org
+@end itemize
+
+These files are @strong{generated}, so you can ignore upstream changes even though
+they are under version control:
+
+@itemize
+@item
+.github/flake.lock
+@item
+README.md
+@item
+CONTRIBUTING.md
+@item
+docs/manual.texi
+@end itemize
+
 @node Nix
-@chapter Nix
+@section Nix
 
 By using Nix, your repository can declare a fixed set of dependencies for
 development and testing.  Not just Elisp dependencies, but also 3rd party
@@ -1031,7 +1119,7 @@ dependencies.
 @end menu
 
 @node Maintaining versions
-@section Maintaining versions
+@subsection Maintaining versions
 
 @cindex nix dependency updating
 
@@ -1054,7 +1142,7 @@ nix flake lock --update-input emacs-overlay
 @end example
 
 @node Customizing Versions
-@section Customizing Versions
+@subsection Customizing Versions
 
 @cindex nix custom Emacs versions
 There are a lot of ways to declare specific versions of Emacs in Nix.  You
@@ -1123,7 +1211,7 @@ nixpkgs version, you override the specific packages by writing an overlay.
 If you need help, file an issue and @uref{https://github.com/sponsors/positron-solutions, consider donating to maintenance}.
 
 @node Reproducing Issues
-@section Reproducing Issues
+@subsection Reproducing Issues
 
 @cindex nix handling version mismaches
 

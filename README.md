@@ -4,6 +4,9 @@
 <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=CI"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/ci.yml/badge.svg" alt="CI workflow status"></a>
 <a href="https://github.com/positron-solutions/elisp-repo-kit/actions/?workflow=Developer+Certificate+of+Origin"><img src="https://github.com/positron-solutions/elisp-repo-kit/actions/workflows/dco.yml/badge.svg" alt="DCO Check"></a>
 
+
+# Elisp Repo Kit
+
 This repository is a kit to start a new elisp package repository on GitHub.  The
 package contained has commands to streamline elisp development.
 
@@ -27,7 +30,7 @@ answer all the questions.
 # Install ERK
 
     
-    (use-package erk) ; vanilla
+    (use-package erk) ; vanilla, assuming you have MELPA configured
     
     ;; using elpaca's with explicit recipe
     (use-package erk
@@ -37,19 +40,16 @@ answer all the questions.
     (use-package erk
       :straight (erk :type git :host github :repo "positron-solutions/elisp-repo-kit"))
     
-    ;; or use melpa, manual load-path & require, you brave yak shaver
+    ;; or use manual load-path & require, you brave yak shaver
 
 
 ## Manual cloning
 
 The standalone command, `erk-clone` will clone without renaming.
 
-This repo is also a [template repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template), so you can fork without forking
-(Bruce Lee).
-
-If you create via template or clone manually, it's presumed you know what
-you're doing at that point.  Call `erk-rename` on its own to rename
-in these cases.
+If you create via [a template](https://github.com/positron-solutions/erk-basic) or clone manually, it's presumed you know what
+you're doing at that point.  Call `erk-rename` on its own to rename in these
+cases.
 
 There are some customize options that cause the renaming to be transitively
 consistent.
@@ -63,27 +63,27 @@ your secrets for Cachix. Read the CI customization section.
 
 # Table of Contents
 
--   [Creating Packages](#org48b1592)
--   [Using ERK for development](#orgac0ff0a)
-    -   [Find Files](#org5874675)
--   [File contents and structure](#org0c0d60c)
--   [Finish setting up your new GitHub repo](#orge318b14)
-    -   [Optional Steps](#org47a615b):item:
--   [Customizing CI](#orgec503c8)
--   [Licensing, Developer Certificate of Origin](#orga3c035b)
--   [Publishing to MELPA](#org233e8d2)
-    -   [Creating the recipe](#org5094545)
-    -   [Testing package build](#org2988a8d)
-    -   [Testing stable package build](#orgdea3e92)
-    -   [MELPA Lints](#orga70f644)
--   [Maintaining versions](#org31ebd2c)
--   [Package scope and relation to other work](#org7967777)
-    -   [Dependency Management](#org9325996)
-    -   [Discovering and Running Tests & Lints](#org4a9d138)
-    -   [Comparisons](#org96cc0c2)
--   [Contributing](#org59d67fb)
--   [Footnote on FSF and Emacs Core Licensing](#org01e3d0e)
--   [Shout-outs](#orgead8c3f)
+-   [Creating Packages](#orgbf14bf1)
+-   [Using ERK for development](#org98720bd)
+    -   [Find Files](#orgf73e424)
+-   [File contents and structure](#org8d1783d)
+-   [Finish setting up your new GitHub repo](#org9cd1ddb)
+    -   [Optional Steps](#org833c99e)
+-   [Customizing CI](#orgaa9298a)
+-   [Licensing, Developer Certificate of Origin](#org3be8afd)
+-   [Publishing to MELPA](#org09c7298)
+    -   [Creating the recipe](#org7388169)
+    -   [Testing package build](#org629febf)
+    -   [Testing stable package build](#orgb99d9c6)
+    -   [MELPA Lints](#orgfaacc4b)
+-   [Maintaining versions](#org8ed3d8a)
+-   [Package scope and relation to other work](#org401c164)
+    -   [Dependency Management](#orge880f34)
+    -   [Discovering and Running Tests & Lints](#org5248f8c)
+    -   [Comparisons](#org6350b87)
+-   [Contributing](#org9a4b34c)
+-   [Footnote on FSF and Emacs Core Licensing](#org4703ea1)
+-   [Shout-outs](#org2ad2eb5)
 
 
 # Creating Packages
@@ -91,16 +91,18 @@ your secrets for Cachix. Read the CI customization section.
 The simplest and intended way is to call `erk-new`.  It will first
 ask you for:
 
+-   Choose a template
 -   Root directory you want to clone to
--   Package name
+-   Package title
+-   Package feature
 -   Package prefix
 -   Author name
--   GitHub user or organization
 -   Email address
+-   GitHub user or organization
 
 `erk-new` also calls `erk-rename-relicense` to rename all of the files, string
 replace names, and re-license to GPL3.  It also changes the author and resets
-the git history.  Now just follow the steps in [finish setting up](#orge318b14) Have fun!
+the git history.  Now just follow the steps in [finish setting up](#org9cd1ddb) Have fun!
 
 
 # Using ERK for development
@@ -203,10 +205,10 @@ directories.
 
 You can copy this checklist to your org agenda files:
 
--   [X] Create a repository (from [install](#org10fb556) instructions)
--   [ ] Create an empty GitHub repository and check the git remote configuration
+-   [X] Create a repository (from [install](#orgc87b537) instructions)
+-   [ ] Create an empty GitHub repository configure it as your git remote
 -   [ ] Set up your git commit signing (and verification so that it's obvious)
-    **and** [sign-off](#orga3c035b) so that it will be hypothetically [straightforward](README.md) for for FSF
+    **and** [sign-off](#org3be8afd) so that it will be hypothetically [straightforward](README.md) for for FSF
     to pull in your changes if they later change to DCO instead of copyright
     assignment.
 -   [ ] Sign up for [cachix](https://app.cachix.org/) and, create a binary cache with API tokens and public
@@ -219,7 +221,7 @@ You can copy this checklist to your org agenda files:
     `CACHIX_AUTH_TOKEN` and `CACHIX_CACHE_NAME` (settings -> secrets -> new
     repository secret)
 
-\#+cindex github enabling actions
+\#+cindex github allowed actions
 
 -   [ ] Enable actions and add the following actions to your allowed actions list:
     
@@ -232,19 +234,20 @@ You can copy this checklist to your org agenda files:
     **Note**, Python is used to run a DCO check script, nothing more.
 
 -   [ ] Get your package working, pushed, actions run, and CI badges all green
--   [ ] [Publish](#org233e8d2) to MELPA
+-   [ ] [Publish](#org09c7298) to MELPA
 -   [ ] Make a post on [reddit](https://reddit.com/r/emacs/) and [mastodon](https://emacs.ch/) about your new package
 
 
-## Optional Steps     :item:
+## Optional Steps
 
 -   [ ] Branch protect and enable check requirements for your default branch
     (usually master).  Merge commits, verified only, and no force push are
     recommended settings.
 -   [ ] Enable requiring contributors to sign-off on web-based commits
--   [ ] For **security** of your Cachix secrets and any other secrets you may someday
-    add, require Actions approval for all outside contributors and leave
-    repository permissions at read-only
+
+-   [ ] For **security** of your Cachix secrets (and any others), require
+    Actions approval for all outside contributors.  Disabling write and
+    disabling creation & approval of PR's is least privilege.
 
 Cachix is somewhat optional.  It's free for open-source projects.  It's
 about as easy to sign up and generate the token as to remove the step from
@@ -264,6 +267,7 @@ command arguments, so you can parameterize the invocations that way.
 
 -   If you need extra elisp dependencies during CI, add them to the `epkgs` list
     in the flake.nix.
+
 -   If you need extra 3rd party dependencies, add them to `packages` in the call
     to `mkShell`.
 -   To invoke different elisp operations, add / modify the commands in
@@ -275,11 +279,12 @@ will want this information in your new repository.
 
 # Licensing, Developer Certificate of Origin
 
-This template project is distributed with the MIT license. `erk-new` will also
-run `erk-rename-relicense`, which will automatically switch to the GPL3
-license.  **The MIT license allows re-licensing, and so this change is
-compatible.** If you accept non-trivial changes to your project, it will be
-very hard to change to the GPL3 later, so consider this choice.
+This project and its derivative templates are distributed with an MIT
+license. `erk-new` will also run `erk-rename-relicense`, which will
+automatically switch to the GPL3 license.  **The MIT license allows
+re-licensing, and so this change is compatible.** If you accept non-trivial
+changes to your project, it will be very hard to change to the GPL3 later, so
+consider this choice.
 
 The new repository will also come with DCO sign-off checking on PR's.  The
 instructions are in the [CONTRIBUTING](../CONTRIBUTING.md) guide.  A DCO sign-off policy will give
@@ -571,6 +576,4 @@ control are strongly attested to be covered by the license you chose.
 -   [adisbladis](https://github.com/adisbladis) for the Nix overlay that makes the CI and local development so nice
 -   [NobbZ](https://github.com/NobbZ) for being all over the Nix & Emacs interwebs
 -   [FSF](https://www.fsf.org/) and all contributors to Emacs & packages for the Yak shaving club
-
-aslkdfj
 
