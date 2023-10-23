@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2022 Positron Solutions
 
-;; Author:  <author>
+;; Author:  Positron Solutions <contact@positron.solutions>
 
 ;; Permission is hereby granted, free of charge, to any person obtaining a copy of
 ;; this software and associated documentation files (the "Software"), to deal in
@@ -52,19 +52,72 @@
 (ert-deftest erk--test-features-test ()
   (should (member 'erk-test (erk--test-features))))
 
-(ert-deftest erk-clone-and-rename-test ()
-  "Clone the repo and rename it, single step."
-  (let ((rev (string-trim
-              (shell-command-to-string "git rev-parse HEAD")))
+(ert-deftest erk--template-github-userorg-test ()
+  (should (string= (erk--template-github-userorg '(:github-path "positron-solutions/bitcoin-miner"))
+                   "positron-solutions")))
+
+(ert-deftest erk--template-github-repo-test ()
+  (should (string= (erk--template-github-repo '(:github-path "positron-solutions/bitcoin-miner"))
+                   "bitcoin-miner")))
+
+(ert-deftest erk--template-feature-test ()
+  (should (string= (erk--template-feature '(:github-path "positron-solutions/bitcoin-miner"))
+                   "bitcoin-miner"))
+  (should (string= (erk--template-feature '(:github-path "positron-solutions/bitcoin-miner"
+                                                         :feature "floozly"))
+                   "floozly")))
+
+(ert-deftest erk--template-prefix-test ()
+  (should (string= (erk--template-prefix '(:github-path "positron-solutions/bitcoin-miner"))
+                   "bitcoin-miner"))
+  (should (string= (erk--template-prefix '(:github-path "positron-solutions/bitcoin-miner"
+                                                        :feature "floozly"))
+                   "floozly"))
+  (should (string= (erk--template-prefix '(:github-path "positron-solutions/bitcoin-miner"
+                                                        :feature "floozly"
+                                                        :prefix "flombow"))
+                   "flombow")))
+
+(ert-deftest erk--expand-filenames-test ()
+  (should (string= (car (erk--expand-filenames '("%s-foo.el") "doo"))
+                   "doo-foo.el")))
+
+(ert-deftest erk--project-elisp-dir-test ()
+  (should (erk--project-elisp-dir)))
+
+(ert-deftest erk--project-package-email-test ()
+  (should (string= (erk-package-email) "contact@positron.solutions")))
+
+(ert-deftest erk--project-package-author-test ()
+   (should (string= (erk-package-author) "Positron Solutions")))
+
+(ert-deftest erk--nodash-test ()
+  (should (string= (erk--nodash "erk-") "erk")))
+
+(ert-deftest erk-clone-test ()
+  (let ((enable-local-variables nil)
         (clone-root (make-temp-file "erk-clone-test-" t)))
-    (erk-new
-     "new-project" ; package-name
-     "nupro" ; package-prefix
-     clone-root
-     "Selindis Raszagal" ; Author
-     "new-shakuras" ; user-org
-     "selindis.r@new-shakuras.planet" ; email
-     rev) ; possibly nil
+    (erk-clone (cdr (assoc 'erk-basic erk-templates))
+               clone-root
+               '(:title "Omg Test"
+                        :prefix "ggg"
+                        :email "mail@template.com"
+                        :author "Huh Idk"
+                        :feature "lol-pkg"
+                        :user-org "zerglingscancode2"))
+    (delete-directory clone-root t)))
+
+(ert-deftest erk-new-test ()
+  (let ((enable-local-variables nil)
+        (clone-root (make-temp-file "erk-clone-test-" t)))
+    (erk-new (cdr (assoc 'erk-basic erk-templates))
+             clone-root
+             '(:title "Hilariously Good Package"
+                      :feature "laughing-package"
+                      :prefix "lol-pkg"
+                      :user-org "zerglingscancode2"
+                      :email "iamzerg@zergs.pwn"
+                      :author "Zagara"))
     (delete-directory clone-root t)))
 
 (provide 'erk-test)

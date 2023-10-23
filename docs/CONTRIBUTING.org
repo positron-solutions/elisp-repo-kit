@@ -1,29 +1,17 @@
 #+TITLE: Contributing
+#+EXPORT_FILE_NAME: ../CONTRIBUTING.md
+#+OPTIONS: toc:nil broken-links:mark num:nil
+
+#+begin_export html
+<!-- !!!THIS FILE HAS BEEN GENERATED!!! Edit CONTRIBUTING.org -->
+#+end_export
 
 Development process & infrastructure guide.
 
-* Contents
-:PROPERTIES:
-:TOC:      :include siblings :ignore this
-:END:
-:CONTENTS:
-- [[#development][Development]]
-  - [[#running-tests][Running tests]]
-    - [[#running-tests-ci-style][Running tests CI style]]
-  - [[#lint-and-byte-compile-code][Lint and byte-compile code]]
-  - [[#loading-and-re-loading-your-package][Loading and re-loading your package]]
-    - [[#manual-loading--reloading][Manual Loading & Reloading]]
-- [[#license][License]]
-- [[#developer-certificate-of-origin-dco][Developer Certificate of Origin (DCO)]]
-  - [[#sign-off][Sign-off]]
-  - [[#gpg-signature][GPG signature]]
-  - [[#user-setup-for-submitting-changes][User setup for submitting changes]]
-    - [[#automatically-add-sign-off][Automatically add sign-off]]
-    - [[#automatic-gpg-signing-with-per-project-keys][Automatic GPG signing with per-project keys]]
-    - [[#manually-signing--adding-sign-off][Manually signing & adding sign-off]]
-- [[#maintaining-nixpkgs-versions][Maintaining nixpkgs versions]]
-:END:
+#+TOC: headlines 2
 
+* Submitting Pull Requests
+  Be sure to abide by instructions in [[../.github/pull_request_template.md][the pull request template]].
 * Development
 
   This repository was created with [[https://github.com/positron-solutions/elisp-repo-kit/][elisp-repo-kit]].  You can use it to streamline
@@ -61,12 +49,12 @@ Development process & infrastructure guide.
    This package uses [[https://github.com/gonewest818/elisp-lint][elisp-lint]] to detect issues with byte compiling, package
    format, code structure and others.
 
-   The configuration is found inside [[.github/run-shim.el][.github/run-shim.el]].  The CI run is invoked
-   inside of [[.github/workflows/ci.yml][ci.yml]] using Emacs in script mode.  Most of the configuration is in
+   The configuration is found inside [[../.github/run-shim.el][.github/run-shim.el]].  The CI run is invoked
+   inside of [[../.github/workflows/ci.yml][ci.yml]] using Emacs in script mode.  Most of the configuration is in
    the run shim.
 
    The tests are also linted, to a less restrictive standard, also found in
-   [[.github/run-shim.el][run-shim.el]]
+   [[../.github/run-shim.el][run-shim.el]]
 
    You can run the lints manually almost the same as running tests.
    #+begin_src bash
@@ -97,11 +85,27 @@ Development process & infrastructure guide.
     Next, add the package to your load-path and then require it or, more
     directly, call =emacs-lisp-byte-compile-and-load= or
     =emacs-lisp-native-compile-and-load=.
+** Re-generating Documentation
+   If you are using ~elisp-repo-kit~, ~erk-export-docs~ will take care of
+   everything.  See the related commands for exporting individually and
+   viewing the outputs. If you enable local variables, declared at the end of
+   each document, saving will automatically export.
 
+   To manually export, use the appropriate org mode command:
+
+   - ~org-md-export-as-markdown~
+   - ~org-texinfo-export-to-info~
+
+   You can view the manual with prefix argument, ~info-display-manual~, and
+   manually type the path to the ~manual.info~.  Honestly, just use
+   ~elisp-repo-kit~.  This stuff is tedious.
+
+   *NOTE* changes to the ~manual.org~ requires re-generation of other documents
+    because they use =#+include:= directives.
 * License
 
   This package is distributed under the terms of the [[./COPYING][included license]].  The CI
-  configuration and scripts are MIT licensed.
+  configuration, documentation, and scripts are MIT licensed.
 
 * Developer Certificate of Origin (DCO)
 
@@ -138,9 +142,10 @@ Development process & infrastructure guide.
 
    Refer to the [[https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits][GitHub signing commits]] instructions to set up your git client
    to add GPG signatures.  File issues if you run into Emacs-specific problems.
+   Be sure to use a Github verified email.
 
    Because signing is intended to be a conscious process, please remember to
-   read and understand the [[./DCO][Developer Certificate of Origin]] before confinguring
+   read and understand the [[../DCO][Developer Certificate of Origin]] before confinguring
    your client to automatically sign-off on commits.
 
 *** Automatically add sign-off
@@ -211,18 +216,31 @@ Development process & infrastructure guide.
       git rebase -i
     #+end_src
 
-* Maintaining nixpkgs versions
+** Maintaining versions
+#+begin_comment
+This heading is duplicated in the manual.org.  The Contributing guide is
+frequently copied around whole because it's not that unique between
+repositories using ERK tooling.
+#+end_comment
 
-  Nixpkgs has a new release about every six months.  You can check their [[https://github.com/NixOS/nixpkgs/branches][branches]]
-  and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  To get updated dependencies from MELPA, it's
-  necessary to update the emacs-overlay with =nix flake lock --update-input
-  emacs-overlay=.  You can also specify revs and branches if you need to roll
-  back. There is a make shortcut: =make flake-update= MacOS tends to get a little
-  less test emphasis, and so =nixpkgs-darwin-<version>= branches exist and are
-  required to pass more Darwin tests before merging.  This is more stable if you
-  are on MacOS. =nixpkgs-unstable= or =master= are your other less common options.
-     
+   The Nix [[../github/flake.nix][flake.nix]] is where versions are declared.  The [[../.github/flake.lock][flake.lock]] stores a
+   fixed value for these declarations.  These fixed versions need periodic
+   update.  Nixpkgs has a new release about every six months.  You can check
+   their [[https://github.com/NixOS/nixpkgs/branches][branches]] and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  The effect is similar to
+   updating linux versions.  The ~nix~ command has a lot of support for
+   specifying versions besides just updating.
+
+   #+begin_src shell
+     nix flake lock --update-input nixpkgs
+   #+end_src
+
+   The ~emacs-overlay~, which contains fixed versions of Emacs and snapshots of
+   Elisp repository package sets can be updated by running:
+
+   #+begin_src shell
+     nix flake lock --update-input emacs-overlay
+   #+end_src
+
 # Local Variables:
-# before-save-hook: (lambda () (when (require 'org-make-toc nil t) (org-make-toc)))
-# org-make-toc-link-type-fn: org-make-toc--link-entry-github
+# after-save-hook: (lambda () (when (require 'erk nil t) (erk-export-contributing)))
 # End:
