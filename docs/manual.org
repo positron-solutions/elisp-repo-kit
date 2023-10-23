@@ -37,8 +37,8 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
 
 * High Level Overview
 
-  - As a repository, Elisp Repo Kit is a template for how to organize and
-    distribute your project.
+  - Elisp Repo Kit provides a scheme for how to organize and distribute your
+    project, which it also uses in its own repository.
 
   - As an Elisp package, Elisp Repo Kit (erk) provides shortcuts for working on
     package using the Elisp Repo Kit organization structure (as well as other
@@ -134,13 +134,10 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
    #+findex: erk-clone
    The standalone command, ~erk-clone~ will clone without renaming.
 
-   This repo is also a [[https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template][template repository]], so you can fork without forking
-   (Bruce Lee).
-
    #+findex: erk-rename
-   If you create via template or clone manually, it's presumed you know what
-   you're doing at that point.  Call ~erk-rename~ on its own to rename
-   in these cases.
+   If you create via [[https://github.com/positron-solutions/erk-basic][a template]] or clone manually, it's presumed you know what
+   you're doing at that point.  Call ~erk-rename~ on its own to rename in these
+   cases.
 
    There are some customize options that cause the renaming to be transitively
    consistent.
@@ -156,12 +153,14 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
   The simplest and intended way is to call ~erk-new~.  It will first
   ask you for:
 
+    - Choose a template
     - Root directory you want to clone to
-    - Package name
+    - Package title
+    - Package feature
     - Package prefix
     - Author name
-    - GitHub user or organization
     - Email address
+    - GitHub user or organization
 
   #+findex: erk-rename-relicense
   ~erk-new~ also calls ~erk-rename-relicense~ to rename all of the files, string
@@ -482,11 +481,12 @@ overview:
    will want this information in your new repository.
 
 ** Licensing, Developer Certificate of Origin
-   This template project is distributed with the MIT license. ~erk-new~ will also
-   run ~erk-rename-relicense~, which will automatically switch to the GPL3
-   license.  *The MIT license allows re-licensing, and so this change is
-   compatible.* If you accept non-trivial changes to your project, it will be
-   very hard to change to the GPL3 later, so consider this choice.
+   This project and its derivative templates are distributed with an MIT
+   license. ~erk-new~ will also run ~erk-rename-relicense~, which will
+   automatically switch to the GPL3 license.  *The MIT license allows
+   re-licensing, and so this change is compatible.* If you accept non-trivial
+   changes to your project, it will be very hard to change to the GPL3 later, so
+   consider this choice.
 
    The new repository will also come with DCO sign-off checking on PR's.  The
    instructions are in the [[../CONTRIBUTING.md][CONTRIBUTING]] guide.  A DCO sign-off policy will give

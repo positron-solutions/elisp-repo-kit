@@ -13,6 +13,9 @@
 #+end_export
 
 * Elisp Repo Kit
+  :PROPERTIES:
+  :UNNUMBERED: notoc
+  :END:
 
 This repository is a kit to start a new elisp package repository on GitHub.  The
 package contained has commands to streamline elisp development.
