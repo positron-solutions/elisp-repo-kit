@@ -95,6 +95,7 @@
                   # needed by your repo after cloning.
                   epkgs.elpaPackages.project
                   epkgs.melpaPackages.auto-compile
+                  epkgs.melpaPackages.license-templates
 
                   # Optionally override derivations.
                   # melpaPackages.weechat.overrideAttrs(old: {

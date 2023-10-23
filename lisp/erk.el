@@ -52,6 +52,7 @@
 (require 'dash)
 (require 'ert)
 (require 'finder)
+(require 'license-templates)
 (require 'lisp-mnt)
 (require 'project)
 (require 'vc)
@@ -124,8 +125,7 @@ you can redistribute it and/or modify
 ;; use a combination of discovery and template information to.  PR's for any of
 ;; these tweaks will be gladly accepted.
 (defconst erk--rename-maps
-  '(( nil "gpl-3.0.txt" "COPYING")
-    ("lisp/" "%s.el" nil)
+  '(("lisp/" "%s.el" nil)
     ("test/" "%s-test.el" nil))
   "List of (DIR SRC DEST) forms.")
 
@@ -370,9 +370,26 @@ are renaming.  Existing files will be clobbered."
   (let* ((old-feature (erk--nodash (erk--template-feature template)))
          (new-feature (erk--nodash (plist-get replacements :feature)))
          (output (get-buffer-create "erk-clone"))
-         (git-bin (executable-find "git")))
+         (git-bin (executable-find "git"))
+         (default-directory clone-dir))
+
+    (let ((new-license (concat clone-dir "LICENSE"))
+          (old-license (concat clone-dir "COPYING")))
+      ;; TODO dynamic re-licensing would be nice since `license-templates'
+      ;; contains a lot.  At least we're no longer worried about shipping
+      ;; licenses.  There's another package with headers and yet another for
+      ;; spdx identifiers.
+      (license-templates-new-file "gpl-3.0" default-directory)
+      (erk--nze
+       (call-process "cp" nil output nil "--verbose" new-license old-license)
+       (format "Could not update %s contents." old-license))
+      (erk--nze
+       (call-process git-bin nil output nil "add" old-license)
+       (format "Could not stage %s update." old-license)))
+
     (mapc (lambda (rename-map)
             (let* ((dir (concat clone-dir (or (pop rename-map) "")))
+                   (default-directory dir)
                    (src (format (pop rename-map) old-feature))
                    (new-filename (when-let ((file (pop rename-map)))
                                    (format
@@ -380,8 +397,7 @@ are renaming.  Existing files will be clobbered."
                                     new-feature)))
                    (dest (or new-filename
                              (replace-regexp-in-string
-                              (rx (literal old-feature)) new-feature src)))
-                   (default-directory dir))
+                              (rx (literal old-feature)) new-feature src))))
               (when (file-exists-p dest)
                 (erk--nze
                  (call-process git-bin nil output nil "rm" "-f" dest)
