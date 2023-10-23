@@ -5,7 +5,7 @@
 ;; Author:  Positron Solutions <contact@positron.solutions>
 ;; Keywords: convenience, programming
 ;; Version: 0.4.0
-;; Package-Requires: ((emacs "28.1") (auto-compile "1.2.0") (dash "2.18.0"))
+;; Package-Requires: ((emacs "28.1") (auto-compile "1.2.0") (dash "2.18.0") (license-templates "0.1.3"))
 ;; Homepage: http://github.com/positron-solutions/elisp-repo-kit
 
 ;; Permission is hereby granted, free of charge, to any person obtaining a copy of
