@@ -44,21 +44,22 @@
       let
 
         # instantaite nixpkgs with the emacs overlay applied.
-        # to explore available attributes, you can instantiate nixpkgs with the emacs overlay in a nix repl:
-        # pkgs = import (builtins.getFlake "nixpkgs") { system = builtins.currentSystem; overlays = [ (builtins.getFlake ("emacs-overlay")).overlay ];}
-        # pkgs.emacs will tab complete
         pkgs = import nixpkgs {
           inherit system;
           overlays = [ emacs-overlay.overlay ];
         };
 
-        # List of Emacsen to generate development shells for
+        # List of Emacsen to generate development shells for.
         emacsPackages = [
-          "emacsUnstable"
-          "emacsGit"
+          "emacs-unstable"
+          "emacs-git"
           "emacs28"
+          "emacs29"
           "emacs"
         ];
+        # To explore available attributes, you can instantiate nixpkgs with the emacs overlay in a nix repl:
+        # pkgs = import (builtins.getFlake "nixpkgs") { system = builtins.currentSystem; overlays = [ (builtins.getFlake ("emacs-overlay")).overlay ];}
+        # pkgs.emacs will tab complete.  pkgs.emacs.version etc describe what's inside.
 
         # let's have a development shell per Emacs!
         devShells = pkgs.lib.genAttrs emacsPackages (emacsPkg:
@@ -113,6 +114,6 @@
         # Augment the devShells with a default so that `nix develop` knows what
         # to do.  Run `nix flake show` to see the results.  Per-system,
         # per-Emacs, we have a development environment avaialble.
-        devShells = devShells // { default = devShells.emacsGit; };
+        devShells = devShells // { default = devShells.emacs-git; };
       });
 }

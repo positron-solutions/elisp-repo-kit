@@ -41,7 +41,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        emacsPkg: [ emacs, emacsGit, ]
+        emacsPkg: [ emacs, emacs-git, ]
     runs-on: ${{ matrix.os }}
     # If you update steps, be sure to update the approved actions list in the
     # manual and in your repositories!
