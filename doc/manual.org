@@ -7,7 +7,7 @@
 #+options: broken-links:warn \n:nil ::t |:t ^:nil -:t f:t *:t <:t e:t ':t
 #+options: d:nil todo:nil pri:nil tags:not-in-toc stat:nil
 #+language: en
-#+export_file_name: erk.texinfo
+#+export_file_name: erk.texi
 #+texinfo_dir_category: Emacs
 #+texinfo_dir_title: Elisp Repo Kit: (erk)
 #+texinfo_dir_desc: Create, distribute, and maintain Emacs Lisp packages
@@ -69,7 +69,7 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
      │       ├── ci.yml                    # workflow for lints and tests
      │       └── dco.yml                   # workflow to check DCO sign-offs
      │
-     ├── docs
+     ├── doc
      │   ├── README.org                    # generates README.md
      │   ├── CONTRIBUTING.org              # generates CONTRIBUTING.md
      │   ├── manual.org                    # actual manual
@@ -93,7 +93,7 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
    - Most of the Elisp shortcuts lean on Emacs settings or packages such as
      ~auto-compile~ and ~ert~.
 ** Documenting
-   - The document inputs are stored in /docs.
+   - The document inputs are stored in /doc.
    - They are *written* in org format
    - The README for the Github home page is *exported* to markdown
    - The Manual, which can be used to supplement the README, is itself
@@ -198,9 +198,9 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
    - ci-nix-flake
    - ci-run-shim
    - ci-tests
-   - docs-contributing
-   - docs-manual
-   - docs-readme
+   - doc-contributing
+   - doc-manual
+   - doc-readme
 
    Generated files or extremely common files are not included.  For each one of
    these choices, there is a corresponding command:
@@ -213,12 +213,12 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
    - ~erk-find-ci-run-shim~
    #+findex: erk-find-ci-test
    - ~erk-find-ci-test~
-   #+findex: erk-find-docs-contributing
-   - ~erk-find-docs-contributing~
-   #+findex: erk-find-docs-manual
-   - ~erk-find-find-docs-manual~
-   #+findex: erk-find-docs-readme
-   - ~erk-find-docs-readme~
+   #+findex: erk-find-doc-contributing
+   - ~erk-find-doc-contributing~
+   #+findex: erk-find-doc-manual
+   - ~erk-find-find-doc-manual~
+   #+findex: erk-find-doc-readme
+   - ~erk-find-doc-readme~
 
 * Documenting Your Package
 #+cindex: document re-structuring
@@ -226,12 +226,12 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
 How this manual is created and maintained.  Elisp Repo Kit's manual scheme
 overview:
 - Contents for the README and built-in manual are mostly stored in
-  [[./manual.org][/docs/manual.org]]
-- Each document stitches together the contents of [[./manual.org][/docs/manual.org]] using
+  [[./manual.org][/doc/manual.org]]
+- Each document stitches together the contents of [[./manual.org][/doc/manual.org]] using
   =#+include:= directives.  Some of the header, footer, and export information
   just controls formatting.
-- The [[../README.md][README.md]] for your repository's home page is generated from [[./README.org][/docs/README.org]]
-- The [[./manual.texi]] is generated from [[./manual.org][/docs/manual.org]]
+- The [[../README.md][README.md]] for your repository's home page is generated from [[./README.org][/doc/README.org]]
+- The [[./erk.texi]] is generated from [[./manual.org][/doc/manual.org]]
 - Re-generation-on-save is automatically configured at the end of each document
 - The .gitignore will ignore any intermediate outputs, so there's no need to
   store them in /tmp or clean them
@@ -602,7 +602,7 @@ overview:
    of files that you generally can just copy and enjoy the updates for:
 
    - .github/pull_request_template.md
-   - docs/CONTRIBUTING.org
+   - doc/CONTRIBUTING.org
 
    Some files are usually tweaked, but only a little bit.  Drastic overhauls
    will be mentioned in change notes.  You probably want to update by hand:
@@ -619,8 +619,8 @@ overview:
    Other files which occasionally receive updates, but changes that you likely
    *do not* want at all:
 
-   - docs/README.org
-   - docs/manual.org
+   - doc/README.org
+   - doc/manual.org
 
    These files are *generated*, so you can ignore upstream changes even though
    they are under version control:
@@ -628,7 +628,7 @@ overview:
    - .github/flake.lock
    - README.md
    - CONTRIBUTING.md
-   - docs/manual.texi
+   - doc/erk.texi
 
 ** Nix
    By using Nix, your repository can declare a fixed set of dependencies for

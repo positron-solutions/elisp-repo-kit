@@ -130,8 +130,8 @@ you can redistribute it and/or modify
   "List of (DIR SRC DEST) forms.")
 
 (defconst erk--files-with-strings
-  '("docs/manual.org"
-    "docs/README.org"
+  '("doc/manual.org"
+    "doc/README.org"
     "lisp/%s.el"
     "test/%s-test.el"
     ".github/run-shim.el")
@@ -668,9 +668,9 @@ This list's name is easy to forget, so here's a shortcut."
     (ci-nix-flake . ".github/flake.nix")
     (ci-run-shim . ".github/run-shim.el")
     (ci-tests . ".github/workflows/ci.yml")
-    (docs-contributing . "docs/CONTRIBUTING.org")
-    (docs-manual . "docs/manual.org")
-    (docs-readme . "docs/README.org"))
+    (doc-contributing . "doc/CONTRIBUTING.org")
+    (doc-manual . "doc/manual.org")
+    (doc-readme . "doc/README.org"))
   "Paths that exist in an ERK style project.")
 
 ;;;###autoload
@@ -704,22 +704,22 @@ This list's name is easy to forget, so here's a shortcut."
   (erk-find "ci-tests"))
 
 ;;;###autoload
-(defun erk-find-docs-contributing ()
+(defun erk-find-doc-contributing ()
   "Shortcut for `erk-find'."
   (interactive)
-  (erk-find "docs-contributing"))
+  (erk-find "doc-contributing"))
 
 ;;;###autoload
-(defun erk-find-docs-manual ()
+(defun erk-find-doc-manual ()
   "Shortcut for `erk-find'."
   (interactive)
-  (erk-find "docs-manual"))
+  (erk-find "doc-manual"))
 
 ;;;###autoload
-(defun erk-find-docs-readme ()
+(defun erk-find-doc-readme ()
   "Shortcut for `erk-find'."
   (interactive)
-  (erk-find "docs-readme"))
+  (erk-find "doc-readme"))
 
 
 (defun erk--export (filename export-fun)
@@ -744,7 +744,7 @@ With prefix argument, PREVIEW the buffer."
   (interactive "P")
   (erk--export
    (concat (erk--project-root)
-           (cdr (assoc 'docs-contributing erk--find-paths)))
+           (cdr (assoc 'doc-contributing erk--find-paths)))
    #'org-md-export-to-markdown)
   (when preview
     (find-file-read-only-other-window
@@ -758,11 +758,11 @@ With prefix argument, PREVIEW the buffer."
   (interactive "P")
   (erk--export
    (concat (erk--project-root)
-           (cdr (assoc 'docs-manual erk--find-paths)))
+           (cdr (assoc 'doc-manual erk--find-paths)))
    #'org-texinfo-export-to-info)
   (when preview
     (let ((exported-path (concat (erk--project-root)
-                                 (format "docs/%s.info"
+                                 (format "doc/%s.info"
                                          (erk--package-root-feature)))))
       (info-initialize)
       (info-other-window (Info-find-file exported-path)
@@ -775,7 +775,7 @@ With prefix argument, PREVIEW the buffer."
   (interactive "P")
   (erk--export
    (concat (erk--project-root)
-           (cdr (assoc 'docs-readme erk--find-paths)))
+           (cdr (assoc 'doc-readme erk--find-paths)))
    #'org-md-export-to-markdown)
   (when preview
     (find-file-read-only-other-window
