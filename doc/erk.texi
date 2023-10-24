@@ -1,6 +1,6 @@
 \input texinfo    @c -*- texinfo -*-
 @c %**start of header
-@setfilename manual.info
+@setfilename erk.info
 @settitle Elisp Repo Kit
 @documentencoding UTF-8
 @documentlanguage en
@@ -225,7 +225,7 @@ Elisp packages).
 │       ├── ci.yml                    # workflow for lints and tests
 │       └── dco.yml                   # workflow to check DCO sign-offs
 │
-├── docs
+├── doc
 │   ├── README.org                    # generates README.md
 │   ├── CONTRIBUTING.org              # generates CONTRIBUTING.md
 │   ├── manual.org                    # actual manual
@@ -262,7 +262,7 @@ Most of the Elisp shortcuts lean on Emacs settings or packages such as
 
 @itemize
 @item
-The document inputs are stored in /docs.
+The document inputs are stored in /doc.
 @item
 They are @strong{written} in org format
 @item
@@ -427,11 +427,11 @@ ci-run-shim
 @item
 ci-tests
 @item
-docs-contributing
+doc-contributing
 @item
-docs-manual
+doc-manual
 @item
-docs-readme
+doc-readme
 @end itemize
 
 Generated files or extremely common files are not included.  For each one of
@@ -457,20 +457,20 @@ these choices, there is a corresponding command:
 @item
 @code{erk-find-ci-test}
 @end itemize
-@findex erk-find-docs-contributing
+@findex erk-find-doc-contributing
 @itemize
 @item
-@code{erk-find-docs-contributing}
+@code{erk-find-doc-contributing}
 @end itemize
-@findex erk-find-docs-manual
+@findex erk-find-doc-manual
 @itemize
 @item
-@code{erk-find-find-docs-manual}
+@code{erk-find-find-doc-manual}
 @end itemize
-@findex erk-find-docs-readme
+@findex erk-find-doc-readme
 @itemize
 @item
-@code{erk-find-docs-readme}
+@code{erk-find-doc-readme}
 @end itemize
 
 @node Documenting Your Package
@@ -483,15 +483,15 @@ overview:
 @itemize
 @item
 Contents for the README and built-in manual are mostly stored in
-@uref{./manual.org, /docs/manual.org}
+@uref{./manual.org, /doc/manual.org}
 @item
-Each document stitches together the contents of @uref{./manual.org, /docs/manual.org} using
+Each document stitches together the contents of @uref{./manual.org, /doc/manual.org} using
 @samp{#+include:} directives.  Some of the header, footer, and export information
 just controls formatting.
 @item
-The @uref{../README.md, README.md} for your repository's home page is generated from @uref{./README.org, /docs/README.org}
+The @uref{../README.md, README.md} for your repository's home page is generated from @uref{./README.org, /doc/README.org}
 @item
-The @uref{./manual.texi} is generated from @uref{./manual.org, /docs/manual.org}
+The @uref{./erk.texi} is generated from @uref{./manual.org, /doc/manual.org}
 @item
 Re-generation-on-save is automatically configured at the end of each document
 @item
@@ -1060,7 +1060,7 @@ of files that you generally can just copy and enjoy the updates for:
 @item
 .github/pull_request_template.md
 @item
-docs/CONTRIBUTING.org
+doc/CONTRIBUTING.org
 @end itemize
 
 Some files are usually tweaked, but only a little bit.  Drastic overhauls
@@ -1086,9 +1086,9 @@ Other files which occasionally receive updates, but changes that you likely
 
 @itemize
 @item
-docs/README.org
+doc/README.org
 @item
-docs/manual.org
+doc/manual.org
 @end itemize
 
 These files are @strong{generated}, so you can ignore upstream changes even though
@@ -1102,7 +1102,7 @@ README.md
 @item
 CONTRIBUTING.md
 @item
-docs/manual.texi
+doc/erk.texi
 @end itemize
 
 @node Nix

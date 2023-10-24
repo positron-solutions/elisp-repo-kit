@@ -63,27 +63,27 @@ your secrets for Cachix. Read the CI customization section.
 
 # Table of Contents
 
--   [Creating Packages](#orgbf14bf1)
--   [Using ERK for development](#org98720bd)
-    -   [Find Files](#orgf73e424)
--   [File contents and structure](#org8d1783d)
--   [Finish setting up your new GitHub repo](#org9cd1ddb)
-    -   [Optional Steps](#org833c99e)
--   [Customizing CI](#orgaa9298a)
--   [Licensing, Developer Certificate of Origin](#org3be8afd)
--   [Publishing to MELPA](#org09c7298)
-    -   [Creating the recipe](#org7388169)
-    -   [Testing package build](#org629febf)
-    -   [Testing stable package build](#orgb99d9c6)
-    -   [MELPA Lints](#orgfaacc4b)
--   [Maintaining versions](#org8ed3d8a)
--   [Package scope and relation to other work](#org401c164)
-    -   [Dependency Management](#orge880f34)
-    -   [Discovering and Running Tests & Lints](#org5248f8c)
-    -   [Comparisons](#org6350b87)
--   [Contributing](#org9a4b34c)
--   [Footnote on FSF and Emacs Core Licensing](#org4703ea1)
--   [Shout-outs](#org2ad2eb5)
+-   [Creating Packages](#orgea06217)
+-   [Using ERK for development](#orgda302a2)
+    -   [Find Files](#org9122b13)
+-   [File contents and structure](#org18ffd0b)
+-   [Finish setting up your new GitHub repo](#org988dca6)
+    -   [Optional Steps](#orgc464d5d)
+-   [Customizing CI](#org33dd9da)
+-   [Licensing, Developer Certificate of Origin](#orgcf113c3)
+-   [Publishing to MELPA](#org9c83480)
+    -   [Creating the recipe](#org019b7ce)
+    -   [Testing package build](#org06993c8)
+    -   [Testing stable package build](#orgef9b1ab)
+    -   [MELPA Lints](#org250bb5a)
+-   [Maintaining versions](#org375ed39)
+-   [Package scope and relation to other work](#org3eb6510)
+    -   [Dependency Management](#orgdc0473a)
+    -   [Discovering and Running Tests & Lints](#org6ea37ef)
+    -   [Comparisons](#org44a2f6b)
+-   [Contributing](#orgb0d9068)
+-   [Footnote on FSF and Emacs Core Licensing](#org03e68cf)
+-   [Shout-outs](#org63f3161)
 
 
 # Creating Packages
@@ -102,7 +102,7 @@ ask you for:
 
 `erk-new` also calls `erk-rename-relicense` to rename all of the files, string
 replace names, and re-license to GPL3.  It also changes the author and resets
-the git history.  Now just follow the steps in [finish setting up](#org9cd1ddb) Have fun!
+the git history.  Now just follow the steps in [finish setting up](#org988dca6) Have fun!
 
 
 # Using ERK for development
@@ -140,9 +140,9 @@ choices:
 -   ci-nix-flake
 -   ci-run-shim
 -   ci-tests
--   docs-contributing
--   docs-manual
--   docs-readme
+-   doc-contributing
+-   doc-manual
+-   doc-readme
 
 Generated files or extremely common files are not included.  For each one of
 these choices, there is a corresponding command:
@@ -155,11 +155,11 @@ these choices, there is a corresponding command:
 
 -   `erk-find-ci-test`
 
--   `erk-find-docs-contributing`
+-   `erk-find-doc-contributing`
 
--   `erk-find-find-docs-manual`
+-   `erk-find-find-doc-manual`
 
--   `erk-find-docs-readme`
+-   `erk-find-doc-readme`
 
 
 # File contents and structure
@@ -184,7 +184,7 @@ these choices, there is a corresponding command:
     │       ├── ci.yml                    # workflow for lints and tests
     │       └── dco.yml                   # workflow to check DCO sign-offs
     │
-    ├── docs
+    ├── doc
     │   ├── README.org                    # generates README.md
     │   ├── CONTRIBUTING.org              # generates CONTRIBUTING.md
     │   ├── manual.org                    # actual manual
@@ -205,10 +205,10 @@ directories.
 
 You can copy this checklist to your org agenda files:
 
--   [X] Create a repository (from [install](#orgc87b537) instructions)
+-   [X] Create a repository (from [install](#orgff995d3) instructions)
 -   [ ] Create an empty GitHub repository configure it as your git remote
 -   [ ] Set up your git commit signing (and verification so that it's obvious)
-    **and** [sign-off](#org3be8afd) so that it will be hypothetically [straightforward](README.md) for for FSF
+    **and** [sign-off](#orgcf113c3) so that it will be hypothetically [straightforward](README.md) for for FSF
     to pull in your changes if they later change to DCO instead of copyright
     assignment.
 -   [ ] Sign up for [cachix](https://app.cachix.org/) and, create a binary cache with API tokens and public
@@ -234,7 +234,7 @@ You can copy this checklist to your org agenda files:
     **Note**, Python is used to run a DCO check script, nothing more.
 
 -   [ ] Get your package working, pushed, actions run, and CI badges all green
--   [ ] [Publish](#org09c7298) to MELPA
+-   [ ] [Publish](#org9c83480) to MELPA
 -   [ ] Make a post on [reddit](https://reddit.com/r/emacs/) and [mastodon](https://emacs.ch/) about your new package
 
 
