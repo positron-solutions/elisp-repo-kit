@@ -5,28 +5,28 @@ Development process & infrastructure guide.
 
 # Table of Contents
 
--   [Submitting Pull Requests](#orgb429362)
--   [Development](#org65192b8)
-    -   [Running tests](#org8a3ddf5)
-    -   [Lint and byte-compile code](#org599b569)
-    -   [Loading and re-loading your package](#org9cf8d98)
-    -   [Re-generating Documentation](#org791ecf1)
--   [License](#org4e7d017)
--   [Developer Certificate of Origin (DCO)](#orgf6a4cbd)
-    -   [Sign-off](#orgf2ce616)
-    -   [GPG signature](#org6ba1a3a)
-    -   [User setup for submitting changes](#org10cbd6d)
-    -   [Maintaining versions](#org56b075d)
+-   [Submitting Pull Requests](#org1b17b33)
+-   [Development](#org950790d)
+    -   [Running tests](#org90a3509)
+    -   [Lint and byte-compile code](#orgeee441d)
+    -   [Loading and re-loading your package](#org4a1551a)
+    -   [Re-generating Documentation](#orgcbcbabd)
+-   [License](#orgb40cc5f)
+-   [Developer Certificate of Origin (DCO)](#orge0e33df)
+    -   [Sign-off](#org4bc3a74)
+    -   [GPG signature](#orged4d5f8)
+    -   [User setup for submitting changes](#org3d30ff1)
+    -   [Maintaining versions](#org14701d6)
 
 
-<a id="orgb429362"></a>
+<a id="org1b17b33"></a>
 
 # Submitting Pull Requests
 
 Be sure to abide by instructions in [the pull request template](../.github/pull_request_template.md).
 
 
-<a id="org65192b8"></a>
+<a id="org950790d"></a>
 
 # Development
 
@@ -34,7 +34,7 @@ This repository was created with [elisp-repo-kit](https://github.com/positron-so
 development workflows.
 
 
-<a id="org8a3ddf5"></a>
+<a id="org90a3509"></a>
 
 ## Running tests
 
@@ -62,7 +62,7 @@ have.  **You do not need Nix to run tests pretty close to what CI does.** CI
 will use Nix to obtain Emacs & dependencies.
 
 
-<a id="org599b569"></a>
+<a id="orgeee441d"></a>
 
 ## Lint and byte-compile code
 
@@ -86,7 +86,7 @@ You can run the lints manually almost the same as running tests.
     emacs --script .github/run-shim.el -- lint-tests
 
 
-<a id="org9cf8d98"></a>
+<a id="org4a1551a"></a>
 
 ## Loading and re-loading your package
 
@@ -109,7 +109,7 @@ directly, call `emacs-lisp-byte-compile-and-load` or
 `emacs-lisp-native-compile-and-load`.
 
 
-<a id="org791ecf1"></a>
+<a id="orgcbcbabd"></a>
 
 ## Re-generating Documentation
 
@@ -131,7 +131,7 @@ manually type the path to the `manual.info`.  Honestly, just use
  because they use `#+include:` directives.
 
 
-<a id="org4e7d017"></a>
+<a id="orgb40cc5f"></a>
 
 # License
 
@@ -139,7 +139,7 @@ This package is distributed under the terms of the [included license](./COPYING)
 configuration, documentation, and scripts are MIT licensed.
 
 
-<a id="orgf6a4cbd"></a>
+<a id="orge0e33df"></a>
 
 # Developer Certificate of Origin (DCO)
 
@@ -152,7 +152,7 @@ A [copy of the DCO](./DCO) is distributed with this project.  Read its text to
 understand the significance of configuring for sign-off.
 
 
-<a id="orgf2ce616"></a>
+<a id="org4bc3a74"></a>
 
 ## Sign-off
 
@@ -163,7 +163,7 @@ following:
     Signed-off-by: Random J Developer <random@developer.example.org>
 
 
-<a id="org6ba1a3a"></a>
+<a id="orged4d5f8"></a>
 
 ## GPG signature
 
@@ -174,7 +174,7 @@ participating in.  Corroborating user's signature accross a history of works
 strengthens that user's attestation provided by DCO sign-off.
 
 
-<a id="org10cbd6d"></a>
+<a id="org3d30ff1"></a>
 
 ## User setup for submitting changes
 
@@ -249,7 +249,7 @@ equivalent:
     git rebase -i
 
 
-<a id="org56b075d"></a>
+<a id="org14701d6"></a>
 
 ## Maintaining versions
 

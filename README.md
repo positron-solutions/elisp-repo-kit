@@ -63,27 +63,27 @@ your secrets for Cachix. Read the CI customization section.
 
 # Table of Contents
 
--   [Creating Packages](#orgea06217)
--   [Using ERK for development](#orgda302a2)
-    -   [Find Files](#org9122b13)
--   [File contents and structure](#org18ffd0b)
--   [Finish setting up your new GitHub repo](#org988dca6)
-    -   [Optional Steps](#orgc464d5d)
--   [Customizing CI](#org33dd9da)
--   [Licensing, Developer Certificate of Origin](#orgcf113c3)
--   [Publishing to MELPA](#org9c83480)
-    -   [Creating the recipe](#org019b7ce)
-    -   [Testing package build](#org06993c8)
-    -   [Testing stable package build](#orgef9b1ab)
-    -   [MELPA Lints](#org250bb5a)
--   [Maintaining versions](#org375ed39)
--   [Package scope and relation to other work](#org3eb6510)
-    -   [Dependency Management](#orgdc0473a)
-    -   [Discovering and Running Tests & Lints](#org6ea37ef)
-    -   [Comparisons](#org44a2f6b)
--   [Contributing](#orgb0d9068)
--   [Footnote on FSF and Emacs Core Licensing](#org03e68cf)
--   [Shout-outs](#org63f3161)
+-   [Creating Packages](#org7c6d0bd)
+-   [Using ERK for development](#org5cb047b)
+    -   [Find Files](#org2ae729c)
+-   [File contents and structure](#org5a796a2)
+-   [Finish setting up your new GitHub repo](#orgdb7210d)
+    -   [Optional Steps](#orgdc9917c)
+-   [Customizing CI](#org9460d21)
+-   [Licensing, Developer Certificate of Origin](#org6d19600)
+-   [Publishing to MELPA](#orgc3beb87)
+    -   [Creating the recipe](#org8ade52c)
+    -   [Testing package build](#orgfed70c7)
+    -   [Testing stable package build](#orgc9b6993)
+    -   [MELPA Lints](#org81e18de)
+-   [Maintaining versions](#orgc670351)
+-   [Package scope and relation to other work](#org47d3e93)
+    -   [Dependency Management](#orgc8ad0dd)
+    -   [Discovering and Running Tests & Lints](#orgccb17c7)
+    -   [Comparisons](#org41cb3df)
+-   [Contributing](#orgc1b3d95)
+-   [Footnote on FSF and Emacs Core Licensing](#org45c3bc0)
+-   [Shout-outs](#orgf24edcf)
 
 
 # Creating Packages
@@ -102,7 +102,7 @@ ask you for:
 
 `erk-new` also calls `erk-rename-relicense` to rename all of the files, string
 replace names, and re-license to GPL3.  It also changes the author and resets
-the git history.  Now just follow the steps in [finish setting up](#org988dca6) Have fun!
+the git history.  Now just follow the steps in [finish setting up](#orgdb7210d) Have fun!
 
 
 # Using ERK for development
@@ -187,8 +187,8 @@ these choices, there is a corresponding command:
     ├── doc
     │   ├── README.org                    # generates README.md
     │   ├── CONTRIBUTING.org              # generates CONTRIBUTING.md
-    │   ├── manual.org                    # actual manual
-    │   └── manual.texi                   # generated manual for distribution
+    │   ├── manual.org                    # actual manual source
+    │   └── erk.texi                      # generated manual for distribution
     │
     ├── lisp
     │   └── erk.el                        # the package
@@ -205,10 +205,10 @@ directories.
 
 You can copy this checklist to your org agenda files:
 
--   [X] Create a repository (from [install](#orgff995d3) instructions)
+-   [X] Create a repository (from [install](#org78940f4) instructions)
 -   [ ] Create an empty GitHub repository configure it as your git remote
 -   [ ] Set up your git commit signing (and verification so that it's obvious)
-    **and** [sign-off](#orgcf113c3) so that it will be hypothetically [straightforward](README.md) for for FSF
+    **and** [sign-off](#org6d19600) so that it will be hypothetically [straightforward](README.md) for for FSF
     to pull in your changes if they later change to DCO instead of copyright
     assignment.
 -   [ ] Sign up for [cachix](https://app.cachix.org/) and, create a binary cache with API tokens and public
@@ -234,7 +234,7 @@ You can copy this checklist to your org agenda files:
     **Note**, Python is used to run a DCO check script, nothing more.
 
 -   [ ] Get your package working, pushed, actions run, and CI badges all green
--   [ ] [Publish](#org9c83480) to MELPA
+-   [ ] [Publish](#orgc3beb87) to MELPA
 -   [ ] Make a post on [reddit](https://reddit.com/r/emacs/) and [mastodon](https://emacs.ch/) about your new package
 
 
