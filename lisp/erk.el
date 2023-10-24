@@ -762,7 +762,8 @@ With prefix argument, PREVIEW the buffer."
    #'org-texinfo-export-to-info)
   (when preview
     (let ((exported-path (concat (erk--project-root)
-                                 "docs/manual.info")))
+                                 (format "docs/%s.info"
+                                         (erk--package-root-feature)))))
       (info-initialize)
       (info-other-window (Info-find-file exported-path)
                          (generate-new-buffer-name "*info*")))))

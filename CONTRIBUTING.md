@@ -124,7 +124,7 @@ To manually export, use the appropriate org mode command:
 -   `org-texinfo-export-to-info`
 
 You can view the manual with prefix argument, `info-display-manual`, and
-manually type the path to the `manual.info`.  Honestly, just use
+manually type the path to the `.info` file.  Honestly, just use
 `elisp-repo-kit`.  This stuff is tedious.
 
 **NOTE** changes to the `manual.org` requires re-generation of other documents

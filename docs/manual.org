@@ -7,6 +7,7 @@
 #+options: broken-links:warn \n:nil ::t |:t ^:nil -:t f:t *:t <:t e:t ':t
 #+options: d:nil todo:nil pri:nil tags:not-in-toc stat:nil
 #+language: en
+#+export_file_name: erk.texinfo
 #+texinfo_dir_category: Emacs
 #+texinfo_dir_title: Elisp Repo Kit: (erk)
 #+texinfo_dir_desc: Create, distribute, and maintain Emacs Lisp packages
