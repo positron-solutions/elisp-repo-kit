@@ -72,8 +72,8 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
      ├── doc
      │   ├── README.org                    # generates README.md
      │   ├── CONTRIBUTING.org              # generates CONTRIBUTING.md
-     │   ├── manual.org                    # actual manual
-     │   └── manual.texi                   # generated manual for distribution
+     │   ├── manual.org                    # actual manual source
+     │   └── erk.texi                      # generated manual for distribution
      │
      ├── lisp
      │   └── erk.el                        # the package

@@ -126,7 +126,8 @@ you can redistribute it and/or modify
 ;; these tweaks will be gladly accepted.
 (defconst erk--rename-maps
   '(("lisp/" "%s.el" nil)
-    ("test/" "%s-test.el" nil))
+    ("test/" "%s-test.el" nil)
+    ("doc/" "%s.texi" nil))
   "List of (DIR SRC DEST) forms.")
 
 (defconst erk--files-with-strings
