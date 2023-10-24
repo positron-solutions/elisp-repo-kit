@@ -91,7 +91,7 @@ Navigating the project
 * Documenting Your Package::
 * Distributing Your Package::
 * Maintaining Your Package::
-* Indices: Indices (1). 
+* Indices::
 
 @detailmenu
 --- The Detailed Node Listing ---
@@ -110,6 +110,9 @@ Install ERK
 
 Using ERK for development
 
+* Loading and re-loading your package::
+* Run tests::
+* Duplicating CI Locally::
 * Find Files::
 
 Documenting Your Package
@@ -117,7 +120,6 @@ Documenting Your Package
 * What makes a good manual::
 * Re-Generating::
 * Formatting::
-* Indices::
 
 What makes a good manual
 
@@ -134,9 +136,6 @@ Formatting
 * Quoting symbols::
 * Elisp Source Blocks::
 * Links::
-
-Indices
-
 * Creating Indices::
 * Adding Entries::
 * Render the Index::
@@ -281,7 +280,7 @@ The CONTRIBUTING guide is @strong{exported} to markdown
 @item
 The repository is designed to be hosted on Github
 @item
-All CI files are stored under @uref{../.github/, ./github}.  (You can include this directory
+All CI files are stored under @uref{./.github/, ./github}.  (You can include this directory
 with minor modifications into other Elisp projects.)
 @item
 Github actions are included for CI@.
@@ -289,7 +288,7 @@ Github actions are included for CI@.
 Dependencies for CI are obtained via Nix.
 @item
 Actions call into Elisp by running Emacs with arguments passed to
-@uref{../.github/ruh-shim.el, .github/run-shim.el}.
+@uref{./.github/run-shim.el, .github/run-shim.el}.
 @item
 Many people install packages directly from repositories (because we like
 supply-chain attacks), so keep your installation instructions up to date.
@@ -372,40 +371,44 @@ GitHub user or organization
 @findex erk-rename-relicense
 @code{erk-new} also calls @code{erk-rename-relicense} to rename all of the files, string
 replace names, and re-license to GPL3.  It also changes the author and resets
-the git history.  Now just follow the steps in Have fun!
+the git history.  Now just follow the steps in @ref{Setting Up Your Github Repository, , finish setting up}. Have fun!
 
 @node Using ERK for development
 @chapter Using ERK for development
 
 Elisp repo kit contains some convenience functions to reload your package and
 to discover and run ert tests.  These shortcuts just make common cases faster.
-@itemize
-@item
-Loading and re-loading your package
+
+@menu
+* Loading and re-loading your package::
+* Run tests::
+* Duplicating CI Locally::
+* Find Files::
+@end menu
+
+@node Loading and re-loading your package
+@section Loading and re-loading your package
+
 @findex erk-reload-project-package
 @code{erk-reload-project-package} will unload and recompile your package if
 necessary and then reload it.
 
 @findex erk-reload-project-tests
 @code{erk-reload-project-tests} is the complementary command for reloading tests.
-@end itemize
-@itemize
-@item
-Run tests
+
+@node Run tests
+@section Run tests
+
 @findex erk-ert-project~
 @code{erk-ert-project} will discover, rebuild & reload if necessary, and run
 tests.  There are a few other commands to augment the @uref{https://www.gnu.org/software/emacs/manual/html_node/ert/, ert} package.
 
-@item
-Duplicating CI Locally
-The CI configuration is all stored in @uref{../.github/, .github}.  Usually you will want
-development instructions in your new repository.  The @uref{./CONTRIBUTING.org, CONTRIBUTING} guide
-contains instructions to reproduce the CI behavior.
-@end itemize
+@node Duplicating CI Locally
+@section Duplicating CI Locally
 
-@menu
-* Find Files::
-@end menu
+The CI configuration is all stored in @uref{./.github/, .github}.  Usually you will want
+development instructions in your new repository.  The @uref{./CONTRIBUTING.md, CONTRIBUTING} guide
+contains instructions to reproduce the CI behavior.
 
 @node Find Files
 @section Find Files
@@ -489,7 +492,7 @@ Each document stitches together the contents of @uref{./manual.org, /doc/manual.
 @samp{#+include:} directives.  Some of the header, footer, and export information
 just controls formatting.
 @item
-The @uref{../README.md, README.md} for your repository's home page is generated from @uref{./README.org, /doc/README.org}
+The @uref{./README.md, README.md} for your repository's home page is generated from @uref{./README.org, /doc/README.org}
 @item
 The @uref{./erk.texi} is generated from @uref{./manual.org, /doc/manual.org}
 @item
@@ -503,7 +506,6 @@ store them in /tmp or clean them
 * What makes a good manual::
 * Re-Generating::
 * Formatting::
-* Indices::
 @end menu
 
 @node What makes a good manual
@@ -674,6 +676,9 @@ sure that your beautiful org document also generates a useful manual.
 * Quoting symbols::
 * Elisp Source Blocks::
 * Links::
+* Creating Indices::
+* Adding Entries::
+* Render the Index::
 @end menu
 
 @node Quoting symbols
@@ -702,10 +707,7 @@ formats such as running elisp expressions through links may not work.
 
 The syntax is @samp{[[http://somewhere.com][label for my link]]} if you are
 unfamiliar.
-
-@node Indices
-@section Indices
-
+** Indices
 @cindex document indices
 Texi has a lot of built-in support for indexes.  Until we have GPT for your
 manual, indexes are a good way to provide alternative views into your
@@ -714,12 +716,6 @@ manual, arranged by entities of similar type.
 Have a look at the docs generation for org, magit, transient, and
 hyperdrive for more extensive examples.  Typically the are using a setup file
 to declare export options.
-
-@menu
-* Creating Indices::
-* Adding Entries::
-* Render the Index::
-@end menu
 
 @node Creating Indices
 @subsection Creating Indices :item:
@@ -889,9 +885,9 @@ to turn off tests for @code{emacsGit} etc because the build times are about
 @node Customizing CI
 @section Customizing CI
 
-The @uref{../.github/run-shim.el, run-shim.el} script is just provides a CLI interface for adding commands in
-the @uref{../.github/workflows/ci.yml, ci.yml} CI declaration.  Each action step just loads the shell, declared in
-the @uref{../.github/flake.nix, flake.nix} and then runs the shim in Emacs.  The shim consumes the CLI
+The @uref{./.github/run-shim.el, run-shim.el} script is just provides a CLI interface for adding commands in
+the @uref{./.github/workflows/ci.yml, ci.yml} CI declaration.  Each action step just loads the shell, declared in
+the @uref{./.github/flake.nix, flake.nix} and then runs the shim in Emacs.  The shim consumes the CLI
 command arguments, so you can parameterize the invocations that way.
 
 @itemize
@@ -906,10 +902,10 @@ If you need extra 3rd party dependencies, add them to @code{packages} in the cal
 to @code{mkShell}.
 @item
 To invoke different elisp operations, add / modify the commands in
-@uref{../.github/run-shim.el, run-shim.el}.
+@uref{./.github/run-shim.el, run-shim.el}.
 @end itemize
 
-There's more information in @uref{../CONTRIBUTING.md, CONTRIBUTING} about running commands locally.  You
+There's more information in @uref{./CONTRIBUTING.md, CONTRIBUTING} about running commands locally.  You
 will want this information in your new repository.
 
 @node Licensing Developer Certificate of Origin
@@ -923,7 +919,7 @@ changes to your project, it will be very hard to change to the GPL3 later, so
 consider this choice.
 
 The new repository will also come with DCO sign-off checking on PR's.  The
-instructions are in the @uref{../CONTRIBUTING.md, CONTRIBUTING} guide.  A DCO sign-off policy will give
+instructions are in the @uref{./CONTRIBUTING.md, CONTRIBUTING} guide.  A DCO sign-off policy will give
 your project a clear attestation of sufficient direct or transitive authority
 from each contributor to submit changes under the terms of your project's
 license.  This can only improve your legal protection from incidentally
@@ -1123,7 +1119,7 @@ dependencies.
 
 @cindex nix dependency updating
 
-The Nix @uref{../github/flake.nix, flake.nix} is where versions are declared.  The @uref{../.github/flake.lock, flake.lock} stores a
+The Nix @uref{./.github/flake.nix, flake.nix} is where versions are declared.  The @uref{./.github/flake.lock, flake.lock} stores a
 fixed value for these declarations.  These fixed versions need periodic
 update.  Nixpkgs has a new release about every six months.  You can check
 their @uref{https://github.com/NixOS/nixpkgs/branches, branches} and @uref{https://github.com/NixOS/nixpkgs/tags, tags} to see what's current.  The effect is similar to
@@ -1230,7 +1226,7 @@ By changing the versions within the flake to match the versions in question
 that are breaking, the user can try versions to confirm a version mismatch and
 then give you their flake so that you can reproduce and confirm a fix.
 
-@node Indices (1)
+@node Indices
 @chapter Indices
 
 @menu

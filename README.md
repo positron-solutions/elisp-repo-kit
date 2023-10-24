@@ -63,27 +63,26 @@ your secrets for Cachix. Read the CI customization section.
 
 # Table of Contents
 
--   [Creating Packages](#org7c6d0bd)
--   [Using ERK for development](#org5cb047b)
-    -   [Find Files](#org2ae729c)
--   [File contents and structure](#org5a796a2)
--   [Finish setting up your new GitHub repo](#orgdb7210d)
-    -   [Optional Steps](#orgdc9917c)
--   [Customizing CI](#org9460d21)
--   [Licensing, Developer Certificate of Origin](#org6d19600)
--   [Publishing to MELPA](#orgc3beb87)
-    -   [Creating the recipe](#org8ade52c)
-    -   [Testing package build](#orgfed70c7)
-    -   [Testing stable package build](#orgc9b6993)
-    -   [MELPA Lints](#org81e18de)
--   [Maintaining versions](#orgc670351)
--   [Package scope and relation to other work](#org47d3e93)
-    -   [Dependency Management](#orgc8ad0dd)
-    -   [Discovering and Running Tests & Lints](#orgccb17c7)
-    -   [Comparisons](#org41cb3df)
--   [Contributing](#orgc1b3d95)
--   [Footnote on FSF and Emacs Core Licensing](#org45c3bc0)
--   [Shout-outs](#orgf24edcf)
+-   [Creating Packages](#org8f89e2d)
+-   [Using ERK for development](#org634d2bc)
+    -   [Find Files](#org4337be9)
+-   [File contents and structure](#org216d1ea)
+    -   [Setting Up Your Github Repository](#org2d988e4)
+-   [Customizing CI](#org451ffdb)
+-   [Licensing, Developer Certificate of Origin](#org1de3655)
+-   [Publishing to MELPA](#org6ad8b28)
+    -   [Creating the recipe](#orga968d33)
+    -   [Testing package build](#org61a373c)
+    -   [Testing stable package build](#org05aef0d)
+    -   [MELPA Lints](#orga1cf780)
+-   [Maintaining versions](#orge89d3e9)
+-   [Package scope and relation to other work](#org8cc4546)
+    -   [Dependency Management](#orgcf9d699)
+    -   [Discovering and Running Tests & Lints](#orgd516806)
+    -   [Comparisons](#org78c421e)
+-   [Contributing](#org10cc81e)
+-   [Footnote on FSF and Emacs Core Licensing](#org65e7167)
+-   [Shout-outs](#org6008479)
 
 
 # Creating Packages
@@ -102,7 +101,7 @@ ask you for:
 
 `erk-new` also calls `erk-rename-relicense` to rename all of the files, string
 replace names, and re-license to GPL3.  It also changes the author and resets
-the git history.  Now just follow the steps in [finish setting up](#orgdb7210d) Have fun!
+the git history.  Now just follow the steps in [finish setting up](#org2d988e4). Have fun!
 
 
 # Using ERK for development
@@ -123,7 +122,7 @@ to discover and run ert tests.  These shortcuts just make common cases faster.
     tests.  There are a few other commands to augment the [ert](https://www.gnu.org/software/emacs/manual/html_node/ert/) package.
 
 -   Duplicating CI Locally
-    The CI configuration is all stored in [.github](../.github/).  Usually you will want
+    The CI configuration is all stored in [.github](./.github/).  Usually you will want
     development instructions in your new repository.  The [CONTRIBUTING](./CONTRIBUTING.md) guide
     contains instructions to reproduce the CI behavior.
 
@@ -201,14 +200,14 @@ You can use either a multi-file or flat layout for lisp.  Just name test files
 directories.
 
 
-# Finish setting up your new GitHub repo
+## Setting Up Your Github Repository
 
 You can copy this checklist to your org agenda files:
 
--   [X] Create a repository (from [install](#org78940f4) instructions)
+-   [X] Create a repository (from [install](#orgaf2c287) instructions)
 -   [ ] Create an empty GitHub repository configure it as your git remote
 -   [ ] Set up your git commit signing (and verification so that it's obvious)
-    **and** [sign-off](#org6d19600) so that it will be hypothetically [straightforward](README.md) for for FSF
+    **and** [sign-off](#org1de3655) so that it will be hypothetically [straightforward](README.md) for for FSF
     to pull in your changes if they later change to DCO instead of copyright
     assignment.
 -   [ ] Sign up for [cachix](https://app.cachix.org/) and, create a binary cache with API tokens and public
@@ -234,11 +233,11 @@ You can copy this checklist to your org agenda files:
     **Note**, Python is used to run a DCO check script, nothing more.
 
 -   [ ] Get your package working, pushed, actions run, and CI badges all green
--   [ ] [Publish](#orgc3beb87) to MELPA
+-   [ ] [Publish](#org6ad8b28) to MELPA
 -   [ ] Make a post on [reddit](https://reddit.com/r/emacs/) and [mastodon](https://emacs.ch/) about your new package
 
 
-## Optional Steps
+### Optional Steps
 
 -   [ ] Branch protect and enable check requirements for your default branch
     (usually master).  Merge commits, verified only, and no force push are
@@ -260,9 +259,9 @@ to turn off tests for `emacsGit` etc because the build times are about
 
 # Customizing CI
 
-The [run-shim.el](../.github/run-shim.el) script is just provides a CLI interface for adding commands in
-the [ci.yml](../.github/workflows/ci.yml) CI declaration.  Each action step just loads the shell, declared in
-the [flake.nix](../.github/flake.nix) and then runs the shim in Emacs.  The shim consumes the CLI
+The [run-shim.el](./.github/run-shim.el) script is just provides a CLI interface for adding commands in
+the [ci.yml](./.github/workflows/ci.yml) CI declaration.  Each action step just loads the shell, declared in
+the [flake.nix](./.github/flake.nix) and then runs the shim in Emacs.  The shim consumes the CLI
 command arguments, so you can parameterize the invocations that way.
 
 -   If you need extra elisp dependencies during CI, add them to the `epkgs` list
@@ -271,9 +270,9 @@ command arguments, so you can parameterize the invocations that way.
 -   If you need extra 3rd party dependencies, add them to `packages` in the call
     to `mkShell`.
 -   To invoke different elisp operations, add / modify the commands in
-    [run-shim.el](../.github/run-shim.el).
+    [run-shim.el](./.github/run-shim.el).
 
-There's more information in [CONTRIBUTING](../CONTRIBUTING.md) about running commands locally.  You
+There's more information in [CONTRIBUTING](./CONTRIBUTING.md) about running commands locally.  You
 will want this information in your new repository.
 
 
@@ -287,7 +286,7 @@ changes to your project, it will be very hard to change to the GPL3 later, so
 consider this choice.
 
 The new repository will also come with DCO sign-off checking on PR's.  The
-instructions are in the [CONTRIBUTING](../CONTRIBUTING.md) guide.  A DCO sign-off policy will give
+instructions are in the [CONTRIBUTING](./CONTRIBUTING.md) guide.  A DCO sign-off policy will give
 your project a clear attestation of sufficient direct or transitive authority
 from each contributor to submit changes under the terms of your project's
 license.  This can only improve your legal protection from incidentally
@@ -380,7 +379,7 @@ you to read the instructions.
 
 # Maintaining versions
 
-The Nix [flake.nix](../github/flake.nix) is where versions are declared.  The [flake.lock](../.github/flake.lock) stores a
+The Nix [flake.nix](./.github/flake.nix) is where versions are declared.  The [flake.lock](./.github/flake.lock) stores a
 fixed value for these declarations.  These fixed versions need periodic
 update.  Nixpkgs has a new release about every six months.  You can check
 their [branches](https://github.com/NixOS/nixpkgs/branches) and [tags](https://github.com/NixOS/nixpkgs/tags) to see what's current.  The effect is similar to
@@ -494,7 +493,7 @@ and how they relate to each other.
 
 [nix-emacs-ci](https://github.com/purcell/nix-emacs-ci) capture the work needed to provide a running Emacs to CI.  Tools
 like [eldev](https://github.com/doublep/eldev#continuous-integration) and [makem.sh](https://github.com/alphapapa/makem.sh/blob/master/test.yml) have support for providing dependencies to that Emacs.
-The Nix flake [in this project](../flake.nix) describes both of these tasks.  Makem and Eldev
+The Nix flake [in this project](./.github/flake.nix) describes both of these tasks.  Makem and Eldev
 etc document Gihub workflows, but **the workflows in this repository are meant to
 be used out-of-the-box after cloning**, although to be fair, there's more
 decisions than actual work.
