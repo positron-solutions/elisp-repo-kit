@@ -564,7 +564,8 @@ test, manual, or CI though)
   (erk--replace-strings
    template clone-dir replacements)
   (erk--rename-package template clone-dir replacements)
-  (let ((default-directory clone-dir))
+  (let ((default-directory clone-dir)
+        (enable-local-variables nil))
     (erk-export-docs)))
 
 ;;;###autoload
