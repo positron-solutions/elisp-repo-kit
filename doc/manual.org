@@ -170,19 +170,19 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
 * Using ERK for development
   Elisp repo kit contains some convenience functions to reload your package and
   to discover and run ert tests.  These shortcuts just make common cases faster.
-  - Loading and re-loading your package
-    #+findex: erk-reload-project-package
-    ~erk-reload-project-package~ will unload and recompile your package if
-    necessary and then reload it.
+** Loading and re-loading your package
+   #+findex: erk-reload-project-package
+   ~erk-reload-project-package~ will unload and recompile your package if
+   necessary and then reload it.
 
-    #+findex: erk-reload-project-tests
-    ~erk-reload-project-tests~ is the complementary command for reloading tests.
- - Run tests
+   #+findex: erk-reload-project-tests
+   ~erk-reload-project-tests~ is the complementary command for reloading tests.
+** Run tests
    #+findex: erk-ert-project~
    ~erk-ert-project~ will discover, rebuild & reload if necessary, and run
    tests.  There are a few other commands to augment the [[https://www.gnu.org/software/emacs/manual/html_node/ert/][ert]] package.
 
- - Duplicating CI Locally
+** Duplicating CI Locally
    The CI configuration is all stored in [[file:./.github/][.github]].  Usually you will want
    development instructions in your new repository.  The [[file:./CONTRIBUTING.md][CONTRIBUTING]] guide
    contains instructions to reproduce the CI behavior.
