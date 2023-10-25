@@ -4,4 +4,4 @@
 **trash
 **~
 **.~undo-tree
-/docs/manual.info
+/doc/*.info
