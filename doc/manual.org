@@ -4,7 +4,7 @@
 #+email: {{{package-email}}}
 #+date: 2022-{{{year}}}
 #+property: header-args :eval no`
-#+options: broken-links:mark \n:nil ::t |:t ^:nil -:t f:t *:t <:t e:t ':t
+#+options: broken-links:nil \n:nil ::t |:t ^:nil -:t f:t *:t <:t e:t ':t
 #+options: d:nil todo:nil pri:nil tags:not-in-toc stat:nil
 #+language: en
 #+export_file_name: erk.texi
@@ -101,12 +101,12 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
    - The CONTRIBUTING guide is *exported* to markdown
 ** Distributing
    - The repository is designed to be hosted on Github
-   - All CI files are stored under [[file:../.github/][./github]].  (You can include this directory
+   - All CI files are stored under [[file:./.github/][./github]].  (You can include this directory
      with minor modifications into other Elisp projects.)
    - Github actions are included for CI.
    - Dependencies for CI are obtained via Nix.
    - Actions call into Elisp by running Emacs with arguments passed to
-     [[file:../.github/run-shim.el][.github/run-shim.el]].
+     [[file:./.github/run-shim.el][.github/run-shim.el]].
    - Many people install packages directly from repositories (because we like
      supply-chain attacks), so keep your installation instructions up to date.
    - You are free to submit your package for distribution on MELPA etc.  This
@@ -166,7 +166,7 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
   #+findex: erk-rename-relicense
   ~erk-new~ also calls ~erk-rename-relicense~ to rename all of the files, string
   replace names, and re-license to GPL3.  It also changes the author and resets
-  the git history.  Now just follow the steps in [[*Finish setting up your new GitHub repo][finish setting up]] Have fun!
+  the git history.  Now just follow the steps in [[*Setting Up Your Github Repository][finish setting up]]. Have fun!
 * Using ERK for development
   Elisp repo kit contains some convenience functions to reload your package and
   to discover and run ert tests.  These shortcuts just make common cases faster.
@@ -183,8 +183,8 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
    tests.  There are a few other commands to augment the [[https://www.gnu.org/software/emacs/manual/html_node/ert/][ert]] package.
 
  - Duplicating CI Locally
-   The CI configuration is all stored in [[file:../.github/][.github]].  Usually you will want
-   development instructions in your new repository.  The [[file:../CONTRIBUTING.md][CONTRIBUTING]] guide
+   The CI configuration is all stored in [[file:./.github/][.github]].  Usually you will want
+   development instructions in your new repository.  The [[file:./CONTRIBUTING.md][CONTRIBUTING]] guide
    contains instructions to reproduce the CI behavior.
 ** Find Files
    Accidentally editing generated files or forgetting the path to a file is
@@ -230,7 +230,7 @@ overview:
 - Each document stitches together the contents of [[file:./manual.org][/doc/manual.org]] using
   =#+include:= directives.  Some of the header, footer, and export information
   just controls formatting.
-- The [[file:../README.md][README.md]] for your repository's home page is generated from [[file:./README.org][/doc/README.org]]
+- The [[file:./README.md][README.md]] for your repository's home page is generated from [[file:./README.org][/doc/README.org]]
 - The [[file:./erk.texi]] is generated from [[file:./manual.org][/doc/manual.org]]
 - Re-generation-on-save is automatically configured at the end of each document
 - The .gitignore will ignore any intermediate outputs, so there's no need to
@@ -465,9 +465,9 @@ overview:
 
 ** Customizing CI
 
-   The [[file:../.github/run-shim.el][run-shim.el]] script is just provides a CLI interface for adding commands in
-   the [[file:../.github/workflows/ci.yml][ci.yml]] CI declaration.  Each action step just loads the shell, declared in
-   the [[file:../.github/flake.nix][flake.nix]] and then runs the shim in Emacs.  The shim consumes the CLI
+   The [[file:./.github/run-shim.el][run-shim.el]] script is just provides a CLI interface for adding commands in
+   the [[file:./.github/workflows/ci.yml][ci.yml]] CI declaration.  Each action step just loads the shell, declared in
+   the [[file:./.github/flake.nix][flake.nix]] and then runs the shim in Emacs.  The shim consumes the CLI
    command arguments, so you can parameterize the invocations that way.
 
    - If you need extra elisp dependencies during CI, add them to the ~epkgs~ list
@@ -476,9 +476,9 @@ overview:
    - If you need extra 3rd party dependencies, add them to ~packages~ in the call
      to ~mkShell~.
    - To invoke different elisp operations, add / modify the commands in
-     [[file:../.github/run-shim.el][run-shim.el]].
+     [[file:./.github/run-shim.el][run-shim.el]].
 
-   There's more information in [[file:../CONTRIBUTING.md][CONTRIBUTING]] about running commands locally.  You
+   There's more information in [[file:./CONTRIBUTING.md][CONTRIBUTING]] about running commands locally.  You
    will want this information in your new repository.
 
 ** Licensing, Developer Certificate of Origin
@@ -490,7 +490,7 @@ overview:
    consider this choice.
 
    The new repository will also come with DCO sign-off checking on PR's.  The
-   instructions are in the [[file:../CONTRIBUTING.md][CONTRIBUTING]] guide.  A DCO sign-off policy will give
+   instructions are in the [[file:./CONTRIBUTING.md][CONTRIBUTING]] guide.  A DCO sign-off policy will give
    your project a clear attestation of sufficient direct or transitive authority
    from each contributor to submit changes under the terms of your project's
    license.  This can only improve your legal protection from incidentally
@@ -638,7 +638,7 @@ overview:
 *** Maintaining versions
  #+cindex: nix dependency updating
 
-    The Nix [[file:../.github/flake.nix][flake.nix]] is where versions are declared.  The [[file:../.github/flake.lock][flake.lock]] stores a
+    The Nix [[file:./.github/flake.nix][flake.nix]] is where versions are declared.  The [[file:./.github/flake.lock][flake.lock]] stores a
     fixed value for these declarations.  These fixed versions need periodic
     update.  Nixpkgs has a new release about every six months.  You can check
     their [[https://github.com/NixOS/nixpkgs/branches][branches]] and [[https://github.com/NixOS/nixpkgs/tags][tags]] to see what's current.  The effect is similar to

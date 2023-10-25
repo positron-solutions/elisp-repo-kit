@@ -1,6 +1,7 @@
 #+title: Elisp Repo Kit (ERK)
 #+export_file_name: ../README.md
-#+options: toc:nil broken-links:mark num:nil
+
+#+options: toc:nil broken-links:nil num:nil
 
 #+begin_export html
 <!-- !!!THIS FILE HAS BEEN GENERATED!!! Edit README.org -->
@@ -30,7 +31,7 @@ package contained has commands to streamline elisp development.
 - Built-in Emacs info manual generation
 - [[https://nixos.org/#examples][Nix]] environment for obtaining dependencies or reproducibly developing CI
   locally
-- Licensing, [[https://developercertificate.org/][DCO]], DCO sign-off checks, PR template and [[file:../CONTRIBUTING.md][CONTRIBUTING]] instructions
+- Licensing, [[https://developercertificate.org/][DCO]], DCO sign-off checks, PR template and [[file:./CONTRIBUTING.md][CONTRIBUTING]] instructions
 - [[https://github.com/melpa/melpa][MELPA]] publishing compatible
 
 *To get started:*
@@ -47,10 +48,7 @@ answer all the questions.
 #+include: "manual.org::*Creating Packages" :minlevel 1
 #+include: "manual.org::*Using ERK for development" :minlevel 1
 #+include: "manual.org::*File contents and structure" :minlevel 1
-
-* Finish setting up your new GitHub repo
-#+include: "manual.org::*Setting Up Your Github Repository" :only-contents t
-
+#+include: "manual.org::*Setting Up Your Github Repository"
 #+include: "manual.org::*Customizing CI" :minlevel 1
 #+include: "manual.org::*Licensing, Developer Certificate of Origin" :minlevel 1
 #+include: "manual.org::*Publishing to MELPA" :minlevel 1
@@ -148,7 +146,7 @@ answer all the questions.
 
     [[https://github.com/purcell/nix-emacs-ci][nix-emacs-ci]] capture the work needed to provide a running Emacs to CI.  Tools
     like [[https://github.com/doublep/eldev#continuous-integration][eldev]] and [[https://github.com/alphapapa/makem.sh/blob/master/test.yml][makem.sh]] have support for providing dependencies to that Emacs.
-    The Nix flake [[file:../.github/flake.nix][in this project]] describes both of these tasks.  Makem and Eldev
+    The Nix flake [[file:./.github/flake.nix][in this project]] describes both of these tasks.  Makem and Eldev
     etc document Gihub workflows, but *the workflows in this repository are meant to
     be used out-of-the-box after cloning*, although to be fair, there's more
     decisions than actual work.
@@ -168,7 +166,7 @@ answer all the questions.
   For code-based contribution, first decide if you want to work on this
   repository or fork it to something entirely different.
 
-  The [[file:../CONTRIBUTING.md][CONTRIBUTING]] guide in this repo contains development instructions,
+  The [[file:./CONTRIBUTING.md][CONTRIBUTING]] guide in this repo contains development instructions,
   including singing & sign-off configuration.  You will usually want this file
   in your own repositories.
 
