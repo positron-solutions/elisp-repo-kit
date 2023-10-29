@@ -154,6 +154,8 @@
 
 (ert-deftest erk-new-test ()
   (let ((enable-local-variables nil)
+        (erk-after-new-hook (when (require 'magit nil t)
+                              '(magit-status)))
         (clone-root (make-temp-file "erk-clone-test-" t)))
     (erk-new (cdr (assoc 'erk-basic erk-templates))
              clone-root
