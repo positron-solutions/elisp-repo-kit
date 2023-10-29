@@ -529,7 +529,7 @@ are renaming.  Existing files will be clobbered."
       ;; spdx identifiers.
       (license-templates-new-file "gpl-3.0" default-directory)
       (erk--nze
-       (call-process "cp" nil output nil "--verbose" new-license old-license)
+       (call-process "mv" nil output nil "--verbose" new-license old-license)
        (format "Could not update %s contents." old-license))
       (erk--nze
        (call-process git-bin nil output nil "add" old-license)
