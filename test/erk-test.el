@@ -127,6 +127,18 @@
 (ert-deftest erk--nodash-test ()
   (should (string= (erk--nodash "erk-") "erk")))
 
+(ert-deftest erk--make-defun-symbol-test ()
+  (should (eq (erk--make-defun-symbol 'something-test) 'something)))
+
+(ert-deftest erk--make-test-symbol-test ()
+  (should (eq (erk--make-test-symbol 'something) 'something-test)))
+
+(ert-deftest erk--project-contains-fun-p-test ()
+  (should (erk--project-contains-fun-p 'erk-new)))
+
+(ert-deftest erk--project-contains-p-test ()
+  (should (erk--project-contains-p (erk--project-root-feature-file))))
+
 (ert-deftest erk-clone-test ()
   (let ((enable-local-variables nil)
         (clone-root (make-temp-file "erk-clone-test-" t)))

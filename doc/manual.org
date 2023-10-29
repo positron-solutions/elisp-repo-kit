@@ -177,6 +177,22 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
 
    #+findex: erk-reload-project-tests
    ~erk-reload-project-tests~ is the complementary command for reloading tests.
+** Jumping to files
+#+cindex: jumping
+Lots of locations come in pairs or small sets.  Jumping functions try to go
+between these locations or to a sensible default location.  They are very
+do-what-I-mean (DWIM).
+
+#+findex: erk-jump-features
+- ~erk-jump-features~ is a command that will jump between the feature and its
+  corresponding test feature.  If you aren't in an elisp file, it will jump to
+  the root feature file.
+
+#+findex: erk-jump-defs
+- ~erk-jump-defs~ will try to go to the test definition and even ask insert an
+  ~ert-deftest~ body if you forgot to write the test.  It can then jump back to
+  the function definition.  If it fails, it will fall back to jumping to the
+  feature.
 ** Run tests
    #+findex: erk-ert-project~
    ~erk-ert-project~ will discover, rebuild & reload if necessary, and run

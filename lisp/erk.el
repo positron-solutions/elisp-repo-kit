@@ -51,6 +51,7 @@
 (require 'auto-compile)
 (require 'dash)
 (require 'ert)
+(require 'find-func)
 (require 'finder)
 (require 'license-templates)
 (require 'lisp-mnt)
@@ -186,6 +187,19 @@ you can redistribute it and/or modify
   (let ((root (erk--project-root)))
     (not (or (file-exists-p (concat root "lisp"))
              (file-exists-p (concat root "test"))))))
+
+(defun erk--project-contains-p (file)
+  "Is FILE a member of the current project?"
+  (or (string-prefix-p (erk--project-root) file)
+      (member file (project-files (project-current)))))
+
+(defun erk--project-contains-fun-p (fun)
+  "Is FUN currently defined within the project?
+Returns FUN if it's bound and within the project."
+  (and  (symbol-function fun)
+        (erk--project-contains-p
+         (cdr (find-function-library fun)))
+        fun))
 
 (defun erk--reload (features dir)
   "Reload FEATURES, found in DIR."
@@ -326,6 +340,89 @@ for development, and being lenient for degenerate cases is fine."
       ;; back into elisp files
       (find-file (erk--project-root-feature-file)))))
 
+(defun erk--insert-test (fun buffer)
+  "Insert test named TEST-SYMBOL for FUN into BUFFER."
+  (pop-to-buffer buffer)
+  ;; If the buffer is open and the point is near a defun already, just slam in a
+  ;; test.  If not, put the test in at the end.
+  (if (erk--last-defname)
+      (progn
+        (beginning-of-defun)
+        (forward-sexp))
+    (progn
+      (goto-char (point-max))
+      (backward-sexp)
+      (backward-sexp)
+      (forward-sexp)))
+  (let ((before (format  "\n\n(ert-deftest %s-test ()\n  (should (%s" fun fun))
+        (after ")))"))
+    (insert before)
+    (save-excursion
+      (insert after))))
+
+(defun erk--last-defname ()
+  "Return previous definition and name.
+Returns nil if we don't know what kind of definition it is or
+what to do with it (yet).  Returns `(def . name)' form."
+  (save-excursion
+    (beginning-of-defun)
+    (pcase-let* ((`(,def ,name)
+                  (funcall load-read-function (current-buffer))))
+      (cons def name))))
+
+(defun erk--make-test-symbol (symbol)
+  "Convert defun SYMBOL into test symbol."
+  (intern (concat (symbol-name symbol) "-test" )))
+
+(defun erk--make-defun-symbol (symbol)
+  "Convert test SYMBOL into defun symbol."
+  (let ((name (symbol-name symbol)))
+    (when (string-match "\\(.*\\)-test\\'" name)
+      (intern (match-string 1 name)))))
+
+;; TODO Possibly add some heuristics to find improper names.  Missing test
+;; suffix is one such irritant.  Check the feature.
+(defun erk-jump-defs ()
+  "Jump between defuns and their test defs.
+For now, only the rigid pairing of an `ert-deftest' and it's
+corresponding `defun' are supported."
+  (interactive)
+  (pcase-let* ((`(,def . ,name) (erk--last-defname)))
+    (pcase def
+      ;; Find the def, try reloading if it's defined from somewhere outside the
+      ;; project, such as within an installed version of the package.
+      (`defun
+          ;; TODO Doesn't check if test is defined inside the project.  Rare,
+          ;; but not if working on two versions of a project.  Let's let the
+          ;; interfaces normalize a bit.
+          (let* ((test-name (erk--make-test-symbol name))
+                 (test (or (when (ert-test-boundp test-name) test-name)
+                           (progn (erk-reload-project-tests)
+                                  (when (ert-test-boundp test-name) test-name)))))
+            (if test
+                (progn (ert-find-test-other-window test)
+                       (forward-sexp))
+              (let ((test-buffer (erk-jump-features)))
+                (when (y-or-n-p (format  "%s not found.  Create? "
+                                         test-name))
+                  (erk--insert-test name test-buffer))))))
+      (`ert-deftest
+          (let* ((def-name (erk--make-defun-symbol name))
+                 (def (or (erk--project-contains-fun-p def-name)
+                          (progn (erk-reload-project-package)
+                                 (erk--project-contains-fun-p def-name)))))
+            (if def
+                (progn
+                  (find-function-do-it def nil 'switch-to-buffer)
+                  (forward-sexp))
+              (progn (erk-jump-features)
+                     (user-error "Definition not found: %s" def-name)))))
+      (_
+       (user-error
+        "No compatible def before point.  def: %s name: %s"
+        def name)))))
+
+
 ;;;###autoload
 (defun erk-ert-rerun-this-no-reload ()
   "Rerun the ert test at point, but don't reload anything.
@@ -344,6 +441,7 @@ middle of a command."
   "Rerun the ert test at point.
 Will reload all features and test features."
   (interactive)
+  ;; TODO integrate ERT and commands within buffer
   (erk-reload-project-package)
   (erk-reload-project-tests)
   (save-excursion
