@@ -167,6 +167,26 @@ you can redistribute it and/or modify
           (funcall #'project-root project))
         default-directory)))
 
+(defun erk--lisp-directory ()
+  "Heuristic to find where package files are stored."
+  (let ((root (erk--project-root)))
+        (if (erk--project-flat-p)
+            root
+          (file-name-as-directory (concat root "lisp")))))
+
+(defun erk--test-directory ()
+  "Heuristic to find where package files are stored."
+  (let ((root (erk--project-root)))
+        (if (erk--project-flat-p)
+            root
+          (file-name-as-directory (concat root "test")))))
+
+(defun erk--project-flat-p ()
+  "Heuristic to detect flat project structure."
+  (let ((root (erk--project-root)))
+    (not (or (file-exists-p (concat root "lisp"))
+             (file-exists-p (concat root "test"))))))
+
 (defun erk--reload (features dir)
   "Reload FEATURES, found in DIR."
   (dolist (feature features)
@@ -289,6 +309,22 @@ for development, and being lenient for degenerate cases is fine."
                             (string-match-p (symbol-name it) (rx "-test.el" eol))
                             (erk--dir-features project-test-dir))))
     (erk--reload package-features project-test-dir)))
+
+(defun erk-jump-features ()
+  "Jump between the corresponding package and test features."
+  (interactive)
+  (let ((file (file-name-nondirectory (buffer-file-name (current-buffer)))))
+    (if (string-match-p ".*\\.el" file)
+        (find-file (if (string-match "\\(.*\\)-tests?\\.el" file)
+                       (concat (erk--lisp-directory)
+                               (match-string 1 file) ".el")
+                     (concat (erk--test-directory)
+                             (and (string-match "\\(.*\\)\\.el" file)
+                                  (match-string 1 file))
+                             "-test.el")))
+      ;; fallback, go to root feature, convenient shortcut
+      ;; back into elisp files
+      (find-file (erk--project-root-feature-file)))))
 
 ;;;###autoload
 (defun erk-ert-rerun-this-no-reload ()

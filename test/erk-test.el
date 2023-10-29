@@ -82,6 +82,39 @@
   (should (string= (car (erk--expand-filenames '("%s-foo.el") "doo"))
                    "doo-foo.el")))
 
+(ert-deftest erk--lisp-directory ()
+  (should (not (string-match-p "test" (erk--lisp-directory))))
+  (should (string-match-p "lisp" (erk--lisp-directory))))
+
+(ert-deftest erk--test-directory ()
+  (should (not (string-match-p "lisp" (erk--test-directory))))
+  (should (string-match-p "test" (erk--test-directory))))
+
+(ert-deftest erk-jump-features-test ()
+  ;; jump to feature when in tests
+  (should
+   (save-excursion
+     ;;  test normally executes in a temporary buffer but `erk-jump-features'
+     ;;  relies on `current-buffer'.
+     (find-file (erk--project-root-feature-file))
+     (erk-jump-features)
+     (string-match-p "test" default-directory)))
+  ;; jump to tests when in feature
+  (should
+   (save-excursion
+     (find-file (concat (erk--test-directory) "erk-test.el"))
+     (erk-jump-features)
+     (string-match-p "lisp" default-directory)))
+  ;; jump to feature when in root
+  (should
+   (save-excursion
+     (find-file (concat (erk--project-root) "README.md"))
+     (erk-jump-features)
+     (string-match-p "lisp" default-directory))))
+
+(ert-deftest erk--test-directory ()
+  (should (erk--test-directory)))
+
 (ert-deftest erk--project-elisp-dir-test ()
   (should (erk--project-elisp-dir)))
 
