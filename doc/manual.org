@@ -723,6 +723,13 @@ overview:
 ~erk-after-new-hook~ will be run after you create a new repository.  The
 ~default-directory~ is set to the newly cloned directory.  By default it runs
 ~magit-status~, where you can check the renaming results.
+
+#+vindex: erk-templates
+~erk-templates~ can be set to default to your own favorite template.  If you want
+to fork [[https://github.com/positron-solutions/erk-basic][erk-basic]], you can set this to point to your fork.  If you are making a
+radically different template, consider a PR to mention your fork or even add it
+to the defaults!  (Please don't abuse this privilege to execute a supply chain
+attack or we will find you).
 * Conventions
 #+cindex: conventions
 ERK relies on [[info:elisp#Packaging][(elisp)standard practices]] to discover files.
