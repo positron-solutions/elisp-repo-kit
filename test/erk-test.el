@@ -82,12 +82,12 @@
   (should (string= (car (erk--expand-filenames '("%s-foo.el") "doo"))
                    "doo-foo.el")))
 
-(ert-deftest erk--lisp-directory ()
+(ert-deftest erk--lisp-directory-test ()
   (should (not (string-match-p "test" (erk--lisp-directory))))
   (should (string-match-p "lisp" (erk--lisp-directory))))
 
-(ert-deftest erk--test-directory ()
-  (should (not (string-match-p "lisp" (erk--test-directory))))
+(ert-deftest erk--test-directory-test ()
+  (should (not (string-match-p "lisp/?$" (erk--test-directory))))
   (should (string-match-p "test" (erk--test-directory))))
 
 (ert-deftest erk-jump-features-test ()
@@ -111,9 +111,6 @@
      (find-file (concat (erk--project-root) "README.md"))
      (erk-jump-features)
      (string-match-p "lisp" default-directory))))
-
-(ert-deftest erk--test-directory ()
-  (should (erk--test-directory)))
 
 (ert-deftest erk--project-elisp-dir-test ()
   (should (erk--project-elisp-dir)))
