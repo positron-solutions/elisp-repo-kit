@@ -191,10 +191,10 @@ try changing them, go ahead.  Binding them is not recommended, but they do work.
    ~erk-find~ will ask you to pick the file based on what it does.  It's
    choices:
 
-   - ci-dco
+   - ci-dco-action
    - ci-nix-flake
    - ci-run-shim
-   - ci-tests
+   - ci-tests-action
    - doc-contributing
    - doc-manual
    - doc-readme
@@ -202,14 +202,14 @@ try changing them, go ahead.  Binding them is not recommended, but they do work.
    Generated files or extremely common files are not included.  For each one of
    these choices, there is a corresponding command:
 
-   #+findex: erk-find-ci-dco
-   - ~erk-find-ci-dco~
+   #+findex: erk-find-ci-dco-action
+   - ~erk-find-ci-dco-action~
    #+findex: erk-find-ci-nix-flake
    - ~erk-find-ci-nix-flake~
    #+findex: erk-find-ci-run-shim
    - ~erk-find-ci-run-shim~
-   #+findex: erk-find-ci-test
-   - ~erk-find-ci-test~
+   #+findex: erk-find-ci-tests-action
+   - ~erk-find-ci-tests-action~
    #+findex: erk-find-doc-contributing
    - ~erk-find-doc-contributing~
    #+findex: erk-find-doc-manual

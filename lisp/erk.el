@@ -815,10 +815,10 @@ This list's name is easy to forget, so here's a shortcut."
   (insert (format "\"%s\"" keyword)))
 
 (defconst erk--find-paths
-  '((ci-dco . ".github/workflows/dco.yml")
+  '((ci-dco-action . ".github/workflows/dco.yml")
     (ci-nix-flake . ".github/flake.nix")
     (ci-run-shim . ".github/run-shim.el")
-    (ci-tests . ".github/workflows/ci.yml")
+    (ci-tests-action . ".github/workflows/ci.yml")
     (doc-contributing . "doc/CONTRIBUTING.org")
     (doc-manual . "doc/manual.org")
     (doc-readme . "doc/README.org"))
@@ -831,10 +831,10 @@ This list's name is easy to forget, so here's a shortcut."
   (find-file (concat (erk--project-root) (cdr (assoc-string file erk--find-paths)))))
 
 ;;;###autoload
-(defun erk-find-ci-dco ()
+(defun erk-find-ci-dco-action ()
   "Shortcut for `erk-find'."
   (interactive)
-  (erk-find "ci-dco"))
+  (erk-find "ci-dco-action"))
 
 ;;;###autoload
 (defun erk-find-ci-nix-flake ()
@@ -849,10 +849,10 @@ This list's name is easy to forget, so here's a shortcut."
   (erk-find "ci-run-shim"))
 
 ;;;###autoload
-(defun erk-find-ci-tests ()
+(defun erk-find-ci-tests-action ()
   "Shortcut for `erk-find'."
   (interactive)
-  (erk-find "ci-tests"))
+  (erk-find "ci-tests-action"))
 
 ;;;###autoload
 (defun erk-find-doc-contributing ()
