@@ -182,16 +182,16 @@ you can redistribute it and/or modify
 (defun erk--lisp-directory ()
   "Heuristic to find where package files are stored."
   (let ((root (erk--project-root)))
-        (if (erk--project-flat-p)
-            root
-          (file-name-as-directory (concat root "lisp")))))
+    (if (erk--project-flat-p)
+        root
+      (file-name-as-directory (concat root "lisp")))))
 
 (defun erk--test-directory ()
   "Heuristic to find where package files are stored."
   (let ((root (erk--project-root)))
-        (if (erk--project-flat-p)
-            root
-          (file-name-as-directory (concat root "test")))))
+    (if (erk--project-flat-p)
+        root
+      (file-name-as-directory (concat root "test")))))
 
 (defun erk--project-flat-p ()
   "Heuristic to detect flat project structure."
