@@ -4,7 +4,7 @@
 
 ;; Author:  Positron Solutions <contact@positron.solutions>
 ;; Keywords: convenience, programming
-;; Version: 0.4.0
+;; Version: 0.5.0
 ;; Package-Requires: ((emacs "28.1") (auto-compile "1.2.0") (dash "2.18.0") (license-templates "0.1.3"))
 ;; Homepage: http://github.com/positron-solutions/elisp-repo-kit
 
@@ -27,23 +27,23 @@
 
 ;;; Commentary:
 
-;; Set up Emacs package with GitHub repository configuration, complete with
-;; Actions CI, tests, lints, documentation generation, and a licensing scheme
-;; all ready to go.  Included commands are focused on productivity, appropriate
-;; for professional development in elisp.  The goal of the package is streamline
-;; authoring & distributing new Emacs packages.  It provides a well-integrated
-;; but rigid scheme, aka opinionated.
+;; Set up and develop Emacs packages, complete with Github Actions CI, tests,
+;; lints, documentation generation, and a licensing scheme all ready to go.
+;; Included commands are focused on productivity, appropriate for professional
+;; development in elisp.  The goal of the package is streamline authoring &
+;; distributing new Emacs packages.  It provides a well-integrated but rigid
+;; scheme, aka opinionated.
 ;;
-;; The package also uses its own hosted source as a substrate for creating new
-;; packages.  It will clone its source repository and then perform renaming &
-;; re-licensing.  Simply call `erk-new' to start a new package.  The
-;; README documents remaining setup steps on GitHub and in preparation for
-;; publishing on MELPA.
+;; Simply call `erk-new' to start a new package.  ERK will clone a small
+;; template project and interactively rename and relicense the project.
+;; Instructions on how to host and publish your package are included in the
+;; manual.
 ;;
 ;; As a development aid, the package is versatile enough to work on some elisp
-;; packages that were not descended from its own source.  The scope of
-;; functionality is primarily to interface with linting and testing frameworks,
-;; both in batch and interactive workflows.
+;; packages not descended from its templates.  The provided functionality
+;; focuses on smoothing out typical workflows.  Common actions like reloading
+;; packages and navigating between source & tests are streamlined.  Processes
+;; like exporting all documents are automated.
 
 ;;; Code:
 
@@ -149,6 +149,10 @@ you can redistribute it and/or modify
    (lambda (f) (format f feature))
    files))
 
+;; TODO I mean, it's ideologically good but practically bad.  In the lazy case,
+;; template authors lose motivation.  New package maintainers forget to sign up.
+;; Okay, convert this to an optional string replacement and let users decide to
+;; be lazy for the greater good.
 (defconst erk--delete-files
   '(".github/FUNDING.yml")
   "Files that would require other accounts to migrate.")
@@ -269,6 +273,8 @@ Only understands project root or root/lisp."
          (root-feature-file (car (sort package-files #'string<))))
     (concat project-elisp-dir "/" root-feature-file)))
 
+;; Note, these functions are kind of redundant, but just want to consume
+;; consistent interfaces internally.
 (defun erk-package-author ()
   "Return the author of this project's package."
   (car (car (lm-authors (erk--project-root-feature-file)))))
@@ -712,7 +718,7 @@ CLONE-ROOT is where the path for the new clone will be created.
 
 REPLACEMENTS is a plist with keys:
 
-- `:full-name': The title of the package, usually found in the
+- `:title': The title of the package, usually found in the
   README, manual, and the first line of Elisp files.
 
 - `:feature': By convention, all Elisp file names will include

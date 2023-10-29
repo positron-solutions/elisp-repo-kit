@@ -47,11 +47,8 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
 
 ** File contents and structure
 #+cindex: project layout
-
    /After cloning and renaming,/ you will have a file tree like this:
-
    #+begin_src shell
-
      ├── .gitignore                        # ignores for byte compiles, autoloads etc
      │
      ├── README.md                         # this file
@@ -80,11 +77,9 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
      │
      └── test
          └── erk-test.el                   # ERT unit tests for the package
-
    #+end_src
-
    You can use either a multi-file or flat layout for lisp.  Just name test files
-   ~something-test.el~ and keep all lisp files in root, ~/lisp~ or ~/test~
+   ~something-tests.el~ and keep all lisp files in root, ~/lisp~ or ~/test~
    directories.
 ** Developing
    - The package is stored in /lisp and its tests in /test.
@@ -113,9 +108,7 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
      package is made available on MELPA partly to maintain the structure and
      workflows for doing so.
 * Install ERK
-
  #+begin_src elisp
-
    (use-package erk) ; vanilla, assuming you have MELPA configured
 
    ;; using elpaca's with explicit recipe
@@ -127,29 +120,11 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
      :straight (erk :type git :host github :repo "positron-solutions/elisp-repo-kit"))
 
    ;; or use manual load-path & require, you brave yak shaver
-
  #+end_src
-
-** Manual cloning
-
-   #+findex: erk-clone
-   The standalone command, ~erk-clone~ will clone without renaming.
-
-   #+findex: erk-rename
-   If you create via [[https://github.com/positron-solutions/erk-basic][a template]] or clone manually, it's presumed you know what
-   you're doing at that point.  Call ~erk-rename~ on its own to rename in these
-   cases.
-
-   There are some customize options that cause the renaming to be transitively
-   consistent.
-
 ** Manually add just CI
-
-   Copy the .github folder and the contributing guide to your package.  Set up
-   your secrets for Cachix. Read the CI customization section.
-
+Copy the .github folder and the contributing guide to your package.  Set up
+your secrets for Cachix. Read the CI customization section.
 * Creating Packages
-
   #+findex: erk-new
   The simplest and intended way is to call ~erk-new~.  It will first
   ask you for:
@@ -157,8 +132,8 @@ working with Elisp packages, Elisp Repo Kit provides shortcuts:
     - Choose a template
     - Root directory you want to clone to
     - Package title
-    - Package feature
-    - Package prefix
+    - Package feature name
+    - Package elisp prefix
     - Author name
     - Email address
     - GitHub user or organization
@@ -194,10 +169,16 @@ do-what-I-mean (DWIM).
   the function definition.  If it fails, it will fall back to jumping to the
   feature.
 ** Run tests
-   #+findex: erk-ert-project~
-   ~erk-ert-project~ will discover, rebuild & reload if necessary, and run
-   tests.  There are a few other commands to augment the [[https://www.gnu.org/software/emacs/manual/html_node/ert/][ert]] package.
+*Warning*!  These commands are very likely to completely change.  If you want to
+try changing them, go ahead.  Binding them is not recommended, but they do work.
 
+#+findex: erk-ert-project
+- ~erk-ert-project~ will discover, rebuild & reload if necessary, and run tests.
+  There are a few other commands to augment the [[https://www.gnu.org/software/emacs/manual/html_node/ert/][ert]] package.
+
+#+findex: erk-ert-rerun-this
+- ~erk-ert-rerun-this~ Is not a very smart function yet, but if you are working on
+  a test at point, it will run it or re-run it.
 ** Duplicating CI Locally
    The CI configuration is all stored in [[file:./.github/][.github]].  Usually you will want
    development instructions in your new repository.  The [[file:./CONTRIBUTING.md][CONTRIBUTING]] guide
@@ -235,7 +216,6 @@ do-what-I-mean (DWIM).
    - ~erk-find-find-doc-manual~
    #+findex: erk-find-doc-readme
    - ~erk-find-doc-readme~
-
 * Documenting Your Package
 #+cindex: document re-structuring
 #+cindex: document export
@@ -356,7 +336,6 @@ overview:
       (let ((truth "Source blocks will render inside the manual like this"))
         (message true))
     #+end_src
-
     You can use ~org-insert-structure-template~ etc to create these easily.
 *** Links :item:
     Hyperlinks thankfully can be written like you expect, though many org
@@ -366,7 +345,6 @@ overview:
 
     The syntax is =[[http://somewhere.com][label for my link]]= if you are
     unfamiliar.
-    ** Indices
 #+cindex: document indices
    Texi has a lot of built-in support for indexes.  Until we have GPT for your
    manual, indexes are a good way to provide alternative views into your
@@ -388,14 +366,11 @@ overview:
     You can also declare a new index with @defindex or @defcodeindex.  The only
     difference is that a code index will render entries in monospace, like
     code.
-
     #+begin_src org
     #+TEXINFO_HEADER: @defindex foo
     #+TEXINFO_HEADER: @defcodeindex foo
     #+end_src
-
     Creating entries with a custom index could be tricky.  Good luck!
-
 *** Adding Entries                                                        :item:
 
     Quoting a symbol will not result in an index entry.  Which quoted symbol
@@ -416,14 +391,12 @@ overview:
 
 *** Render the Index                                                      :item:
     Just use a regular header like so:
-
     #+begin_src org
       ,** Keystroke index
       :PROPERTIES:
       :INDEX: ky
       :END:
     #+end_src
-
     The built-in index keys are =ky=, =fn=, =vr=, =cp=, =pg=, and =tp=.
 * Distributing Your Package
 ** Setting Up Your Github Repository
@@ -437,21 +410,19 @@ overview:
     assignment.
   - [ ] Sign up for [[https://app.cachix.org/][cachix]] and, create a binary cache with API tokens and public
     read access
-  #+cindex nix enabling cachix
-  #+cindex github adding secrets
+  #+cindex: nix enabling cachix
+  #+cindex: github adding secrets
   - [ ] Add repository secrets necessary for your GitHub actions
     ~CACHIX_AUTH_TOKEN~ and ~CACHIX_CACHE_NAME~ (settings -> secrets -> new
     repository secret)
-  #+cindex github allowed actions
+  #+cindex: github allowed actions
   - [ ] Enable actions and add the following actions to your allowed actions list:
 
     #+begin_src txt
-
     actions/checkout@v3.2.0,
     cachix/cachix-action@v12,
     cachix/install-nix-action@v20,
     actions/setup-python@v4,
-
     #+end_src
 
     *Note*, Python is used to run a DCO check script, nothing more.
@@ -606,7 +577,6 @@ overview:
     If everything works, you are ready to make a pull request to MELPA.  Push your
     changes and check all the boxes in the PR template except the one that requires
     you to read the instructions.
-
 * Maintaining Your Package
   Keeping your project fresh.
 ** Upgrading ERK
@@ -650,7 +620,6 @@ overview:
    By using Nix, your repository can declare a fixed set of dependencies for
    development and testing.  Not just Elisp dependencies, but also 3rd party
    dependencies.
-
 *** Maintaining versions
  #+cindex: nix dependency updating
 
@@ -683,7 +652,6 @@ overview:
     version of the flake in the ~nix repl~:
 
     #+begin_src nix
-
       # <nixpkgs> is known in your flake registry
       pkgs = import <nixpkgs> { system = builtins.currentSystem; overlays = [ (builtins.getFlake ("emacs-overlay")).overlay ];}
 
@@ -695,14 +663,12 @@ overview:
 
       # Have fun inspecting the various versions.  Checking their declarations in
       # emacs-overlay source can be insightful.
-
     #+end_src
 
     To obtain truly specific Emacs versions, specify the Emacs source as a flake
     input and then override the attributes of an Emacs package:
 
     #+begin_src nix
-
       inputs = {
         # declare the exact source you want
         emacs29-src = {
@@ -720,7 +686,6 @@ overview:
       });
       # It's nix expressions.  It's programming.
       # Ask your favorite large langauge model!
-
     #+end_src
 
     #+cindex: nix binary cache
@@ -753,17 +718,46 @@ overview:
    By changing the versions within the flake to match the versions in question
    that are breaking, the user can try versions to confirm a version mismatch and
    then give you their flake so that you can reproduce and confirm a fix.
+* Configuring ERK
+#+vindex: erk-after-new-hook
+~erk-after-new-hook~ will be run after you create a new repository.  The
+~default-directory~ is set to the newly cloned directory.  By default it runs
+~magit-status~, where you can check the renaming results.
+* Conventions
+#+cindex: conventions
+ERK relies on [[info:elisp#Packaging][(elisp)standard practices]] to discover files.
+- Feature names always match file names
+- Elisp prefixes are consistent throughout the entire package
+- The project is either all flat or all nested:
+    + tests in =/test=
+    + package lisp in =/lisp=
+    + documenation inputs in =/doc=
+- Tests for a feature are found in the same feature + =-test=.
+- Unit tests are always named after the function they test, ending in =-test=
+- Documentation generation expects:
+    + CONTRIBUTING.org
+    + manual.org
+    + README.org
+- Emacs will only install your manual by default if it exports to
+  =my-feature.texi=
 
+Files that can vary based on the hosting platform often must use another
+convention, such as =/.github=.  Tools expect mostly rigid names such as =flake.nix=
+and =/.git=.
+
+If you create a new template, please respect this very simple standard, which is
+also expected by package managers like ~elpaca~ and ~straight~.
+>>>>>>> c0ebedf (fixup! Doc cleanups for version bump)
 * Indices
 ** Command and Function index
-  :PROPERTIES:
-  :INDEX: fn
-  :END:
+:PROPERTIES:
+:INDEX: fn
+:END:
 
 ** Concept index
-   :PROPERTIES:
-   :INDEX: cp
-   :END:
+:PROPERTIES:
+:INDEX: cp
+:END:
 
 * Licensing
 :PROPERTIES:
