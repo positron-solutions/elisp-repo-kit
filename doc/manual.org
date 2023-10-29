@@ -747,7 +747,7 @@ and =/.git=.
 
 If you create a new template, please respect this very simple standard, which is
 also expected by package managers like ~elpaca~ and ~straight~.
->>>>>>> c0ebedf (fixup! Doc cleanups for version bump)
+
 * Indices
 ** Command and Function index
 :PROPERTIES:
@@ -757,6 +757,12 @@ also expected by package managers like ~elpaca~ and ~straight~.
 ** Concept index
 :PROPERTIES:
 :INDEX: cp
+:INDEX: cp
+:END:
+
+** Variable index
+:PROPERTIES:
+:INDEX: vr
 :END:
 
 * Licensing

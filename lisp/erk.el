@@ -87,6 +87,13 @@ templates with different layouts and other requirements."
   :group 'erk
   :type '(alist :key-type symbol :value-type plist))
 
+(defcustom erk-after-new-hook '(magit-status)
+  "Action to perform after a new clone has been created.
+Called with no arguments.  The cloned directory set as
+`default-directory'"
+  :group 'erk
+  :type '(list function))
+
 (defun erk--template-github-userorg (template)
   "Get the github repo from a TEMPLATE."
   (car (split-string (plist-get template :github-path) "/")))
@@ -789,7 +796,9 @@ implementation information and more details about argument usage."
        :author author
        :email email))))
   (let ((cloned (erk-clone template clone-root replacements)))
-    (erk-rename-relicense template cloned replacements)))
+    (erk-rename-relicense template cloned replacements)
+    (let ((default-directory cloned))
+      (run-hooks 'erk-after-new-hook))))
 
 ;;;###autoload
 (defun erk-insert-package-keyword (keyword)
