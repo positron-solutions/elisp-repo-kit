@@ -36,7 +36,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE@.
 @finalout
 @titlepage
 @title Elisp Repo Kit
-@subtitle for version 0.4.0
+@subtitle for version 0.5.0
 @author Positron Solutions
 @page
 @vskip 0pt plus 1filll
@@ -91,6 +91,8 @@ Navigating the project
 * Documenting Your Package::
 * Distributing Your Package::
 * Maintaining Your Package::
+* Configuring ERK::
+* Conventions::
 * Indices::
 
 @detailmenu
@@ -105,12 +107,12 @@ High Level Overview
 
 Install ERK
 
-* Manual cloning::
 * Manually add just CI::
 
 Using ERK for development
 
 * Loading and re-loading your package::
+* Jumping to files::
 * Run tests::
 * Duplicating CI Locally::
 * Find Files::
@@ -173,6 +175,7 @@ Indices
 
 * Command and Function index::
 * Concept index::
+* Variable index::
 
 @end detailmenu
 @end menu
@@ -202,11 +205,8 @@ Elisp packages).
 @section File contents and structure
 
 @cindex project layout
-
 @emph{After cloning and renaming,} you will have a file tree like this:
-
 @example
-
 ├── .gitignore                        # ignores for byte compiles, autoloads etc
 │
 ├── README.md                         # this file
@@ -235,11 +235,9 @@ Elisp packages).
 │
 └── test
     └── erk-test.el                   # ERT unit tests for the package
-
 @end example
-
 You can use either a multi-file or flat layout for lisp.  Just name test files
-@code{something-test.el} and keep all lisp files in root, @code{/lisp} or @code{/test}
+@code{something-tests.el} and keep all lisp files in root, @code{/lisp} or @code{/test}
 directories.
 
 @node Developing
@@ -302,7 +300,6 @@ workflows for doing so.
 @chapter Install ERK
 
 @lisp
-
 (use-package erk) ; vanilla, assuming you have MELPA configured
 
 ;; using elpaca's with explicit recipe
@@ -314,27 +311,11 @@ workflows for doing so.
   :straight (erk :type git :host github :repo "positron-solutions/elisp-repo-kit"))
 
 ;; or use manual load-path & require, you brave yak shaver
-
 @end lisp
 
 @menu
-* Manual cloning::
 * Manually add just CI::
 @end menu
-
-@node Manual cloning
-@section Manual cloning
-
-@findex erk-clone
-The standalone command, @code{erk-clone} will clone without renaming.
-
-@findex erk-rename
-If you create via @uref{https://github.com/positron-solutions/erk-basic, a template} or clone manually, it's presumed you know what
-you're doing at that point.  Call @code{erk-rename} on its own to rename in these
-cases.
-
-There are some customize options that cause the renaming to be transitively
-consistent.
 
 @node Manually add just CI
 @section Manually add just CI
@@ -357,9 +338,9 @@ Root directory you want to clone to
 @item
 Package title
 @item
-Package feature
+Package feature name
 @item
-Package prefix
+Package elisp prefix
 @item
 Author name
 @item
@@ -381,6 +362,7 @@ to discover and run ert tests.  These shortcuts just make common cases faster.
 
 @menu
 * Loading and re-loading your package::
+* Jumping to files::
 * Run tests::
 * Duplicating CI Locally::
 * Find Files::
@@ -396,12 +378,50 @@ necessary and then reload it.
 @findex erk-reload-project-tests
 @code{erk-reload-project-tests} is the complementary command for reloading tests.
 
+@node Jumping to files
+@section Jumping to files
+
+@cindex jumping
+Lots of locations come in pairs or small sets.  Jumping functions try to go
+between these locations or to a sensible default location.  They are very
+do-what-I-mean (DWIM).
+
+@findex erk-jump-features
+@itemize
+@item
+@code{erk-jump-features} is a command that will jump between the feature and its
+corresponding test feature.  If you aren't in an elisp file, it will jump to
+the root feature file.
+@end itemize
+
+@findex erk-jump-defs
+@itemize
+@item
+@code{erk-jump-defs} will try to go to the test definition and even ask insert an
+@code{ert-deftest} body if you forgot to write the test.  It can then jump back to
+the function definition.  If it fails, it will fall back to jumping to the
+feature.
+@end itemize
+
 @node Run tests
 @section Run tests
 
-@findex erk-ert-project~
-@code{erk-ert-project} will discover, rebuild & reload if necessary, and run
-tests.  There are a few other commands to augment the @uref{https://www.gnu.org/software/emacs/manual/html_node/ert/, ert} package.
+@strong{Warning}!  These commands are very likely to completely change.  If you want to
+try changing them, go ahead.  Binding them is not recommended, but they do work.
+
+@findex erk-ert-project
+@itemize
+@item
+@code{erk-ert-project} will discover, rebuild & reload if necessary, and run tests.
+There are a few other commands to augment the @uref{https://www.gnu.org/software/emacs/manual/html_node/ert/, ert} package.
+@end itemize
+
+@findex erk-ert-rerun-this
+@itemize
+@item
+@code{erk-ert-rerun-this} Is not a very smart function yet, but if you are working on
+a test at point, it will run it or re-run it.
+@end itemize
 
 @node Duplicating CI Locally
 @section Duplicating CI Locally
@@ -422,13 +442,13 @@ choices:
 
 @itemize
 @item
-ci-dco
+ci-dco-action
 @item
 ci-nix-flake
 @item
 ci-run-shim
 @item
-ci-tests
+ci-tests-action
 @item
 doc-contributing
 @item
@@ -440,10 +460,10 @@ doc-readme
 Generated files or extremely common files are not included.  For each one of
 these choices, there is a corresponding command:
 
-@findex erk-find-ci-dco
+@findex erk-find-ci-dco-action
 @itemize
 @item
-@code{erk-find-ci-dco}
+@code{erk-find-ci-dco-action}
 @end itemize
 @findex erk-find-ci-nix-flake
 @itemize
@@ -455,10 +475,10 @@ these choices, there is a corresponding command:
 @item
 @code{erk-find-ci-run-shim}
 @end itemize
-@findex erk-find-ci-test
+@findex erk-find-ci-tests-action
 @itemize
 @item
-@code{erk-find-ci-test}
+@code{erk-find-ci-tests-action}
 @end itemize
 @findex erk-find-doc-contributing
 @itemize
@@ -694,7 +714,6 @@ Symbols will \~display\~ `quoted' in the manual.  Mentioning a symbol will
 (let ((truth "Source blocks will render inside the manual like this"))
   (message true))
 @end lisp
-
 You can use @code{org-insert-structure-template} etc to create these easily.
 
 @node Links
@@ -707,7 +726,6 @@ formats such as running elisp expressions through links may not work.
 
 The syntax is @samp{[[http://somewhere.com][label for my link]]} if you are
 unfamiliar.
-** Indices
 @cindex document indices
 Texi has a lot of built-in support for indexes.  Until we have GPT for your
 manual, indexes are a good way to provide alternative views into your
@@ -740,12 +758,10 @@ data type
 You can also declare a new index with @@defindex or @@defcodeindex.  The only
 difference is that a code index will render entries in monospace, like
 code.
-
 @example
 #+TEXINFO_HEADER: @@defindex foo
 #+TEXINFO_HEADER: @@defcodeindex foo
 @end example
-
 Creating entries with a custom index could be tricky.  Good luck!
 
 @node Adding Entries
@@ -779,14 +795,12 @@ listings of related entities.
 @subsection Render the Index :item:
 
 Just use a regular header like so:
-
 @example
 ** Keystroke index
 :PROPERTIES:
 :INDEX: ky
 :END:
 @end example
-
 The built-in index keys are @samp{ky}, @samp{fn}, @samp{vr}, @samp{cp}, @samp{pg}, and @samp{tp}.
 
 @node Distributing Your Package
@@ -818,26 +832,24 @@ assignment.
 Sign up for @uref{https://app.cachix.org/, cachix} and, create a binary cache with API tokens and public
 read access
 @end itemize
-#+cindex nix enabling cachix
-#+cindex github adding secrets
+@cindex nix enabling cachix
+@cindex github adding secrets
 @itemize
 @item
 Add repository secrets necessary for your GitHub actions
 @code{CACHIX_AUTH_TOKEN} and @code{CACHIX_CACHE_NAME} (settings -> secrets -> new
 repository secret)
 @end itemize
-#+cindex github allowed actions
+@cindex github allowed actions
 @itemize
 @item
 Enable actions and add the following actions to your allowed actions list:
 
 @example
-
 actions/checkout@@v3.2.0,
 cachix/cachix-action@@v12,
 cachix/install-nix-action@@v20,
 actions/setup-python@@v4,
-
 @end example
 
 @strong{Note}, Python is used to run a DCO check script, nothing more.
@@ -1149,7 +1161,6 @@ time.  You can view which attributes are available by inspecting the current
 version of the flake in the @code{nix repl}:
 
 @example
-
 # <nixpkgs> is known in your flake registry
 pkgs = import <nixpkgs> @{ system = builtins.currentSystem; overlays = [ (builtins.getFlake ("emacs-overlay")).overlay ];@}
 
@@ -1161,14 +1172,12 @@ pkgs.emacsUnstable.version
 
 # Have fun inspecting the various versions.  Checking their declarations in
 # emacs-overlay source can be insightful.
-
 @end example
 
 To obtain truly specific Emacs versions, specify the Emacs source as a flake
 input and then override the attributes of an Emacs package:
 
 @example
-
 inputs = @{
   # declare the exact source you want
   emacs29-src = @{
@@ -1186,7 +1195,6 @@ emacs29 = pkgs.emacs.overrideAttrs (old: @{
 @});
 # It's nix expressions.  It's programming.
 # Ask your favorite large langauge model!
-
 @end example
 
 @cindex nix binary cache
@@ -1226,12 +1234,74 @@ By changing the versions within the flake to match the versions in question
 that are breaking, the user can try versions to confirm a version mismatch and
 then give you their flake so that you can reproduce and confirm a fix.
 
+@node Configuring ERK
+@chapter Configuring ERK
+
+@vindex erk-after-new-hook
+@code{erk-after-new-hook} will be run after you create a new repository.  The
+@code{default-directory} is set to the newly cloned directory.  By default it runs
+@code{magit-status}, where you can check the renaming results.
+
+@vindex erk-templates
+@code{erk-templates} can be set to default to your own favorite template.  If you want
+to fork @uref{https://github.com/positron-solutions/erk-basic, erk-basic}, you can set this to point to your fork.  If you are making a
+radically different template, consider a PR to mention your fork or even add it
+to the defaults!  (Please don't abuse this privilege to execute a supply chain
+attack or we will find you).
+
+@node Conventions
+@chapter Conventions
+
+@cindex conventions
+ERK relies on @ref{Packaging,(elisp)standard practices,,elisp,} to discover files.
+@itemize
+@item
+Feature names always match file names
+@item
+Elisp prefixes are consistent throughout the entire package
+@item
+The project is either all flat or all nested:
+@itemize
+@item
+tests in @samp{/test}
+@item
+package lisp in @samp{/lisp}
+@item
+documenation inputs in @samp{/doc}
+@end itemize
+@item
+Tests for a feature are found in the same feature + @samp{-test}.
+@item
+Unit tests are always named after the function they test, ending in @samp{-test}
+@item
+Documentation generation expects:
+@itemize
+@item
+CONTRIBUTING.org
+@item
+manual.org
+@item
+README.org
+@end itemize
+@item
+Emacs will only install your manual by default if it exports to
+@samp{my-feature.texi}
+@end itemize
+
+Files that can vary based on the hosting platform often must use another
+convention, such as @samp{/.github}.  Tools expect mostly rigid names such as @samp{flake.nix}
+and @samp{/.git}.
+
+If you create a new template, please respect this very simple standard, which is
+also expected by package managers like @code{elpaca} and @code{straight}.
+
 @node Indices
 @chapter Indices
 
 @menu
 * Command and Function index::
 * Concept index::
+* Variable index::
 @end menu
 
 @node Command and Function index
@@ -1243,5 +1313,10 @@ then give you their flake so that you can reproduce and confirm a fix.
 @section Concept index
 
 @printindex cp
+
+@node Variable index
+@section Variable index
+
+@printindex vr
 
 @bye

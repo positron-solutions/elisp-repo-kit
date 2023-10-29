@@ -29,7 +29,6 @@ answer all the questions.
 
 # Install ERK
 
-    
     (use-package erk) ; vanilla, assuming you have MELPA configured
     
     ;; using elpaca's with explicit recipe
@@ -43,18 +42,6 @@ answer all the questions.
     ;; or use manual load-path & require, you brave yak shaver
 
 
-## Manual cloning
-
-The standalone command, `erk-clone` will clone without renaming.
-
-If you create via [a template](https://github.com/positron-solutions/erk-basic) or clone manually, it's presumed you know what
-you're doing at that point.  Call `erk-rename` on its own to rename in these
-cases.
-
-There are some customize options that cause the renaming to be transitively
-consistent.
-
-
 ## Manually add just CI
 
 Copy the .github folder and the contributing guide to your package.  Set up
@@ -63,26 +50,30 @@ your secrets for Cachix. Read the CI customization section.
 
 # Table of Contents
 
--   [Creating Packages](#org8f89e2d)
--   [Using ERK for development](#org634d2bc)
-    -   [Find Files](#org4337be9)
--   [File contents and structure](#org216d1ea)
-    -   [Setting Up Your Github Repository](#org2d988e4)
--   [Customizing CI](#org451ffdb)
--   [Licensing, Developer Certificate of Origin](#org1de3655)
--   [Publishing to MELPA](#org6ad8b28)
-    -   [Creating the recipe](#orga968d33)
-    -   [Testing package build](#org61a373c)
-    -   [Testing stable package build](#org05aef0d)
-    -   [MELPA Lints](#orga1cf780)
--   [Maintaining versions](#orge89d3e9)
--   [Package scope and relation to other work](#org8cc4546)
-    -   [Dependency Management](#orgcf9d699)
-    -   [Discovering and Running Tests & Lints](#orgd516806)
-    -   [Comparisons](#org78c421e)
--   [Contributing](#org10cc81e)
--   [Footnote on FSF and Emacs Core Licensing](#org65e7167)
--   [Shout-outs](#org6008479)
+-   [Creating Packages](#orgdbe452f)
+-   [Using ERK for development](#orgac601cf)
+    -   [Loading and re-loading your package](#orga0cf377)
+    -   [Jumping to files](#org396eda3)
+    -   [Run tests](#orgcda3976)
+    -   [Duplicating CI Locally](#org3dacc44)
+    -   [Find Files](#org4970f85)
+-   [File contents and structure](#org8ce5e2c)
+    -   [Setting Up Your Github Repository](#orge370d02)
+-   [Customizing CI](#orgad90c4f)
+-   [Licensing, Developer Certificate of Origin](#orgbccb740)
+-   [Publishing to MELPA](#org89cc5b7)
+    -   [Creating the recipe](#orgc42570c)
+    -   [Testing package build](#org8509443)
+    -   [Testing stable package build](#orgf82d903)
+    -   [MELPA Lints](#org0496004)
+-   [Maintaining versions](#org2c1191b)
+-   [Package scope and relation to other work](#orge7e095a)
+    -   [Dependency Management](#org5df7fa9)
+    -   [Discovering and Running Tests & Lints](#orgdcccbf5)
+    -   [Comparisons](#orgbfd286f)
+-   [Contributing](#orgbaa1077)
+-   [Footnote on FSF and Emacs Core Licensing](#orgd1e7ded)
+-   [Shout-outs](#org0f2ed06)
 
 
 # Creating Packages
@@ -93,15 +84,15 @@ ask you for:
 -   Choose a template
 -   Root directory you want to clone to
 -   Package title
--   Package feature
--   Package prefix
+-   Package feature name
+-   Package elisp prefix
 -   Author name
 -   Email address
 -   GitHub user or organization
 
 `erk-new` also calls `erk-rename-relicense` to rename all of the files, string
 replace names, and re-license to GPL3.  It also changes the author and resets
-the git history.  Now just follow the steps in [finish setting up](#org2d988e4). Have fun!
+the git history.  Now just follow the steps in [finish setting up](#orge370d02). Have fun!
 
 
 # Using ERK for development
@@ -109,22 +100,48 @@ the git history.  Now just follow the steps in [finish setting up](#org2d988e4).
 Elisp repo kit contains some convenience functions to reload your package and
 to discover and run ert tests.  These shortcuts just make common cases faster.
 
--   Loading and re-loading your package
-    
-    `erk-reload-project-package` will unload and recompile your package if
-    necessary and then reload it.
-    
-    `erk-reload-project-tests` is the complementary command for reloading tests.
 
--   Run tests
-    
-    `erk-ert-project` will discover, rebuild & reload if necessary, and run
-    tests.  There are a few other commands to augment the [ert](https://www.gnu.org/software/emacs/manual/html_node/ert/) package.
+## Loading and re-loading your package
 
--   Duplicating CI Locally
-    The CI configuration is all stored in [.github](./.github/).  Usually you will want
-    development instructions in your new repository.  The [CONTRIBUTING](./CONTRIBUTING.md) guide
-    contains instructions to reproduce the CI behavior.
+`erk-reload-project-package` will unload and recompile your package if
+necessary and then reload it.
+
+`erk-reload-project-tests` is the complementary command for reloading tests.
+
+
+## Jumping to files
+
+Lots of locations come in pairs or small sets.  Jumping functions try to go
+between these locations or to a sensible default location.  They are very
+do-what-I-mean (DWIM).
+
+-   `erk-jump-features` is a command that will jump between the feature and its
+    corresponding test feature.  If you aren't in an elisp file, it will jump to
+    the root feature file.
+
+-   `erk-jump-defs` will try to go to the test definition and even ask insert an
+    `ert-deftest` body if you forgot to write the test.  It can then jump back to
+    the function definition.  If it fails, it will fall back to jumping to the
+    feature.
+
+
+## Run tests
+
+**Warning**!  These commands are very likely to completely change.  If you want to
+try changing them, go ahead.  Binding them is not recommended, but they do work.
+
+-   `erk-ert-project` will discover, rebuild & reload if necessary, and run tests.
+    There are a few other commands to augment the [ert](https://www.gnu.org/software/emacs/manual/html_node/ert/) package.
+
+-   `erk-ert-rerun-this` Is not a very smart function yet, but if you are working on
+    a test at point, it will run it or re-run it.
+
+
+## Duplicating CI Locally
+
+The CI configuration is all stored in [.github](./.github/).  Usually you will want
+development instructions in your new repository.  The [CONTRIBUTING](./CONTRIBUTING.md) guide
+contains instructions to reproduce the CI behavior.
 
 
 ## Find Files
@@ -135,10 +152,10 @@ annoying.  ERK provides a helper to find files based on their purpose.
 `erk-find` will ask you to pick the file based on what it does.  It's
 choices:
 
--   ci-dco
+-   ci-dco-action
 -   ci-nix-flake
 -   ci-run-shim
--   ci-tests
+-   ci-tests-action
 -   doc-contributing
 -   doc-manual
 -   doc-readme
@@ -146,13 +163,13 @@ choices:
 Generated files or extremely common files are not included.  For each one of
 these choices, there is a corresponding command:
 
--   `erk-find-ci-dco`
+-   `erk-find-ci-dco-action`
 
 -   `erk-find-ci-nix-flake`
 
 -   `erk-find-ci-run-shim`
 
--   `erk-find-ci-test`
+-   `erk-find-ci-tests-action`
 
 -   `erk-find-doc-contributing`
 
@@ -165,7 +182,6 @@ these choices, there is a corresponding command:
 
 *After cloning and renaming,* you will have a file tree like this:
 
-    
     ├── .gitignore                        # ignores for byte compiles, autoloads etc
     │
     ├── README.md                         # this file
@@ -196,7 +212,7 @@ these choices, there is a corresponding command:
         └── erk-test.el                   # ERT unit tests for the package
 
 You can use either a multi-file or flat layout for lisp.  Just name test files
-`something-test.el` and keep all lisp files in root, `/lisp` or `/test`
+`something-tests.el` and keep all lisp files in root, `/lisp` or `/test`
 directories.
 
 
@@ -204,27 +220,21 @@ directories.
 
 You can copy this checklist to your org agenda files:
 
--   [X] Create a repository (from [install](#orgaf2c287) instructions)
+-   [X] Create a repository (from [install](#orgb10843e) instructions)
 -   [ ] Create an empty GitHub repository configure it as your git remote
 -   [ ] Set up your git commit signing (and verification so that it's obvious)
-    **and** [sign-off](#org1de3655) so that it will be hypothetically [straightforward](README.md) for for FSF
+    **and** [sign-off](#orgbccb740) so that it will be hypothetically [straightforward](README.md) for for FSF
     to pull in your changes if they later change to DCO instead of copyright
     assignment.
 -   [ ] Sign up for [cachix](https://app.cachix.org/) and, create a binary cache with API tokens and public
     read access
 
-\#+cindex nix enabling cachix
-\#+cindex github adding secrets
-
 -   [ ] Add repository secrets necessary for your GitHub actions
     `CACHIX_AUTH_TOKEN` and `CACHIX_CACHE_NAME` (settings -> secrets -> new
     repository secret)
 
-\#+cindex github allowed actions
-
 -   [ ] Enable actions and add the following actions to your allowed actions list:
     
-        
         actions/checkout@v3.2.0,
         cachix/cachix-action@v12,
         cachix/install-nix-action@v20,
@@ -233,7 +243,7 @@ You can copy this checklist to your org agenda files:
     **Note**, Python is used to run a DCO check script, nothing more.
 
 -   [ ] Get your package working, pushed, actions run, and CI badges all green
--   [ ] [Publish](#org6ad8b28) to MELPA
+-   [ ] [Publish](#org89cc5b7) to MELPA
 -   [ ] Make a post on [reddit](https://reddit.com/r/emacs/) and [mastodon](https://emacs.ch/) about your new package
 
 
