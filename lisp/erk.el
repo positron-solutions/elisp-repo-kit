@@ -757,8 +757,16 @@ implementation information and more details about argument usage."
               "Rev, tag, or branch (empty implies default branch): "))
         (template (plist-put template :rev rev))
         (clone-root
-         (directory-file-name
-          (read-directory-name "Clone root: " default-directory)))
+         (let ((root))
+           (while (not root)
+             (let ((candidate
+                    (directory-file-name
+                     (read-directory-name "Clone root (must exist): " default-directory))))
+               (if (file-directory-p candidate)
+                   (setq root candidate)
+                 (message "Directory must exist!")
+                 (sit-for 1))))
+           root))
         (title
          (read-string
           "Package full name, for documentation: "
