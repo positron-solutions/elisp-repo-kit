@@ -273,12 +273,13 @@ Only understands project root or root/lisp."
 ;; TODO quite redundant
 (defun erk--project-root-feature-file ()
   "Return the path of the root feature for the project."
-  (let* ((project-elisp-dir (erk--project-elisp-dir))
-         (package-files (directory-files project-elisp-dir nil (rx ".el" string-end)))
-         (package-files (->> package-files
-                             (--reject (string-match-p (rx "autoloads.el" string-end) it))))
-         (root-feature-file (car (sort package-files #'string<))))
-    (concat project-elisp-dir "/" root-feature-file)))
+  (if-let* ((project-elisp-dir (erk--project-elisp-dir))
+            (package-files (directory-files project-elisp-dir nil (rx ".el" string-end)))
+            (package-files (->> package-files
+                                (--reject (string-match-p (rx "autoloads.el" string-end) it))))
+            (root-feature-file (car (sort package-files #'string<))))
+      (concat project-elisp-dir "/" root-feature-file)
+    (user-error "%s doesn't seem to be an elisp project" (erk--project-root))))
 
 ;; Note, these functions are kind of redundant, but just want to consume
 ;; consistent interfaces internally.
@@ -340,14 +341,17 @@ for development, and being lenient for degenerate cases is fine."
 (defun erk-jump-features ()
   "Jump between the corresponding package and test features."
   (interactive)
-  (let ((file (file-name-nondirectory (buffer-file-name (current-buffer)))))
-    (if (string-match-p ".*\\.el" file)
-        (find-file (if (string-match "\\(.*\\)-tests?\\.el" file)
+  (let* ((filepath (buffer-file-name (current-buffer)))
+         (filename (when filepath
+                     (file-name-nondirectory filepath))))
+    (if (and filename
+             (string-match-p ".*\\.el" filename))
+        (find-file (if (string-match "\\(.*\\)-tests?\\.el" filename)
                        (concat (erk--lisp-directory)
-                               (match-string 1 file) ".el")
+                               (match-string 1 filename) ".el")
                      (concat (erk--test-directory)
-                             (and (string-match "\\(.*\\)\\.el" file)
-                                  (match-string 1 file))
+                             (and (string-match "\\(.*\\)\\.el" filename)
+                                  (match-string 1 filename))
                              "-test.el")))
       ;; fallback, go to root feature, convenient shortcut
       ;; back into elisp files
@@ -433,8 +437,17 @@ corresponding `defun' are supported."
       (_
        (user-error
         "No compatible def before point.  def: %s name: %s"
-        def name)))))
+        def name)
+       (erk-jump-features)))))
 
+(defun erk--last-test ()
+  "Return test name for last thing.
+Note, to expand tests, a type parameter will have to be specified
+and configured by the project."
+  (pcase-let* ((`(,def ,name) (erk--last-defname)))
+    (pcase def
+      (`defun (erk--make-test-symbol name))
+      (`ert-deftest name))))
 
 ;;;###autoload
 (defun erk-ert-rerun-this-no-reload ()
@@ -443,11 +456,10 @@ Use this when debugging with external state or debugging elisp
 repo kit itself, which may behave strangely if reloaded in the
 middle of a command."
   (interactive)
-  (save-excursion
-    (beginning-of-defun)
-    (let* ((form (funcall load-read-function (current-buffer)))
-           (name (elt form 1)))
-      (ert `(member ,name)))))
+  ;; TODO make this work off of newer primitive
+  (when-let ((name (erk--last-test)))
+    (when (ert-get-test name))
+    (ert `(member ,name))))
 
 ;;;###autoload
 (defun erk-ert-rerun-this ()
@@ -787,7 +799,6 @@ implementation information and more details about argument usage."
                           (string-trim
                            (shell-command-to-string "git config user.name")))))
            (read-string "Author: " default)))
-
         (email
          (let ((default (when (executable-find "git")
                           (string-trim
