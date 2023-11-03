@@ -482,26 +482,31 @@ Will reload all features and test features."
 (defun erk-ert-project-results-buffer ()
   "Return an ERT buffer name based on project name.")
 
+(defun erk--get-ert-test-symbols ()
+  "Return all defined ERT test symbols.
+Does not reload."
+  (let ((test-features (erk--test-features)))
+    (->> test-features
+         (-map #'symbol-file)
+         (--map (cdr (assoc it load-history)))
+         (-flatten-n 1)
+         (--filter (eq 'define-symbol-props (car it)))
+         (-map #'cdr)
+         (-flatten-n 2)
+         (--filter (plist-get (symbol-plist it) 'ert--test)))))
+
 (defun erk-ert-project-selector ()
   "Return a selector for just this project's ERT test.
 This selector generates the symbols list before that selector
 will run, so new features or new symbols only available after
 reload will not be picked up.  Run this after any necessary
 feature reloading."
-  (let* ((test-features (erk--test-features))
-         (test-symbols (->> test-features
-                            (-map #'symbol-file)
-                            (--map (cdr (assoc it load-history)))
-                            (-flatten-n 1)
-                            (--filter (eq 'define-symbol-props (car it)))
-                            (-map #'cdr)
-                            (-flatten-n 2))))
-    (message "test-symbols: %s" test-symbols)
-    `(satisfies ,(lambda (test)
-                   (member (ert-test-name test) test-symbols)))))
+  `(member ,@(erk--get-ert-test-symbols)))
 
 ;;;###autoload
 (defun erk-ert-project ()
+  ;; TODO select failed, automatically when there are failed figure out how to
+  ;; offer up tags as options.  See `ert-select-tests', but it's just okay
   "Run Ert interactively, with selector for this project."
   (interactive)
   (erk-reload-project-package)
