@@ -381,6 +381,7 @@ what to do with it (yet).  Returns `(def . name)' form."
       (backward-sexp)
       (backward-sexp)
       (forward-sexp)))
+  ;; TODO test templates configuration
   (let ((before (format  "\n\n(ert-deftest %s-test ()\n  (should (%s" fun fun))
         (after ")))"))
     (insert before)

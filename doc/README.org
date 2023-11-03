@@ -180,16 +180,13 @@ answer all the questions.
   - Expose trivial options where a structural choice has limited them
     unnecessarily
   - Behave the same, but with a less complicated code
-  - Guix or other pure dependency management support
+  - More templates, such as those for dynamic modules or using different CI
 
   Changes will likely be rejected if it is aimed at:
 
   - Non-elisp interfaces meant for invocation outside of Emacs or with scripting
     implemented in a language besides elisp.
   - Managing dependencies outside of Nix (or other pure dependency management)
-    expressions
-  - CI infrastructure support for non-Actions infrastructure (which cannot be
-    tested in this repo)
   - Backwards compatibility for Emacs two versions behind next release.  Master,
     current stable release, and release - 1 are the only versions being supported
   - pre-flake Nix support
