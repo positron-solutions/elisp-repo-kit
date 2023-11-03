@@ -112,6 +112,17 @@
      (erk-jump-features)
      (string-match-p "lisp" default-directory))))
 
+(ert-deftest erk-jump-defs-test ()
+  (should
+   (save-window-excursion
+     (find-file (concat (erk--project-elisp-dir)
+                        "/erk.el"))
+     (save-excursion
+       (goto-char (point-min))
+       (search-forward "(defun erk-jump-defs")
+       (erk-jump-defs)
+       (string-match-p "erk-test.el" (buffer-file-name (current-buffer)))))))
+
 (ert-deftest erk--project-elisp-dir-test ()
   (should (erk--project-elisp-dir)))
 

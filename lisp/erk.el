@@ -385,7 +385,8 @@ what to do with it (yet).  Returns `(def . name)' form."
         (after ")))"))
     (insert before)
     (save-excursion
-      (insert after))))
+      (insert after))
+    (recenter)))
 
 (defun erk--make-test-symbol (symbol)
   "Convert defun SYMBOL into test symbol."
@@ -417,8 +418,9 @@ corresponding `defun' are supported."
                            (progn (erk-reload-project-tests)
                                   (when (ert-test-boundp test-name) test-name)))))
             (if test
-                (progn (ert-find-test-other-window test)
-                       (forward-sexp))
+                (progn (find-function-do-it test 'ert--test 'switch-to-buffer)
+                       (forward-sexp)
+                       (recenter))
               (let ((test-buffer (erk-jump-features)))
                 (when (y-or-n-p (format  "%s not found.  Create? "
                                          test-name))
@@ -431,7 +433,8 @@ corresponding `defun' are supported."
             (if def
                 (progn
                   (find-function-do-it def nil 'switch-to-buffer)
-                  (forward-sexp))
+                  (forward-sexp)
+                  (recenter))
               (progn (erk-jump-features)
                      (user-error "Definition not found: %s" def-name)))))
       (_
