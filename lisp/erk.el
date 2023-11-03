@@ -357,6 +357,16 @@ for development, and being lenient for degenerate cases is fine."
       ;; back into elisp files
       (find-file (erk--project-root-feature-file)))))
 
+(defun erk--last-defname ()
+  "Return previous definition and name.
+Returns nil if we don't know what kind of definition it is or
+what to do with it (yet).  Returns `(def . name)' form."
+  (save-excursion
+    (beginning-of-defun)
+    (pcase-let* ((`(,def ,name)
+                  (funcall load-read-function (current-buffer))))
+      (cons def name))))
+
 (defun erk--insert-test (fun buffer)
   "Insert test named TEST-SYMBOL for FUN into BUFFER."
   (pop-to-buffer buffer)
@@ -376,16 +386,6 @@ for development, and being lenient for degenerate cases is fine."
     (insert before)
     (save-excursion
       (insert after))))
-
-(defun erk--last-defname ()
-  "Return previous definition and name.
-Returns nil if we don't know what kind of definition it is or
-what to do with it (yet).  Returns `(def . name)' form."
-  (save-excursion
-    (beginning-of-defun)
-    (pcase-let* ((`(,def ,name)
-                  (funcall load-read-function (current-buffer))))
-      (cons def name))))
 
 (defun erk--make-test-symbol (symbol)
   "Convert defun SYMBOL into test symbol."
