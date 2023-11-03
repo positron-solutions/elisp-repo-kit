@@ -50,30 +50,30 @@ your secrets for Cachix. Read the CI customization section.
 
 # Table of Contents
 
--   [Creating Packages](#orgdbe452f)
--   [Using ERK for development](#orgac601cf)
-    -   [Loading and re-loading your package](#orga0cf377)
-    -   [Jumping to files](#org396eda3)
-    -   [Run tests](#orgcda3976)
-    -   [Duplicating CI Locally](#org3dacc44)
-    -   [Find Files](#org4970f85)
--   [File contents and structure](#org8ce5e2c)
-    -   [Setting Up Your Github Repository](#orge370d02)
--   [Customizing CI](#orgad90c4f)
--   [Licensing, Developer Certificate of Origin](#orgbccb740)
--   [Publishing to MELPA](#org89cc5b7)
-    -   [Creating the recipe](#orgc42570c)
-    -   [Testing package build](#org8509443)
-    -   [Testing stable package build](#orgf82d903)
-    -   [MELPA Lints](#org0496004)
--   [Maintaining versions](#org2c1191b)
--   [Package scope and relation to other work](#orge7e095a)
-    -   [Dependency Management](#org5df7fa9)
-    -   [Discovering and Running Tests & Lints](#orgdcccbf5)
-    -   [Comparisons](#orgbfd286f)
--   [Contributing](#orgbaa1077)
--   [Footnote on FSF and Emacs Core Licensing](#orgd1e7ded)
--   [Shout-outs](#org0f2ed06)
+-   [Creating Packages](#org55d6c6f)
+-   [Using ERK for development](#org8df953f)
+    -   [Loading and re-loading your package](#org832dbac)
+    -   [Jumping to files](#org6cd8dde)
+    -   [Run tests](#org59f2f7b)
+    -   [Duplicating CI Locally](#org512e00a)
+    -   [Find Files](#orgd13d7b8)
+-   [File contents and structure](#orgd91f6b8)
+    -   [Setting Up Your Github Repository](#org2b43980)
+-   [Customizing CI](#org6f4bf92)
+-   [Licensing, Developer Certificate of Origin](#org5d1d80d)
+-   [Publishing to MELPA](#orgf9492cc)
+    -   [Creating the recipe](#org1bcced8)
+    -   [Testing package build](#orgea41cb1)
+    -   [Testing stable package build](#org6975475)
+    -   [MELPA Lints](#orgef6e69d)
+-   [Maintaining versions](#org90c8308)
+-   [Package scope and relation to other work](#org74f808b)
+    -   [Dependency Management](#org7e7eab5)
+    -   [Discovering and Running Tests & Lints](#orgdc8001e)
+    -   [Comparisons](#orgccbe76b)
+-   [Contributing](#org729e175)
+-   [Footnote on FSF and Emacs Core Licensing](#orga0697b8)
+-   [Shout-outs](#orgd54722e)
 
 
 # Creating Packages
@@ -92,7 +92,7 @@ ask you for:
 
 `erk-new` also calls `erk-rename-relicense` to rename all of the files, string
 replace names, and re-license to GPL3.  It also changes the author and resets
-the git history.  Now just follow the steps in [finish setting up](#orge370d02). Have fun!
+the git history.  Now just follow the steps in [finish setting up](#org2b43980). Have fun!
 
 
 # Using ERK for development
@@ -220,10 +220,10 @@ directories.
 
 You can copy this checklist to your org agenda files:
 
--   [X] Create a repository (from [install](#orgb10843e) instructions)
+-   [X] Create a repository (from [install](#org97f4634) instructions)
 -   [ ] Create an empty GitHub repository configure it as your git remote
 -   [ ] Set up your git commit signing (and verification so that it's obvious)
-    **and** [sign-off](#orgbccb740) so that it will be hypothetically [straightforward](README.md) for for FSF
+    **and** [sign-off](#org5d1d80d) so that it will be hypothetically [straightforward](README.md) for for FSF
     to pull in your changes if they later change to DCO instead of copyright
     assignment.
 -   [ ] Sign up for [cachix](https://app.cachix.org/) and, create a binary cache with API tokens and public
@@ -243,7 +243,7 @@ You can copy this checklist to your org agenda files:
     **Note**, Python is used to run a DCO check script, nothing more.
 
 -   [ ] Get your package working, pushed, actions run, and CI badges all green
--   [ ] [Publish](#org89cc5b7) to MELPA
+-   [ ] [Publish](#orgf9492cc) to MELPA
 -   [ ] Make a post on [reddit](https://reddit.com/r/emacs/) and [mastodon](https://emacs.ch/) about your new package
 
 
@@ -538,16 +538,13 @@ Non-exhaustive list of changes that are very welcome:
 -   Expose trivial options where a structural choice has limited them
     unnecessarily
 -   Behave the same, but with a less complicated code
--   Guix or other pure dependency management support
+-   More templates, such as those for dynamic modules or using different CI
 
 Changes will likely be rejected if it is aimed at:
 
 -   Non-elisp interfaces meant for invocation outside of Emacs or with scripting
     implemented in a language besides elisp.
 -   Managing dependencies outside of Nix (or other pure dependency management)
-    expressions
--   CI infrastructure support for non-Actions infrastructure (which cannot be
-    tested in this repo)
 -   Backwards compatibility for Emacs two versions behind next release.  Master,
     current stable release, and release - 1 are the only versions being supported
 -   pre-flake Nix support
