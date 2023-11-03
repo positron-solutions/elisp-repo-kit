@@ -372,7 +372,7 @@ what to do with it (yet).  Returns `(def . name)' form."
   (pop-to-buffer buffer)
   ;; If the buffer is open and the point is near a defun already, just slam in a
   ;; test.  If not, put the test in at the end.
-  (if (erk--last-defname)
+  (if (eq (car (erk--last-defname)) 'ert-deftest)
       (progn
         (beginning-of-defun)
         (forward-sexp))
