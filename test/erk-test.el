@@ -93,7 +93,7 @@
 (ert-deftest erk-jump-features-test ()
   ;; jump to feature when in tests
   (should
-   (save-excursion
+   (save-window-excursion
      ;;  test normally executes in a temporary buffer but `erk-jump-features'
      ;;  relies on `current-buffer'.
      (find-file (erk--project-root-feature-file))
@@ -101,13 +101,13 @@
      (string-match-p "test" default-directory)))
   ;; jump to tests when in feature
   (should
-   (save-excursion
+   (save-window-excursion
      (find-file (concat (erk--test-directory) "erk-test.el"))
      (erk-jump-features)
      (string-match-p "lisp" default-directory)))
   ;; jump to feature when in root
   (should
-   (save-excursion
+   (save-window-excursion
      (find-file (concat (erk--project-root) "README.md"))
      (erk-jump-features)
      (string-match-p "lisp" default-directory))))
@@ -148,6 +148,7 @@
   (should (erk--project-contains-p (erk--project-root-feature-file))))
 
 (ert-deftest erk-clone-test ()
+  :tags '("slow")
   (let ((enable-local-variables nil)
         (clone-root (make-temp-file "erk-clone-test-" t)))
     (erk-clone (cdr (assoc 'erk-basic erk-templates))
@@ -161,6 +162,7 @@
     (delete-directory clone-root t)))
 
 (ert-deftest erk-new-test ()
+  :tags '("slow")
   (let ((enable-local-variables nil)
         (erk-after-new-hook (when (require 'magit nil t)
                               '(magit-status)))
