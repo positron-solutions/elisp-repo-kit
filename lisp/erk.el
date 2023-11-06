@@ -439,12 +439,8 @@ corresponding `defun' are supported."
                   (find-function-do-it def nil 'switch-to-buffer)
                   (forward-sexp)
                   (recenter))
-              (progn (erk-jump-features)
-                     (user-error "Definition not found: %s" def-name)))))
+              (progn (erk-jump-features)))))
       (_
-       (user-error
-        "No compatible def before point.  def: %s name: %s"
-        def name)
        (erk-jump-features)))))
 
 (defun erk--last-test ()
