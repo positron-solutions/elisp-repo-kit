@@ -233,8 +233,11 @@ Returns FUN if it's bound and within the project."
   "Return a list of the elisp files in DIR.
 Ignore autoloads."
   (->>
-   (directory-files dir nil (rx ".el" string-end))
-   (--reject (string-match-p (rx "autoloads.el" string-end) it))))
+   (directory-files dir nil (rx (literal ".el") string-end))
+   (--reject (string-match-p (rx (literal "autoloads.el") line-end) it))
+   ;; flycheck creates a short-lived file starting with flycheck_
+   ;; Will heisenbug you.
+   (--reject (string-match-p (rx line-start (literal "flycheck_")) it))))
 
 (defun erk--dir-features (dir)
   "Return list of features provided by elisp files in DIR.
