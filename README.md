@@ -31,6 +31,12 @@ answer all the questions.
 
     (use-package erk) ; vanilla, assuming you have MELPA configured
     
+    ;; package-vc
+    (package-vc-install
+     '(erk :url "https://github.com/positron-solutions/elisp-repo-kit.git"
+           :lisp-dir "lisp"
+           :doc "doc/erk.texi"))
+    
     ;; using elpaca's with explicit recipe
     (use-package erk
       :elpaca (erk :host github :repo "positron-solutions/elisp-repo-kit"))
