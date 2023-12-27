@@ -986,5 +986,51 @@ With prefix argument, PREVIEW the buffer."
   (interactive)
   (let ((current-prefix-arg '(4))) (call-interactively #'erk-export-readme)))
 
+;; TODO initialize for tests or batch
+;;;###autoload
+(defun erk-temp-emacsen ()
+  "Create a temporary Emacsen."
+  ;; TODO enable multiple Emacsen and multiple base configs
+  (interactive)
+  (let* ((init-dir (make-temp-file "emacsen-" t))
+         (buffer-name (format " *%s*" (file-name-nondirectory
+                                       (directory-file-name init-dir))))
+         (out-buffer (get-buffer-create buffer-name))
+         (emacsen (executable-find "emacs")) ; TODO customize for more Emacsen
+         (package-path (erk--project-root))  ; TODO prefer package over project
+         ;; TODO set up $HOME to avoid stupid trash files that `no-littering'
+         ;; would normally catch
+         ;; TODO support no package
+         (package-feature (erk--package-root-feature))
+         (init-form `(progn
+                       (load-theme 'modus-vivendi t) ; TODO customize
+                       ;; TODO customize
+                       ;; TODO use early init
+                       (setopt load-prefer-newer t
+                               inhibit-startup-message t
+                               package-enable-at-startup nil
+                               use-short-answers t
+                               use-dialog-box nil
+                               pixel-scroll-precision-mode 1
+                               ;; Recursive minibuffer too useful when introspecting
+                               enable-recursive-minibuffers t
+                               default-frame-alist
+                               '((tool-bar-lines . 0)
+                                 (menu-bar-lines . 0)
+                                 (internal-border-width . 0)
+                                 (undecorated . nil)
+                                 (background-color . "#000000") ; said to reduce startup flicker on theme
+                                 (ns-appearance . dark)         ; darwin
+                                 (ns-transparent-titlebar . t)  ; darwin
+                                 (vertical-scroll-bars . nil)
+                                 (horizontal-scroll-bars . nil)))
+                       (setq load-path ',load-path)
+                       (push ,package-path load-path)
+                       (require ',package-feature))))
+    (start-process buffer-name out-buffer emacsen
+                   "-Q"
+                   "--init-dir" init-dir
+                   "--eval" (format "%S" init-form))))
+
 (provide 'erk)
-;;; erk.el ends here
+;;; erk.el ends here.
