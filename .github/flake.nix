@@ -28,7 +28,7 @@
     # stable branches are recommended for CI, regression spotting.  Testing with
     # multiple versions can be done via input overrides, such as:
     # nix build .#ci --override-input nixpkgs github:nixpkgs/nixpkgs/unstable
-    nixpkgs.url = "github:nixos/nixpkgs?ref=release-22.11";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=release-23.11";
     flake-utils.url = "github:numtide/flake-utils";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     # slave Emacs overlay to our nixpkgs.  This doesn't do a lot except reduce
