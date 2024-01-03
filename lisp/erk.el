@@ -1006,29 +1006,31 @@ With prefix argument, PREVIEW the buffer."
                        (load-theme 'modus-vivendi t) ; TODO customize
                        ;; TODO customize
                        ;; TODO use early init
-                       (setopt load-prefer-newer t
-                               inhibit-startup-message t
-                               package-enable-at-startup nil
-                               use-short-answers t
-                               use-dialog-box nil
-                               pixel-scroll-precision-mode 1
-                               ;; Recursive minibuffer too useful when introspecting
-                               enable-recursive-minibuffers t
-                               default-frame-alist
-                               '((tool-bar-lines . 0)
-                                 (menu-bar-lines . 0)
-                                 (internal-border-width . 0)
-                                 (undecorated . nil)
-                                 (background-color . "#000000") ; said to reduce startup flicker on theme
-                                 (ns-appearance . dark)         ; darwin
-                                 (ns-transparent-titlebar . t)  ; darwin
-                                 (vertical-scroll-bars . nil)
-                                 (horizontal-scroll-bars . nil)))
+                       ;; TODO switch to setopt after 28 is deprecated.
+                       (setq load-prefer-newer t
+                             inhibit-startup-message t
+                             package-enable-at-startup nil
+                             use-short-answers t
+                             use-dialog-box nil
+                             pixel-scroll-precision-mode 1
+                             ;; Recursive minibuffer too useful when introspecting
+                             enable-recursive-minibuffers t
+                             default-frame-alist
+                             '((tool-bar-lines . 0)
+                               (menu-bar-lines . 0)
+                               (internal-border-width . 0)
+                               (undecorated . nil)
+                               (background-color . "#000000") ; startup flicker
+                               (ns-appearance . dark)         ; darwin
+                               (ns-transparent-titlebar . t)  ; darwin
+                               (vertical-scroll-bars . nil)
+                               (horizontal-scroll-bars . nil)))
                        (setq load-path ',load-path)
                        (push ,package-path load-path)
                        (require ',package-feature))))
     (start-process buffer-name out-buffer emacsen
                    "-Q"
+                   "--debug-init"       ; TODO switch
                    "--init-dir" init-dir
                    "--eval" (format "%S" init-form))))
 
